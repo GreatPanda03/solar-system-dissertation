@@ -1,4 +1,4 @@
-# Your project name here
+# A Simulator to Model Solar Systems
 
 ## Information about this repository
 
