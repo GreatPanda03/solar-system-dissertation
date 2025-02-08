@@ -20,7 +20,7 @@ For additional information or questions, please contact **Muhammad Mogra**.
 
 ---
 
-## Information for myself (oroginal READ.ME)
+## Information for myself (original READ.ME)
 
 This is the repository that you are going to use **individually** for developing your project. Please use the resources provided in the module to learn about **plagiarism** and how plagiarism awareness can foster your learning.
 
