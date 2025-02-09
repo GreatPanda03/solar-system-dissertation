@@ -1,0 +1,41 @@
+.exitAppMargin {
+    margin-top: 30%;
+}
+
+.container {
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.title {
+    align-self: center;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-align: upper-center;
+    font-size: 18px;
+    margin-bottom: 10%;
+}
+
+.menuButton {
+    width: 100%;
+    -unity-text-align: middle-left;
+    background-color: rgba(255, 255, 255, 0.59);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    transition-duration: 0.25s;
+}
+
+.menuButton:hover {
+    width: 100%;
+    -unity-text-align: middle-left;
+    background-color: rgba(200, 200, 200, 0.69);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    transition-duration: 0.25s;
+}

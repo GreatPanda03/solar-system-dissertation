@@ -1,0 +1,44 @@
+.container {
+    background-color: rgba(0, 0, 0, 0.78);
+    height: 300px;
+    width: 400px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding-top: 1%;
+    padding-right: 1%;
+    padding-bottom: 1%;
+    padding-left: 1%;
+}
+
+.header {
+}
+
+.title {
+    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&guid=90d973a7d54dcce4c978f2d90dc13a4e&type=3#NotInter-Regular");
+    font-size: 100%;
+}
+
+.divider {
+    height: 3px;
+    max-height: 3px;
+    min-height: 3px;
+    background-color: rgba(255, 255, 255, 0.59);
+}
+
+.field {
+    margin-bottom: 3%;
+}
+
+.footer {
+}
+
+.validation {
+    color: rgb(224, 84, 37);
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+}

@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 1304e4b993e0e4846954c9d7cf78f55a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - StarTemplate: {fileID: 316262288655567128, guid: 7722a5f1e113a864c912fd4b9ad7762b, type: 3}
+  - PlanetTemplate: {fileID: 316262288655567128, guid: 6e4b8f762f2ad9a4bad4ece4b8410591, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
