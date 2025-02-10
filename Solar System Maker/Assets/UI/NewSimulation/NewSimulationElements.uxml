@@ -13,7 +13,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="GravityConstant" class="field" style="flex-grow: 1; flex-direction: row; -unity-text-align: middle-left; flex-basis: 100%; height: 15%; max-height: 20%; min-height: 20px;">
                     <ui:Label text="Gravity&#10;Constant" name="GravityConstantLabel" style="flex-basis: 30%; color: rgb(255, 255, 255); -unity-text-align: middle-right; font-size: 16px;" />
-                    <ui:FloatField value="0.0001" name="GravityConstantInput" max-length="100" tooltip="The strength of gravity throughout the simulation" placeholder-text="(blank)" mask-character="w" password="false" readonly="false" hide-placeholder-on-focus="false" style="flex-basis: 65%; -unity-text-outline-color: rgba(255, 255, 255, 0);" />
+                    <ui:FloatField value="0.01" name="GravityConstantInput" max-length="100" tooltip="The strength of gravity throughout the simulation" placeholder-text="(blank)" mask-character="w" password="false" readonly="false" hide-placeholder-on-focus="false" style="flex-basis: 65%; -unity-text-outline-color: rgba(255, 255, 255, 0);" />
                 </ui:VisualElement>
                 <ui:VisualElement name="GravityAlgorithm" class="field" style="flex-grow: 1; flex-direction: row; -unity-text-align: middle-left; flex-basis: 100%; height: 15%; max-height: 20%; min-height: 20px;">
                     <ui:Label text="Gravity&#10;Algorithm" name="GravityAlgorithmLabel" style="flex-basis: 30%; color: rgb(255, 255, 255); -unity-text-align: middle-right; font-size: 16px;" />

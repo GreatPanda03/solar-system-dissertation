@@ -13,6 +13,7 @@ using UnityEngine;
 
 public abstract class Body
 {
+    [SerializeField]
     protected string name;
     public string Name {
         get => name;
@@ -23,6 +24,7 @@ public abstract class Body
         }   
     }
 
+    [NonSerialized]
     protected GameObject entity;
     public GameObject Entity {
         get => entity;
@@ -32,12 +34,14 @@ public abstract class Body
         }
     }
 
+    [SerializeField]
     protected float mass;
     public float Mass {
         get => mass;
         set => mass = value;
     }
 
+    [SerializeField]
     protected float radius;
     public float Radius {
         get => radius;
@@ -47,30 +51,35 @@ public abstract class Body
         }
     }
 
+    [SerializeField]
     protected Vector3 position;
     public Vector3 Position {
         get => position;
         set => position = value;
     }
 
+    [SerializeField]
     protected Vector3 velocity;
     public Vector3 Velocity {
         get => velocity;
         set => velocity = value;
     }
 
+    [SerializeField]
     protected Vector3 acceleration;
     public Vector3 Acceleration {
         get => acceleration;
         set => acceleration = value;
     }
 
+    [SerializeField]
     protected float surfaceTemp;
     public float SurfaceTemp {
         get => surfaceTemp;
         set => surfaceTemp = value;
     }
 
+    [SerializeField]
     protected float density;
     public float Density {
         get => density;
@@ -107,6 +116,11 @@ public abstract class Body
         density = 1f;
 
         radius = GetRadiusFromMass();
+    }
+
+    public override string ToString()
+    {
+        return JsonUtility.ToJson(this, true);
     }
 
     // auxiliary: returns a radius value from the body's mass

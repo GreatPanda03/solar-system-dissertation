@@ -14,17 +14,24 @@ public class MainMenuUIScript : MonoBehaviour
 {
     public VisualElement mainMenuUI;
     public VisualElement newSimUI;
+    public VisualElement savedSimsUI;
+    public VisualElement templateSimsUI;
     public VisualElement simulatorUI;
 
     // retrieves the main menu interface
     // * the main menu is displayed first - all other UI is hidden
+    // * also ensures all UI is enabled in case they've been disabled during editing
     private void Awake()
     {
         mainMenuUI = GetComponent<UIDocument>().rootVisualElement;
         newSimUI = GameObject.Find("NewSimulationUI").GetComponent<UIDocument>().rootVisualElement;
+        savedSimsUI = GameObject.Find("SavedSystemsUI").GetComponent<UIDocument>().rootVisualElement;
+        templateSimsUI = GameObject.Find("TemplateSystemsUI").GetComponent<UIDocument>().rootVisualElement;
         simulatorUI = GameObject.Find("SimulatorUI").GetComponent<UIDocument>().rootVisualElement;
-    
+
         newSimUI.style.display = DisplayStyle.None;
+        savedSimsUI.style.display = DisplayStyle.None;
+        templateSimsUI.style.display = DisplayStyle.None;
         simulatorUI.style.display = DisplayStyle.None;
     }
 
@@ -50,13 +57,15 @@ public class MainMenuUIScript : MonoBehaviour
     // displays the list of all saved simulations
     private void OnSavedSimsButtonClicked()
     {
-        Debug.Log("Displaying Saved Simulations");
+        mainMenuUI.style.display = DisplayStyle.None;
+        savedSimsUI.style.display = DisplayStyle.Flex;
     }
 
     // displays the list of all simulation templates
     private void OnTemplateSimsButtonClicked()
     {
-        Debug.Log("Displaying Template Simulations");
+        mainMenuUI.style.display = DisplayStyle.None;
+        templateSimsUI.style.display = DisplayStyle.Flex;
     }
 
     // displays the tutorial section

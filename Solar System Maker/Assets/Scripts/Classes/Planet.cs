@@ -8,10 +8,10 @@
 using System;
 using UnityEngine;
 
+[Serializable]
 public class Planet : Body
 {
-    public GameObject PlanetTemplate;
-
+    [SerializeField]
     protected float habitability;
     public float Habitability {
         get { return habitability;  }
@@ -25,6 +25,7 @@ public class Planet : Body
     }
     */
 
+    [SerializeField]
     protected float waterContent;
     public float WaterContent {
         get { return waterContent;  }

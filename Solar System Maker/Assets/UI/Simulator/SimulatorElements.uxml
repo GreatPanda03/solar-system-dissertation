@@ -1,9 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Simulator/SimulatorStyles.uss?fileID=7433441132597879392&amp;guid=f640695c10d59ba4199d931b7b100157&amp;type=3#SimulatorStyles" />
-    <ui:VisualElement name="ToolBar" style="flex-grow: 1;">
-        <ui:VisualElement name="Options" class="bodyList" style="flex-grow: 1; width: 50%; max-height: 25px; background-color: rgba(255, 255, 255, 0); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: flex-start; padding-top: 5px; padding-bottom: 0; flex-direction: row; padding-right: 5px; padding-left: 5px;">
-            <ui:Button text="Exit" name="ExitSimulator" class="exitButton" style="width: 50px; height: 100%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-            <ui:Label text="Label" name="Title" class="title" />
+    <ui:VisualElement name="ToolBar" class="toolbar" style="flex-grow: 1; height: 50px; width: 100%; flex-direction: column; max-height: 50px; min-height: 50px;">
+        <ui:Label text="Simulation Name" name="Title" class="title" style="width: auto;" />
+        <ui:VisualElement name="Options" class="options" style="flex-grow: 1; width: auto; max-height: none; background-color: rgba(255, 255, 255, 0); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: flex-start;">
+            <ui:Button text="Save" name="SaveSimulation" class="saveButton" style="width: 50px; height: 100%;" />
+            <ui:Button text="Exit" name="ExitSimulator" class="exitButton" style="width: 50px; height: 100%;" />
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="BodyList" style="flex-grow: 1; align-content: flex-end; justify-content: flex-end; display: flex; position: relative;">

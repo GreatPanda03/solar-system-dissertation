@@ -5,12 +5,13 @@
 * [1] - Andrew Raphael Lukasik, "BFN", www.github.com [Online]. Available at: https://github.com/andrew-raphael-lukasik/BFN
 */
 
+using System;
 using UnityEngine;
 
+[Serializable]
 public class Star : Body
 {
-    public GameObject StarTemplate;
-
+    [SerializeField]
     protected float luminosity;
     public float Luminosity {
         get { return luminosity;  }

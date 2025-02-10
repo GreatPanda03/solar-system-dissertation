@@ -30,6 +30,12 @@
     background-color: rgba(255, 255, 255, 0.59);
 }
 
+.content {
+    flex-basis: 80%;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 .field {
     margin-bottom: 3%;
 }

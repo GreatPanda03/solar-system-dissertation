@@ -1,0 +1,31 @@
+{
+    "Settings": {
+        "SimulationName": "Our Solar System!",
+        "GravityConstant": 6.6743e-11,
+        "GravityAlgorithm": "Newtonian Physics",
+        "CollisionQuality": "High"
+    },
+    "Bodies": [
+        {
+            "Type": "Star",
+            "Properties": {
+                "Name": "Sun",
+                "Mass": 1.988416e30,
+                "Luminosity": 3.83e26,
+                "Radius": 6.9634e6,
+                "Density": 1.408,
+                "SurfaceTemp": 5772 
+            }
+        },
+        {
+            "Type": "Planet",
+            "Properties": {
+                "Name": "Earth",
+                "Mass": 5.972e24,
+                "Radius": 6.378e6,
+                "Density": 5.51,
+                "Inclination": 1.57
+            }
+        }
+    ]
+}

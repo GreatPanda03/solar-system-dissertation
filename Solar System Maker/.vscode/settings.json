@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Solar System maker.sln"
+    "dotnet.defaultSolution": "Solar System Maker.sln"
 }

@@ -1,14 +1,14 @@
-# A Simulator to Model Solar Systems
+# A Solar System Simulator
 
 ---
 
 ## Information about this repository
 
-This repository tracks the development of my project, "A Solar System Simulator". The project enables users to view a realistic model of our solar system based on real data. Additionally, users can create simulations of custom solar systems (made by themselves) with bodies of their choice.
+This repository tracks the development of my project, "A Solar System Simulator". The application allows users to view a realistic model of solar systems, such as our own, based on real data. Additionally, users can create simulations of custom solar systems (made by themselves) with bodies of their choice.
 
 The repository includes the list of requirements required for the project, defined as issues. Each requirement has a set of acceptance criteria, a priority, and a label for the its current development stage.
 
-Occassional commits with source code have been provided. Each commit details new features, changes, and removals to the application.
+Occassional commits with source code have been provided. Each commit details new features, changes, and removals to the application. The folder "Solar System Maker" within the repository contains all source code.
 
 Documentation for the application, such as its features and how to use it, have been provided in the repository's Wiki section.
 

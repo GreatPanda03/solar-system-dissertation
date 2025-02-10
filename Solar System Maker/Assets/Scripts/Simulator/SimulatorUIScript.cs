@@ -4,6 +4,7 @@
 * [1] - Game Dev Beginner, "How to convert the mouse position to world space in Unity", www.youtube.com [Online]. Available at: https://www.youtube.com/watch?v=5NTmxDSKj-Q
 */
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -31,6 +32,7 @@ public class SimulatorUIScript : MonoBehaviour
         set => bodies = value;
     }
 
+    [SerializeField]
     private Settings settings;
     public Settings Settings {
         get => settings;
@@ -58,12 +60,19 @@ public class SimulatorUIScript : MonoBehaviour
     // initialises the interface when the enabled
     private void OnEnable()
     {
+        simulatorUI.Q<Button>("SaveSimulation").clicked += OnSaveSimulationClicked;
         simulatorUI.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
         simulatorUI.Q<Button>("AddStar").clicked += OnAddStarClicked;
         simulatorUI.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
 
         Debug.Log("[SIMULATOR UI] SUCCESS: UI Loaded");
+    }
+
+    // saves the simulation
+    private void OnSaveSimulationClicked()
+    {
+        SaveSimulation();
     }
 
     // clears the simulator and returns to the main menu
@@ -98,6 +107,12 @@ public class SimulatorUIScript : MonoBehaviour
 
     #region Loading the Simulator
     
+    // loads the given simulation
+    public void LoadSimulation(Simulation simulation)
+    {
+        LoadSimulator(simulation.bodies, simulation.settings);
+    }
+
     // starts the simulator with no particular bodies and default settings
     public void LoadSimulator()
     {
@@ -141,6 +156,43 @@ public class SimulatorUIScript : MonoBehaviour
     }
 
     #endregion Loading the Simulator
+
+
+    #region Options in Simulator
+
+    public void SaveSimulation()
+    {
+        // * [DONE] gather all settings and body data
+        // * [DONE] serialise as a JSON
+        // * save to a text file with all other saves
+        // * preferably auto generate an ID?
+
+        // retrieve the next available ID
+        int saveId = 0;
+
+        // serialising data
+        string settingsData = JsonUtility.ToJson(settings);
+        
+        List<string> bodyInfo = new List<string>();
+        foreach (Body body in bodies)
+        {
+            // serialising "bodies" returns empty {} - doing separately instead
+            string data = JsonUtility.ToJson(body);
+            string str = $"{data}";
+            bodyInfo.Add(str);
+        }
+        string bodyData = "[" + string.Join(',', bodyInfo) + "]";
+        
+        // constructing and saving the final data
+        string fullData = $"{{ \"id\": {saveId}, \"settings\": {settingsData}, \"bodies\": {bodyData} }}";
+
+        // Debug.Log(fullData);
+
+        Simulation test = JsonUtility.FromJson<Simulation>(fullData);
+        Debug.Log(test.bodies);
+    }
+
+    #endregion Options in Simulator
 
     
     #region Body Adding Methods
