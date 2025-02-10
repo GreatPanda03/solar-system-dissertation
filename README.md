@@ -1,7 +1,5 @@
 # A Simulator to Model Solar Systems
 
----
-
 ## Information about this repository
 
 This repository tracks the development of my project, "A Solar System Simulator". The project enables users to view a realistic model of our solar system based on real data. Additionally, users can create simulations of custom solar systems (made by themselves) with bodies of their choice.
@@ -17,8 +15,6 @@ For additional information or questions, please contact **Muhammad Mogra**.
 **Email:** mm994@student.le.ac.uk
 
 **Student ID:** 219001683
-
----
 
 ## Information for myself (original READ.ME)
 
