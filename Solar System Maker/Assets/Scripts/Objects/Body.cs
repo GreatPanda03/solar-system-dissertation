@@ -9,17 +9,25 @@
 */
 
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Body
 {
+    [SerializeField]
+    protected string type;
+    public string Type {
+        get => type; 
+        private set => type = value; 
+    }
+
     [SerializeField]
     protected string name;
     public string Name {
         get => name;
         set {
             name = value;
-            if (entity != null) entity.name = value;
+            if (entity != null) entity.transform.name = value;
             // update physical name label in world space...
         }   
     }
@@ -30,7 +38,7 @@ public abstract class Body
         get => entity;
         set {
             entity = value;
-            if (entity != null) UpdateScale();
+            UpdateEntity();
         }
     }
 
@@ -38,7 +46,7 @@ public abstract class Body
     protected float mass;
     public float Mass {
         get => mass;
-        set => mass = value;
+        set => mass = value; 
     }
 
     [SerializeField]
@@ -54,37 +62,38 @@ public abstract class Body
     [SerializeField]
     protected Vector3 position;
     public Vector3 Position {
-        get => position;
-        set => position = value;
+        get => position; 
+        set => position = value; 
     }
 
     [SerializeField]
     protected Vector3 velocity;
     public Vector3 Velocity {
-        get => velocity;
-        set => velocity = value;
+        get => velocity; 
+        set => velocity = value; 
     }
 
     [SerializeField]
     protected Vector3 acceleration;
     public Vector3 Acceleration {
-        get => acceleration;
-        set => acceleration = value;
+        get => acceleration; 
+        set => acceleration = value; 
     }
 
     [SerializeField]
     protected float surfaceTemp;
     public float SurfaceTemp {
-        get => surfaceTemp;
-        set => surfaceTemp = value;
+        get => surfaceTemp; 
+        set => surfaceTemp = value; 
     }
 
     [SerializeField]
     protected float density;
     public float Density {
-        get => density;
-        set => density = value;
+        get => density; 
+        set => density = value; 
     }
+    
     // private Texture texture {
     //     get { return texture; }
     //     set
@@ -96,6 +105,8 @@ public abstract class Body
 
     public Body()
     {
+        type = "Body";
+        name = "Body";
         mass = 10f;
         position = new Vector3(0,0,0);
         velocity = new Vector3(0,0,0);
@@ -108,6 +119,8 @@ public abstract class Body
 
     public Body(float mass, Vector3 position, Vector3 velocity)
     {
+        type = "Body";
+        name = "Body";
         this.mass = mass;
         this.position = position;
         this.velocity = velocity;
@@ -132,7 +145,7 @@ public abstract class Body
     public void UpdateScale()
     {
         if (entity == null) return;
-        entity.transform.localScale = new Vector3(1,1,1) * radius * 2;
+        entity.transform.localScale = 2 * radius * new Vector3(1,1,1);
     }
 
     // returns the force applied between two objects
@@ -165,5 +178,21 @@ public abstract class Body
         position += velocity;
         acceleration = new Vector3(0,0,0);
         entity.transform.position = position;
+    }
+
+    // returns a new generic Body entity
+    public void CreateEntity() {
+        GameObject prefab = Resources.Load<GameObject>($"Prefabs/{type}");
+        entity = GameObject.Instantiate(prefab);
+        UpdateEntity();
+    }
+
+    // full entity update (if any) to match the body's actual values
+    public void UpdateEntity()
+    {
+        if (entity == null) return;
+        entity.transform.name = name;
+        entity.transform.position = position;
+        UpdateScale();
     }
 }

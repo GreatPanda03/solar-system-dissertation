@@ -10,24 +10,14 @@ public class SampleSimulationScript : MonoBehaviour
     public GameObject PlanetTemplate;
     private List<GameObject> planets;
     public Vector3 systemCentre;
-    private bool sampleRunning;
+    private bool sampleRunning = false;
 
-    // preparing variables
-    private void Awake() {
-        planets = new List<GameObject>();
-        sampleRunning = false;
-    }
-
-    // creates a sample simulation when the scene is first loaded
-    private void Start()
-    {
-        LoadSampleSimulation();
-    }
 
     // prepares a sample simulation
     public void LoadSampleSimulation()
     {
         if (sampleRunning) return; // only one system at a time
+        planets = new List<GameObject>();
         CreateSampleSimulation();
         RunSampleSimulation();
     }
@@ -85,7 +75,7 @@ public class SampleSimulationScript : MonoBehaviour
         Debug.Log("[SAMPLE SIM] SUCCESS: Sample System Loaded");
     }
 
-    // runs / stops the sample simulation
+    // enables / disables the sample simulation
     public void RunSampleSimulation()
     {
         sampleRunning = true;

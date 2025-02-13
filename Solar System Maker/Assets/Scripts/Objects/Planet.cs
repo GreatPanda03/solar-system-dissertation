@@ -34,6 +34,7 @@ public class Planet : Body
 
     public Planet()
     {
+        type = "Planet";
         name = "Planet";
         mass = 10f;
         habitability = 0;
@@ -44,6 +45,7 @@ public class Planet : Body
     public Planet(float mass, Vector3 position, Vector3 velocity)
         : base(mass, position, velocity)
     {
+        type = "Planet";
         name = "Planet";
         habitability = 0;
         waterContent = 0;
@@ -52,6 +54,7 @@ public class Planet : Body
     public Planet(float mass, Vector3 position, Vector3 velocity, float habitability, float waterContent)
         : base(mass, position, velocity)
     {
+        type = "Planet";
         name = "Planet";
         this.habitability = habitability;
         this.waterContent = waterContent;

@@ -20,6 +20,7 @@ public class Star : Body
 
     public Star()
     {
+        type = "Star";
         name = "Star";
         mass = 1000f;
         luminosity = 1f;
@@ -29,6 +30,7 @@ public class Star : Body
     public Star(float mass, Vector3 position, Vector3 velocity)
         : base(mass, position, velocity)
     {
+        type = "Star";
         name = "Star";
         luminosity = 1f;
     }
@@ -36,6 +38,7 @@ public class Star : Body
     public Star(float mass, Vector3 position, Vector3 velocity, float luminosity)
         : base(mass, position, velocity)
     {
+        type = "Star";
         name = "Star";
         this.luminosity = luminosity;
     }

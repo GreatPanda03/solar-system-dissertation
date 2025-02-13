@@ -4,7 +4,7 @@
         <ui:VisualElement name="Container" class="container" style="flex-grow: 1;">
             <ui:VisualElement name="Header" class="header" style="flex-grow: 1;">
                 <ui:Label text="Template Systems" name="Title" class="title" />
-                <ui:Button text="Close" name="Close" class="closeButton" />
+                <ui:Button text="Close" name="CloseWindow" class="closeButton" />
             </ui:VisualElement>
             <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
             <ui:VisualElement name="Content" class="content" style="align-content: center; align-items: stretch; justify-content: center;">

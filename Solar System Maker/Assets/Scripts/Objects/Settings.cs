@@ -36,6 +36,7 @@ public class Settings
 
     public Settings()
     {
+        simulationName = "New Simulation";
         gravityAlgorithm = "Newtonian Physics";
         gravityConstant = 0.01f;
         collisionQuality = "High";
