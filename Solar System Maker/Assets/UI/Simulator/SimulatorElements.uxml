@@ -24,7 +24,7 @@
                         <ui:TextField label="Name" placeholder-text="(blank)" name="BodyName" tooltip="Name" class="propertiesField" />
                         <ui:FloatField label="Mass" value="10" name="BodyMass" tooltip="Mass" />
                         <ui:FloatField label="Radius" value="10" name="BodyRadius" tooltip="Radius" />
-                        <ui:FloatField label="Speed" value="10" name="BodySpeed" tooltip="Speed (Magnitude)" />
+                        <ui:FloatField label="Speed" value="10" name="BodySpeed" tooltip="Speed (Magnitude)" readonly="true" />
                         <ui:FloatField label="Surface Temp." value="10" name="BodySurfaceTemp" tooltip="Surface Temperature" />
                         <ui:FloatField label="Density" value="10" name="BodyDensity" tooltip="Density" />
                     </ui:VisualElement>

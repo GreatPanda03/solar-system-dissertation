@@ -10,6 +10,7 @@
 
 // LIBRARIES
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -87,11 +88,13 @@ public class SimulatorUIController : MonoBehaviour
             bodyProperties.style.display = DisplayStyle.Flex;
 
             bodyProperties.Q<TextField>("BodyName").value = selectedBody.Name;
-            bodyProperties.Q<TextField>("BodyMass").value = selectedBody.Mass.ToString();
-            bodyProperties.Q<TextField>("BodyRadius").value = selectedBody.Radius.ToString();
-            bodyProperties.Q<TextField>("BodySpeed").value = selectedBody.Velocity.magnitude.ToString();
-            bodyProperties.Q<TextField>("BodySurfaceTemp").value = selectedBody.SurfaceTemp.ToString();
-            bodyProperties.Q<TextField>("BodyDensity").value = selectedBody.Density.ToString();
+            bodyProperties.Q<FloatField>("BodyMass").value = selectedBody.Mass;
+            bodyProperties.Q<FloatField>("BodyRadius").value = selectedBody.Radius;
+            bodyProperties.Q<FloatField>("BodySpeed").value = selectedBody.Velocity.magnitude;
+            bodyProperties.Q<FloatField>("BodySurfaceTemp").value = selectedBody.SurfaceTemp;
+            bodyProperties.Q<FloatField>("BodyDensity").value = selectedBody.Density;
+
+            // Debug.Log(selectedBody.GetType().GetProperty("Radius").GetValue(selectedBody, null));
 
             // initially hiding all "particular" property groups
             VisualElement starProperties = properties.Q<VisualElement>("Properties_Star");
@@ -104,14 +107,14 @@ public class SimulatorUIController : MonoBehaviour
             if (selectedBody is Star star)
             {
                 starProperties.style.display = DisplayStyle.Flex;
-                starProperties.Q<TextField>("StarLuminosity").value = star.Luminosity.ToString();
+                starProperties.Q<FloatField>("StarLuminosity").value = star.Luminosity;
 
             } // planet properties
             else if (selectedBody is Planet planet)
             {
                 planetProperties.style.display = DisplayStyle.Flex;
-                planetProperties.Q<TextField>("PlanetWaterContent").value = planet.WaterContent.ToString();
-                planetProperties.Q<TextField>("PlanetHabitability").value = planet.Habitability.ToString();
+                planetProperties.Q<FloatField>("PlanetWaterContent").value = planet.WaterContent;
+                planetProperties.Q<FloatField>("PlanetHabitability").value = planet.Habitability;
             }
         }
 
@@ -256,14 +259,16 @@ public class SimulatorUIController : MonoBehaviour
     {
         if (!isActive) return;
 
-        // removes the current selected body to have an "empty hand"
+        // BODY ITEM SELECTION TOGGLE
+        //   removes the current selected body to have an "empty hand"
         if (selectedBodyItem != null && Input.GetKeyDown(KeyCode.E))
         {
             SelectBodyItem(selectedBodyItem); // as if the button is being toggled off
             RemoveEntityPreview();
         }
 
-        // displays a "ghost" representation of the selected body
+        // BODY PREVIEW
+        //   displays a "ghost" representation of the selected body
         //   at the target location (only updates position if not being fired)
         if (bodyPreview != null && bodyPreview.Entity != null && startVelocityPoint == null)
         {
@@ -273,7 +278,34 @@ public class SimulatorUIController : MonoBehaviour
             bodyPreview.Entity.transform.position = worldPosition;
         }
 
-        // set the starting velocity point to the mouse's position in the world on LMB click
+        // BODY SELECTION (in space)
+        //   detecting any bodies that have been selected with LMB
+        //   (only if a body preview isn't already being placed, to prevent interference)
+        if (bodyPreview == null && Input.GetMouseButtonDown(0))
+        {
+            Vector3 screenPosition = Input.mousePosition;
+            Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                if (hit.collider != null)
+                {
+                    // finding the Body object from the hit object (if any)
+                    GameObject hitPart = hit.collider.gameObject;
+                    Body body = GetBodyFromEntity(hitPart);
+
+                    if (body != null)
+                    {
+                        selectedBody = body;
+                        ShowProperties();
+                    }
+                }
+            }
+        }
+
+        // BODY TRAJECTORY (start)
+        //   set the starting velocity point to the mouse's position in the world on LMB click
+        //   * don't really need to check for previewEntity since no direct operations...
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 screenPosition = Input.mousePosition;
@@ -281,17 +313,20 @@ public class SimulatorUIController : MonoBehaviour
             startVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
         }
 
-        // stop tracking the starting velocity on LMB lift (marks that 0 velocity will be applied)
+        // BODY TRAJECTORY (end)
+        //   stop tracking the starting velocity on LMB lift (marks that 0 velocity will be applied)
         if (Input.GetMouseButtonUp(0))
         {
             startVelocityPoint = null;
         }
 
-        // updating spawn distance from camera with scrolling
+        // SPAWN DISTANCE
+        //   updating spawn distance from camera with scrolling
         float cameraOffset = distanceFromCamera - Input.mouseScrollDelta.y * 3;
         distanceFromCamera = Math.Max(0, cameraOffset);
 
-        // place the selected body down on input
+        // BODY PLACEMENT
+        //   place the selected body down on input
         if (bodyPreview != null && Input.GetKeyDown(KeyCode.Q))
         {
             Vector3 position = bodyPreview.Entity.transform.position;
@@ -329,4 +364,19 @@ public class SimulatorUIController : MonoBehaviour
     }
 
     #endregion Inputs Loop
+
+
+    #region Auxiliary
+
+    // returns the body from the list of bodies which matches the give entity
+    public Body GetBodyFromEntity(GameObject entity)
+    {
+        foreach (Body body in simController.simulation.bodies)
+        {
+            if (body.Entity == entity) return body;
+        }
+        return null;
+    }
+
+    #endregion
 }
