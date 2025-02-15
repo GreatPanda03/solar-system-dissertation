@@ -8,20 +8,23 @@
 * [4] - Andrew Raphael Lukasik, "BFN", www.github.com [Online]. Available at: https://github.com/andrew-raphael-lukasik/BFN
 */
 
+
+// LIBRARIES
 using System;
-using Unity.VisualScripting;
+using Newtonsoft.Json;
 using UnityEngine;
 
-public abstract class Body
-{
-    [SerializeField]
-    protected string type;
-    public string Type {
-        get => type; 
-        private set => type = value; 
-    }
 
-    [SerializeField]
+// CLASS DEFINITION
+[Serializable]
+public class Body
+{
+
+    #region Attributes
+
+    readonly string type = "Body";
+    public virtual string Type { get => type; }
+
     protected string name;
     public string Name {
         get => name;
@@ -32,8 +35,8 @@ public abstract class Body
         }   
     }
 
-    [NonSerialized]
     protected GameObject entity;
+    [JsonIgnore] // recreated a runtime
     public GameObject Entity {
         get => entity;
         set {
@@ -42,14 +45,12 @@ public abstract class Body
         }
     }
 
-    [SerializeField]
     protected float mass;
     public float Mass {
         get => mass;
         set => mass = value; 
     }
 
-    [SerializeField]
     protected float radius;
     public float Radius {
         get => radius;
@@ -59,35 +60,31 @@ public abstract class Body
         }
     }
 
-    [SerializeField]
     protected Vector3 position;
     public Vector3 Position {
         get => position; 
         set => position = value; 
     }
 
-    [SerializeField]
     protected Vector3 velocity;
     public Vector3 Velocity {
         get => velocity; 
         set => velocity = value; 
     }
 
-    [SerializeField]
     protected Vector3 acceleration;
+    [JsonIgnore] // will always be serialized as empty Vector3 anyway
     public Vector3 Acceleration {
         get => acceleration; 
         set => acceleration = value; 
     }
 
-    [SerializeField]
     protected float surfaceTemp;
     public float SurfaceTemp {
         get => surfaceTemp; 
         set => surfaceTemp = value; 
     }
 
-    [SerializeField]
     protected float density;
     public float Density {
         get => density; 
@@ -103,9 +100,13 @@ public abstract class Body
     //     }
     // }
 
+    #endregion Attributes
+
+
+    #region Class Methods
+
     public Body()
     {
-        type = "Body";
         name = "Body";
         mass = 10f;
         position = new Vector3(0,0,0);
@@ -119,7 +120,6 @@ public abstract class Body
 
     public Body(float mass, Vector3 position, Vector3 velocity)
     {
-        type = "Body";
         name = "Body";
         this.mass = mass;
         this.position = position;
@@ -131,10 +131,38 @@ public abstract class Body
         radius = GetRadiusFromMass();
     }
 
+    // returns a copy of the body
+    public Body GetCopy()
+    {
+        return new()
+        {
+            name = name,
+            mass = mass,
+            position = position,
+            velocity = velocity,
+            acceleration = acceleration,
+            surfaceTemp = surfaceTemp,
+            density = density,
+            radius = radius
+        };
+    }
+
     public override string ToString()
     {
-        return JsonUtility.ToJson(this, true);
+        return JsonConvert.SerializeObject(
+            this, 
+            new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                Formatting = Formatting.Indented
+            }
+        );
     }
+
+    #endregion Class Methods
+
+
+    #region Entity Methods
 
     // auxiliary: returns a radius value from the body's mass
     public float GetRadiusFromMass()
@@ -182,7 +210,7 @@ public abstract class Body
 
     // returns a new generic Body entity
     public void CreateEntity() {
-        GameObject prefab = Resources.Load<GameObject>($"Prefabs/{type}");
+        GameObject prefab = Resources.Load<GameObject>($"Prefabs/{this.Type}");
         entity = GameObject.Instantiate(prefab);
         UpdateEntity();
     }
@@ -195,4 +223,6 @@ public abstract class Body
         entity.transform.position = position;
         UpdateScale();
     }
+
+    #endregion Entity Methods
 }

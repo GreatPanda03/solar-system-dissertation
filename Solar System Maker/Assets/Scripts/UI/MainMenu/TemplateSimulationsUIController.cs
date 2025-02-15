@@ -33,13 +33,13 @@ public static class TemplateSimulationsUIController
     // shows the Saved Simulations interface
     public static void ShowInterface()
     {
-        ui.style.display = DisplayStyle.Flex;
+        ui.Q("Root").style.display = DisplayStyle.Flex;
     }
 
     // hides the Saved Simulations interface
     public static void HideInterface()
     {
-        ui.style.display = DisplayStyle.None;
+        ui.Q("Root").style.display = DisplayStyle.None;
     }
 
     // closes the new saves window and re-displays the main menu

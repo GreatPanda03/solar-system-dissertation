@@ -35,13 +35,13 @@ public static class NewSimulationUIController
     // displays the New Simulation interface
     public static void ShowInterface()
     {
-        ui.style.display = DisplayStyle.Flex;
+        ui.Q("Root").style.display = DisplayStyle.Flex;
     }
 
     // hides the New Simulation Interface
     public static void HideInterface()
     {
-        ui.style.display = DisplayStyle.None;
+        ui.Q("Root").style.display = DisplayStyle.None;
     }
 
     // closes the new simulation window and re-displays the main menu
@@ -65,6 +65,7 @@ public static class NewSimulationUIController
 
         // constructing a new simulation
         Simulation newSimulation = DataManager.CreateSimulationSave();
+        newSimulation.settings = settings;
 
         // hiding the entire Main Menu interface
         MainMenuUIController.HideInterface();
@@ -74,7 +75,7 @@ public static class NewSimulationUIController
         SimulatorUIController simUIController = GameObject.Find("Simulator").GetComponent<SimulatorUIController>();
         simUIController.ShowInterface();
         simUIController.EnableInterface();
-        simUIController.SetTitle(newSimulation.settings.SimulationName);
+        simUIController.SetTitle(settings.SimulationName);
 
         SimulatorController simController = GameObject.Find("Simulator").GetComponent<SimulatorController>();
         simController.LoadSimulation(newSimulation);
@@ -124,7 +125,7 @@ public static class NewSimulationUIController
         // creating a new settings object from the validated data
         Settings settings = new()
         {
-            SimulationName = simNameInput.value,
+            SimulationName = simNameInput.text,
             GravityConstant = gravConstantInput.value,
             GravityAlgorithm = gravAlgorithmInput.value,
             CollisionQuality = collQualityInput.value

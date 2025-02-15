@@ -28,6 +28,8 @@ public class SimulatorUIController : MonoBehaviour
     private Vector3? startVelocityPoint; // positional point, not velocity
     private float distanceFromCamera = 30f;
 
+    private Body selectedBody;
+
 
     #region UI Setup
 
@@ -43,6 +45,8 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
         ui.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
 
+        ui.Q<Button>("PropertiesClose").clicked += OnPropertiesCloseClicked;
+
         Debug.Log("[SIMULATOR] SUCCESS: UI Loaded");
     }
 
@@ -54,13 +58,70 @@ public class SimulatorUIController : MonoBehaviour
     // displays the Simulator interface
     public void ShowInterface()
     {
-        ui.style.display = DisplayStyle.Flex;
+        ui.Q("Root").style.display = DisplayStyle.Flex;
     }
 
     // hides the Simulator interface
     public void HideInterface()
     {
-        ui.style.display = DisplayStyle.None;
+        ui.Q("Root").style.display = DisplayStyle.None;
+    }
+
+    // shows the properties window
+    public void ShowProperties()
+    {
+        VisualElement properties = ui.Q<VisualElement>("Properties");
+
+        if (selectedBody == null)
+        {
+            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.None;
+            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.Flex;
+        }
+        else 
+        {
+            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.None;
+            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.Flex;
+
+            // general body properties
+            VisualElement bodyProperties = properties.Q<VisualElement>("Properties_Body");
+            bodyProperties.style.display = DisplayStyle.Flex;
+
+            bodyProperties.Q<TextField>("BodyName").value = selectedBody.Name;
+            bodyProperties.Q<TextField>("BodyMass").value = selectedBody.Mass.ToString();
+            bodyProperties.Q<TextField>("BodyRadius").value = selectedBody.Radius.ToString();
+            bodyProperties.Q<TextField>("BodySpeed").value = selectedBody.Velocity.magnitude.ToString();
+            bodyProperties.Q<TextField>("BodySurfaceTemp").value = selectedBody.SurfaceTemp.ToString();
+            bodyProperties.Q<TextField>("BodyDensity").value = selectedBody.Density.ToString();
+
+            // initially hiding all "particular" property groups
+            VisualElement starProperties = properties.Q<VisualElement>("Properties_Star");
+            VisualElement planetProperties = properties.Q<VisualElement>("Properties_Planet");
+
+            starProperties.style.display = DisplayStyle.None;
+            planetProperties.style.display = DisplayStyle.None;
+
+            // star properties
+            if (selectedBody is Star star)
+            {
+                starProperties.style.display = DisplayStyle.Flex;
+                starProperties.Q<TextField>("StarLuminosity").value = star.Luminosity.ToString();
+
+            } // planet properties
+            else if (selectedBody is Planet planet)
+            {
+                planetProperties.style.display = DisplayStyle.Flex;
+                planetProperties.Q<TextField>("PlanetWaterContent").value = planet.WaterContent.ToString();
+                planetProperties.Q<TextField>("PlanetHabitability").value = planet.Habitability.ToString();
+            }
+        }
+
+        properties.style.display = DisplayStyle.Flex;
+    }
+
+    // hides the properties window
+    public void HideProperties()
+    {
+        ui.Q<VisualElement>("Properties").style.display = DisplayStyle.None;
     }
 
     // enables the interface
@@ -95,6 +156,8 @@ public class SimulatorUIController : MonoBehaviour
         Simulation simulation = simController.simulation;;
         bool updated = DataManager.UpdateSimulationSave(simulation.id, simulation);
         if (!updated) DataManager.AddSimulationSave(simulation);
+
+        DataManager.SaveAllData();
     }
 
     // clears the simulator and returns to the main menu
@@ -109,6 +172,12 @@ public class SimulatorUIController : MonoBehaviour
 
         Camera.main.GetComponent<CameraController>()
             .SetScene(CameraController.Mode.MainMenu);
+    }
+
+    // hides the properties window when the close button is clicked
+    public void OnPropertiesCloseClicked()
+    {
+        HideProperties();
     }
 
     #endregion General UI

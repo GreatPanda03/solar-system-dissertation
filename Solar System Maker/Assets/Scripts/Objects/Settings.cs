@@ -42,6 +42,17 @@ public class Settings
         collisionQuality = "High";
     }
 
+    public Settings GetCopy()
+    {
+        return new()
+        {
+            SimulationName = simulationName,
+            GravityAlgorithm = gravityAlgorithm,
+            GravityConstant = gravityConstant,
+            CollisionQuality = collisionQuality
+        };
+    }
+
     public override string ToString()
     {
         return JsonUtility.ToJson(this, true);

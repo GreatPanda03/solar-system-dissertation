@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/MainMenu/MainMenuStyles.uss?fileID=7433441132597879392&amp;guid=ebc3229213f62b145ad3963571294e60&amp;type=3#MainMenuStyles" />
-    <ui:VisualElement name="VisualElement" style="flex-grow: 1; align-self: flex-start; justify-content: center; align-content: center; position: relative; max-height: none; display: flex;">
+    <ui:VisualElement name="Root" style="flex-grow: 1; align-self: flex-start; justify-content: center; align-content: center; position: relative; max-height: none; display: none;">
         <ui:VisualElement name="Container" class="main_menu_container container" style="flex-grow: 1; align-self: center; justify-content: center; align-content: center; position: relative; max-height: none; display: flex; align-items: center;">
             <ui:Label text="Solar System&#10;Simulator" name="Title" parse-escape-sequences="false" class="title" />
             <ui:Button text="New Simulation" name="NewSimulation" class="menuButton" />

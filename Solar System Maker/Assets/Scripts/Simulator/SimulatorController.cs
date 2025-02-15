@@ -31,9 +31,13 @@ public class SimulatorController : MonoBehaviour
     }
 
     // loads the Simulator with the given simulation
+    // * also creates a physical entity for each body in case they don't have one
     public void LoadSimulation(Simulation simulation)
     {
         this.simulation = simulation;
+
+        foreach (Body body in simulation.bodies)
+            if (body.Entity == null) body.CreateEntity();
     }
 
     // clears all bodies in the Simulator

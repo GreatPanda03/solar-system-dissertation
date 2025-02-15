@@ -1,0 +1,48 @@
+.saveEntry {
+    width: 100px;
+    height: 100px;
+    max-width: 100px;
+    max-height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.78);
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    transition-duration: 0.25s;
+    transition-property: background-color;
+}
+
+.saveEntry:hover {
+    transition-duration: 0.25s;
+    transition-property: background-color;
+    background-color: rgba(228, 228, 228, 0.78);
+}
+
+.title {
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    -unity-font-style: bold;
+    text-overflow: clip;
+    white-space: normal;
+    -unity-text-align: upper-center;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(0, 0, 0);
+}
