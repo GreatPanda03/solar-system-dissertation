@@ -1,14 +1,14 @@
-# A Simulator to Model Solar Systems
+# Computer Science Project
 
 ## Information about this repository
 
-This repository tracks the development of my project, "A Solar System Simulator". The project enables users to view a realistic model of our solar system based on real data. Additionally, users can create simulations of custom solar systems (made by themselves) with bodies of their choice.
+This repository tracks the development of my project, **"An Application to Simulate Solar Systems, Orbitals, and Planetary Properties"**. The project enables users to view a realistic model of our solar system based on real data. Additionally, users can create custom solar system simulations with different bodies, such as stars and planets.
 
-The repository includes the list of requirements required for the project, defined as issues. Each requirement has a set of acceptance criteria, a priority, and a label for the its current development stage.
+The **GitLab Repository** contains the source code for the project. Occassional commits with source code have been provided. Each commit details new features, changes, and removals to the application. It also contains documentation for the application, such as its features and how to use it, provided in the Wiki section.
 
-Occassional commits with source code have been provided. Each commit details new features, changes, and removals to the application.
+A separate **Azure DevOps Repository** includes the list of requirements required for the project. Each requirement has a set of acceptance criteria, a priority, and a label for the its current development stage. This has a few more helpful features than GitLab for better organisation.
 
-Documentation for the application, such as its features and how to use it, have been provided in the repository's Wiki section.
+**Azure DevOps Backlog:** https://dev.azure.com/MuhammadsOrganisation/CS%20Project/_backlogs/backlog/CS%20Project%20Team/Features
 
 For additional information or questions, please contact **Muhammad Mogra**.
 
