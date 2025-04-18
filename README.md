@@ -8,6 +8,8 @@ The **GitLab Repository** contains the source code for the project. Occassional 
 
 A separate **Azure DevOps Repository** includes the list of requirements required for the project. Each requirement has a set of acceptance criteria, a priority, and a label for the its current development stage. This has a few more helpful features than GitLab for better organisation.
 
+Although there are some Issues defined in the GitLab Repository, ***please follow the Azure DevOps Repository*** as the former is obsolete and was only used as a start. The latter has been maintained.
+
 **Azure DevOps Backlog:** https://dev.azure.com/MuhammadsOrganisation/CS%20Project/_backlogs/backlog/CS%20Project%20Team/Features
 
 For additional information or questions, please contact **Muhammad Mogra**.
