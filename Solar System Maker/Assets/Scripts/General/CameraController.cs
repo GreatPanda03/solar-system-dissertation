@@ -108,6 +108,8 @@ public class CameraController : MonoBehaviour
     // * NOTE: no need for separate WASD binds - automatically done by input!!!
     private void Movement()
     {
+        if (GeneralUI.IsTextFieldFocused()) return;
+
         Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
         if (Input.GetKey(KeyCode.LeftControl))

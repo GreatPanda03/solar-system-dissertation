@@ -11,6 +11,7 @@
 // LIBRARIES
 using System;
 using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -129,7 +130,12 @@ public class SimulatorUIController : MonoBehaviour
     public void OnPropertiesCloseClicked()
     {
         HideProperties();
-    }
+
+        selectedBody = null;
+        Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
+        Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+        ShowProperties();
+}
 
     #endregion General UI
 
@@ -334,6 +340,8 @@ public class SimulatorUIController : MonoBehaviour
                 };
                 star.CreateEntity();
                 simController.AddBody(star);
+
+                CreateExplorerEntry(star);
             }
             else if (selectedBodyItem == "Planet")
             {
@@ -344,6 +352,8 @@ public class SimulatorUIController : MonoBehaviour
                 };
                 planet.CreateEntity();
                 simController.AddBody(planet);
+
+                CreateExplorerEntry(planet);
             }
 
             RemoveEntityPreview();
@@ -471,9 +481,23 @@ public class SimulatorUIController : MonoBehaviour
     #region Explorer List Functions 
 
     // creates a new entry in the explorer for the given body
-    public void AddBodyEntry(Body body)
+    public TemplateContainer CreateExplorerEntry(Body body)
     {
-        // TODO: create entry
+        VisualTreeAsset explorerEntryTemplate = GameObject.Find("ExplorerUI").GetComponent<UIDocument>().visualTreeAsset;
+        TemplateContainer explorerEntry = explorerEntryTemplate.Instantiate();
+
+        explorerEntry.Q<Label>("ExplorerEntry_Type").text = body.Type;
+        explorerEntry.Q<Label>("ExplorerEntry_Name").text = body.Name;
+
+        ui.Q<ScrollView>("ExplorerList").Add(explorerEntry);
+
+        explorerEntry.RegisterCallback<ClickEvent>(e =>
+        {
+            selectedBody = body;
+            ShowProperties();
+        });
+
+        return explorerEntry;
     }
 
     #endregion
