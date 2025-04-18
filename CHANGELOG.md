@@ -8,6 +8,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.3.1
+**Date:** 2025/04/18
+<br/>**Bug Fixes:**
+* **1)** Fixed body not being followed aftering selecting it in the explorer
+
+**Additions / Changes:**
+* **1)** Editing a body's details now updates the corresponding entry in the explorer
+
+---
+
 ### Version: 1.3.0
 **Date:** 2025/04/18
 <br/>**Bug Fixes:**
