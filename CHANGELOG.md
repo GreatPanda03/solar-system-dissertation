@@ -1,20 +1,58 @@
 ## Changelog
 
-This changelog covers a list of features and fixes which have been made for the application. All dates are in the form YYYY/MM/DD.
+This changelog covers a list of features and fixes which have been made for the application.
+
+Versions are in the form **X.Y.Z**: *X* represents a significant feature which covers a range of functionality; *Y* represents single / small feature changes; and *Z* represents fixes or bulk patches.
+
+All dates are in the form **YYYY/MM/DD**.
 
 ---
 
-### [v1.0.0] - 2025/02/09
-* First usable release
-* **Main menu** - primary area to access different parts of the application
+### Version: 1.3.0
+**Date:** 2025/04/18
+<br/>**Bug Fixes:**
+* **1)** Closing the properties window while following a body stops following the body
+* **2)** The camera no longer moves when pressing movement keys while a textbox is selected
+
+**Additions / Changes:**
+* **1)** Creating a body created a new entry in the explorer when adding a body
+* **2)** Selecting an entry in the explorer follows the corresponding body
+* **Note:** editing a body's properties doesn't update its explorer entry yet
+
+---
+
+### Version: 1.2.0
+**Date:** 2025/04/18
+<br/>**Bug Fixes:**
+* **1)** Selecting a text box with a preview body selected no longer places a body behind the UI
+
+**Additions / Changes:**
+* **1)** New Explorer panel (not yet usable)
+* **2)** New panel to distinguish between Body List and Explorer
+* **3)** Can follow a planet when selecting a planet *(follows the planet until deselected)*
+
+---
+
+### Version: 1.1.0
+**Date:** 2025/02/12
+<br/>**Additions / Changes:**
+* **1)** Simulations can be saved
+* **Note:** although saving works, loading doesn't work properly yet
+
+---
+
+### Version: 1.0.0
+**Date:** 2025/02/09
+<br/>**Additions / Changes:**
+* **1)** **Main menu** - primary area to access different parts of the application
     * Currently, only "New Simulation" works
-* New blank simulations can be created with a small set of settings
+* **2)** New blank simulations can be created with a small set of settings
     * Simulation Name - the name of the simulation 
     * Gravity Constant - gravity strength
     * Gravity Algorithm - how gravity is simulated
-* Stars and Planets can be created in simulations
+* **3)** Stars and Planets can be created in simulations
     * Currently, Stars and Planets have a fixed mass
-* Gravity is simulated with Newtonian Physics (this is the only algorithm for now)
-* **NOTE:** Simulations cannot be saved yet!
+* **4)** Gravity is simulated with Newtonian Physics (this is the only algorithm for now)
+* **5)** Movement controls - a camera which can be moved and turned to explore the system
 
 ---
