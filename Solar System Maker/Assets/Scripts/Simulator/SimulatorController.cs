@@ -56,6 +56,12 @@ public class SimulatorController : MonoBehaviour
 
     #region Simulator Methods
 
+    // returns all bodies in the simulation
+    public List<Body> GetBodies()
+    {
+        return simulation.bodies;
+    }
+
     // adds the given body to the simulation
     public void AddBody(Body body)
     {

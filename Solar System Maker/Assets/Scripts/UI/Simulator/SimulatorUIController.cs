@@ -10,6 +10,7 @@
 
 // LIBRARIES
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -408,6 +409,8 @@ public class SimulatorUIController : MonoBehaviour
                 PropertyInfo info = selectedBody.GetType().GetProperty(property);
                 info.SetValue(selectedBody, field.value);
                 field.Blur(); // unfocuses the field
+
+                RefreshExplorer();
             }
         }, TrickleDown.TrickleDown);
 
@@ -481,6 +484,17 @@ public class SimulatorUIController : MonoBehaviour
     #region Explorer List Functions 
 
     // creates a new entry in the explorer for the given body
+    public void RefreshExplorer()
+    {
+        ui.Q<ScrollView>("ExplorerList").Clear();
+
+        foreach (Body body in simController.GetBodies())
+        {
+            CreateExplorerEntry(body);
+        }
+    }
+
+    // creates an entry for the given body
     public TemplateContainer CreateExplorerEntry(Body body)
     {
         VisualTreeAsset explorerEntryTemplate = GameObject.Find("ExplorerUI").GetComponent<UIDocument>().visualTreeAsset;
@@ -494,6 +508,8 @@ public class SimulatorUIController : MonoBehaviour
         explorerEntry.RegisterCallback<ClickEvent>(e =>
         {
             selectedBody = body;
+            Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+            Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
             ShowProperties();
         });
 
