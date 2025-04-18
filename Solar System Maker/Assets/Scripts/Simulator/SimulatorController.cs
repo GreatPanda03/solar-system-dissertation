@@ -89,6 +89,8 @@ public class SimulatorController : MonoBehaviour
     {
         List<Body> bodies = simulation.bodies;
 
+        // O(nlogn)!!!
+
         for (int a = 0; a < bodies.Count; a++)
         {
             Body bodyA = bodies[a];

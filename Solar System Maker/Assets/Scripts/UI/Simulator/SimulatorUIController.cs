@@ -10,8 +10,9 @@
 
 // LIBRARIES
 using System;
-using UnityEditor;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 
@@ -43,9 +44,13 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("SaveSimulation").clicked += OnSaveSimulationClicked;
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
+        ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
+        ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
+
         ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
         ui.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
 
+        InitialisePropertyFields();
         ui.Q<Button>("PropertiesClose").clicked += OnPropertiesCloseClicked;
 
         Debug.Log("[SIMULATOR] SUCCESS: UI Loaded");
@@ -68,65 +73,6 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q("Root").style.display = DisplayStyle.None;
     }
 
-    // shows the properties window
-    public void ShowProperties()
-    {
-        VisualElement properties = ui.Q<VisualElement>("Properties");
-
-        if (selectedBody == null)
-        {
-            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.None;
-            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.Flex;
-        }
-        else 
-        {
-            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.None;
-            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.Flex;
-
-            // general body properties
-            VisualElement bodyProperties = properties.Q<VisualElement>("Properties_Body");
-            bodyProperties.style.display = DisplayStyle.Flex;
-
-            bodyProperties.Q<TextField>("BodyName").value = selectedBody.Name;
-            bodyProperties.Q<FloatField>("BodyMass").value = selectedBody.Mass;
-            bodyProperties.Q<FloatField>("BodyRadius").value = selectedBody.Radius;
-            bodyProperties.Q<FloatField>("BodySpeed").value = selectedBody.Velocity.magnitude;
-            bodyProperties.Q<FloatField>("BodySurfaceTemp").value = selectedBody.SurfaceTemp;
-            bodyProperties.Q<FloatField>("BodyDensity").value = selectedBody.Density;
-
-            // Debug.Log(selectedBody.GetType().GetProperty("Radius").GetValue(selectedBody, null));
-
-            // initially hiding all "particular" property groups
-            VisualElement starProperties = properties.Q<VisualElement>("Properties_Star");
-            VisualElement planetProperties = properties.Q<VisualElement>("Properties_Planet");
-
-            starProperties.style.display = DisplayStyle.None;
-            planetProperties.style.display = DisplayStyle.None;
-
-            // star properties
-            if (selectedBody is Star star)
-            {
-                starProperties.style.display = DisplayStyle.Flex;
-                starProperties.Q<FloatField>("StarLuminosity").value = star.Luminosity;
-
-            } // planet properties
-            else if (selectedBody is Planet planet)
-            {
-                planetProperties.style.display = DisplayStyle.Flex;
-                planetProperties.Q<FloatField>("PlanetWaterContent").value = planet.WaterContent;
-                planetProperties.Q<FloatField>("PlanetHabitability").value = planet.Habitability;
-            }
-        }
-
-        properties.style.display = DisplayStyle.Flex;
-    }
-
-    // hides the properties window
-    public void HideProperties()
-    {
-        ui.Q<VisualElement>("Properties").style.display = DisplayStyle.None;
-    }
-
     // enables the interface
     public void EnableInterface()
     {
@@ -142,6 +88,8 @@ public class SimulatorUIController : MonoBehaviour
         {
             Destroy(bodyPreview.Entity);
             bodyPreview = null;
+
+            // TODO: change camera mode to Main Menu?
         }
         startVelocityPoint = new();
         distanceFromCamera = 30f;
@@ -186,7 +134,29 @@ public class SimulatorUIController : MonoBehaviour
     #endregion General UI
 
 
+    #region Toolbox Functions
+
+    public void OnBodiesClicked()
+    {
+        VisualElement bodyList = ui.Q<VisualElement>("BodyList");
+        bodyList.style.display = bodyList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+    }
+
+    public void OnExplorerClicked()
+    {
+        // VisualElement explorer = ui.Q<VisualElement>("ExplorerList");
+        // explorer.style.display = explorer.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+    }
+
+    #endregion
+
+
     #region Body Selection & Preview
+
+    public Body GetSelectedBody()
+    {
+        return selectedBody;
+    }
 
     private void OnAddStarClicked() { OnBodyItemClicked("Star"); }
     private void OnAddPlanetClicked() { OnBodyItemClicked("Planet"); }
@@ -255,7 +225,7 @@ public class SimulatorUIController : MonoBehaviour
     #region Inputs Loop
 
     // input loop - manages body placement and other inputs
-   void Update()
+    void Update()
     {
         if (!isActive) return;
 
@@ -281,7 +251,8 @@ public class SimulatorUIController : MonoBehaviour
         // BODY SELECTION (in space)
         //   detecting any bodies that have been selected with LMB
         //   (only if a body preview isn't already being placed, to prevent interference)
-        if (bodyPreview == null && Input.GetMouseButtonDown(0))
+        //   (also if it's in the world space, not UI)
+        if (bodyPreview == null && Input.GetMouseButtonDown(0) && GeneralUI.IsPointerOverAnyUI())
         {
             Vector3 screenPosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
@@ -297,10 +268,24 @@ public class SimulatorUIController : MonoBehaviour
                     if (body != null)
                     {
                         selectedBody = body;
+                        Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+                        Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
                         ShowProperties();
                     }
                 }
             }
+            else
+            {
+                selectedBody = null;
+                Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
+                Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+                ShowProperties();
+            }
+        }
+
+        if (bodyPreview == null && selectedBody == null)
+        {
+            Camera.main.transform.position += Input.mouseScrollDelta.y * 3 * Camera.main.transform.forward;
         }
 
         // BODY TRAJECTORY (start)
@@ -360,10 +345,138 @@ public class SimulatorUIController : MonoBehaviour
                 planet.CreateEntity();
                 simController.AddBody(planet);
             }
+
+            RemoveEntityPreview();
+            SetEntityPreview(selectedBodyItem);
         }
     }
 
     #endregion Inputs Loop
+
+
+    #region Properties
+
+    
+    // changes the selected body's properties when any property field is changed
+    private void InitialisePropertyFields()
+    {
+        VisualElement propertiesFrame = ui.Q<VisualElement>("Properties");
+        
+        VisualElement bodyFields = propertiesFrame.Q("BodyFields");
+        foreach (VisualElement field in bodyFields.Children()) // all elements will be fields
+        {
+            string name = field.name;
+            string property = name[(name.IndexOf("_") + 1)..]; // the part after the "_"
+
+            if (field is FloatField floatField)
+            {
+                InitialisePropertyField(floatField, property);
+            }
+            else if (field is TextField textField)
+            {
+                InitialisePropertyField(textField, property);
+            }
+            else if (field is DropdownField dropdownField)
+            {
+                InitialisePropertyField(dropdownField, property);
+            }
+        }
+
+        Debug.Log("Property Fields Initialised");
+    }
+
+    // sets up the given property field so that, when enter is pressed,
+    //   the corresponding property is updated with the value provided
+    private void InitialisePropertyField<T>(BaseField<T> field, string property)
+    {   
+        // Debug.Log(property);
+
+        field.RegisterCallback<KeyDownEvent>((e) =>{
+            if (e.keyCode == KeyCode.Return && selectedBody != null)
+            {
+                var value = field.value;
+                PropertyInfo info = selectedBody.GetType().GetProperty(property);
+                info.SetValue(selectedBody, field.value);
+                field.Blur(); // unfocuses the field
+            }
+        }, TrickleDown.TrickleDown);
+
+        // weirdly - by default, two key presses are required to work
+        //   * "TrickleDown.TrickleDown" only requires one key press
+        //   * no idea why!
+    }
+
+    // shows the properties window
+    public void ShowProperties()
+    {
+        VisualElement properties = ui.Q<VisualElement>("Properties");
+
+        if (selectedBody == null)
+        {
+            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.None;
+            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.Flex;
+        }
+        else 
+        {
+            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.None;
+            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.Flex;
+
+            // general body properties
+            VisualElement bodyProperties = properties.Q<VisualElement>("Properties_Body");
+            bodyProperties.style.display = DisplayStyle.Flex;
+
+            bodyProperties.Q<TextField>("Body_Name").value = selectedBody.Name;
+            bodyProperties.Q<FloatField>("Body_Mass").value = selectedBody.Mass;
+            bodyProperties.Q<FloatField>("Body_Radius").value = selectedBody.Radius;
+            bodyProperties.Q<FloatField>("Body_Speed").value = selectedBody.Velocity.magnitude;
+            bodyProperties.Q<FloatField>("Body_SurfaceTemp").value = selectedBody.SurfaceTemp;
+            bodyProperties.Q<FloatField>("Body_Density").value = selectedBody.Density;
+
+            // Debug.Log(selectedBody.GetType().GetProperty("Radius").GetValue(selectedBody, null));
+
+            // initially hiding all "particular" property groups
+            VisualElement starProperties = properties.Q<VisualElement>("Properties_Star");
+            VisualElement planetProperties = properties.Q<VisualElement>("Properties_Planet");
+
+            starProperties.style.display = DisplayStyle.None;
+            planetProperties.style.display = DisplayStyle.None;
+
+            // star properties
+            if (selectedBody is Star star)
+            {
+                starProperties.style.display = DisplayStyle.Flex;
+                starProperties.Q<FloatField>("Star_Luminosity").value = star.Luminosity;
+
+            } // planet properties
+            else if (selectedBody is Planet planet)
+            {
+                planetProperties.style.display = DisplayStyle.Flex;
+                planetProperties.Q<FloatField>("Planet_WaterContent").value = planet.WaterContent;
+                planetProperties.Q<FloatField>("Planet_Habitability").value = planet.Habitability;
+            }
+        }
+
+        properties.style.display = DisplayStyle.Flex;
+    }
+
+    // hides the properties window
+    public void HideProperties()
+    {
+        ui.Q<VisualElement>("Properties").style.display = DisplayStyle.None;
+    }
+
+    #endregion Properties
+
+
+    #region Explorer List Functions 
+
+    // creates a new entry in the explorer for the given body
+    public void AddBodyEntry(Body body)
+    {
+        // TODO: create entry
+    }
+
+    #endregion
 
 
     #region Auxiliary
