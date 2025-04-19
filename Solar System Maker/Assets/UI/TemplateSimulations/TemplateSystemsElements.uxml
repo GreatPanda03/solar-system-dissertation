@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/TemplateSimulations/TemplateSystemsStyles.uss?fileID=7433441132597879392&amp;guid=f9649f2b36510a74bbf6f5431ba84ab5&amp;type=3#TemplateSystemsStyles" />
-    <ui:VisualElement name="VisualElement" style="flex-grow: 1; align-self: center; justify-content: center;">
+    <ui:VisualElement name="Root" style="flex-grow: 1; align-self: center; justify-content: center; display: none;">
         <ui:VisualElement name="Container" class="container" style="flex-grow: 1;">
             <ui:VisualElement name="Header" class="header" style="flex-grow: 1;">
                 <ui:Label text="Template Systems" name="Title" class="title" />

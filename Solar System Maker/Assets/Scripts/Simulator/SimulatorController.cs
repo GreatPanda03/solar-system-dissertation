@@ -31,9 +31,13 @@ public class SimulatorController : MonoBehaviour
     }
 
     // loads the Simulator with the given simulation
+    // * also creates a physical entity for each body in case they don't have one
     public void LoadSimulation(Simulation simulation)
     {
         this.simulation = simulation;
+
+        foreach (Body body in simulation.bodies)
+            if (body.Entity == null) body.CreateEntity();
     }
 
     // clears all bodies in the Simulator
@@ -51,6 +55,12 @@ public class SimulatorController : MonoBehaviour
 
 
     #region Simulator Methods
+
+    // returns all bodies in the simulation
+    public List<Body> GetBodies()
+    {
+        return simulation.bodies;
+    }
 
     // adds the given body to the simulation
     public void AddBody(Body body)
@@ -84,6 +94,8 @@ public class SimulatorController : MonoBehaviour
     public void ApplyNewtonianPhysics_v1()
     {
         List<Body> bodies = simulation.bodies;
+
+        // O(nlogn)!!!
 
         for (int a = 0; a < bodies.Count; a++)
         {

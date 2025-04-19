@@ -45,7 +45,7 @@ public static class MainMenuUIController
     // displays the Main Menu interface
     public static void ShowInterface()
     {
-        ui.style.display = DisplayStyle.Flex;
+        ui.Q("Root").style.display = DisplayStyle.Flex;
 
         sampleSimScript.LoadSampleSimulation();
         sampleSimScript.RunSampleSimulation();
@@ -54,7 +54,7 @@ public static class MainMenuUIController
     // hides the Main Menu interface
     public static void HideInterface()
     {
-        ui.style.display = DisplayStyle.None;
+        ui.Q("Root").style.display = DisplayStyle.None;
 
         sampleSimScript.StopSampleSimulation();
         sampleSimScript.ClearSampleSimulation();

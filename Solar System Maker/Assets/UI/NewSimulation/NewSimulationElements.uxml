@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/NewSimulation/NewSimulationStyles.uss?fileID=7433441132597879392&amp;guid=11924aa3a2d607242afc23ab291ebf42&amp;type=3#NewSimulationStyles" />
-    <ui:VisualElement name="VisualElement" style="flex-grow: 1; align-self: center; justify-content: center; align-content: center; position: relative; max-height: none; display: flex; align-items: center; visibility: visible;">
+    <ui:VisualElement name="Root" style="flex-grow: 1; align-self: center; justify-content: center; align-content: center; position: relative; max-height: none; display: none; align-items: center; visibility: visible;">
         <ui:VisualElement name="Container" class="container" style="display: flex;">
             <ui:VisualElement name="Header" class="header" style="height: 10%;">
                 <ui:Label text="Create a New Simulation" name="Title" class="title" />

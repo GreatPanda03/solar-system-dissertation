@@ -32,13 +32,13 @@ public class TutorialUIController
     // shows the Tutorial interface
     public static void ShowInterface()
     {
-        ui.style.display = DisplayStyle.Flex;
+        ui.Q("Root").style.display = DisplayStyle.Flex;
     }
 
     // hides the Tutorial interface
     public static void HideInterface()
     {
-        ui.style.display = DisplayStyle.None;
+        ui.Q("Root").style.display = DisplayStyle.None;
     }
 
     // closes the new Tutorial window and displays the Main Menu

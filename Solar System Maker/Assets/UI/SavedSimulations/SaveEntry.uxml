@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/SavedSimulations/SaveEntryStyles.uss?fileID=7433441132597879392&amp;guid=12bae4b5d3f7f7b48905bf1828ea8adb&amp;type=3#SaveEntryStyles" />
+    <ui:Button name="SaveEntry" class="saveEntry">
+        <ui:Label text="Simulation Name" name="Title" class="title" />
+    </ui:Button>
+</ui:UXML>

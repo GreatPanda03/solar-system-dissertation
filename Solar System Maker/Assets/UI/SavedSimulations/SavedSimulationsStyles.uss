@@ -60,7 +60,29 @@
 }
 
 .saveList {
-    flex-basis: 70%;
+    flex-basis: 65%;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.selectedEntry {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    margin-right: 0;
+    background-color: rgb(162, 217, 255);
+    transition-duration: 0.25s;
+}
+
+.selectedEntry:hover {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    margin-right: 0;
+    background-color: rgb(107, 198, 255);
+    transition-duration: 0.25s;
 }
 
 .saveViewer {
@@ -82,11 +104,20 @@
     -unity-text-align: upper-center;
 }
 
+.footer {
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
 .loadButton {
     max-width: 50px;
     background-color: rgb(56, 173, 73);
+    color: rgb(255, 255, 255);
 }
 
-.footer {
-    align-items: center;
+.deleteButton {
+    max-width: 60px;
+    background-color: rgb(232, 79, 54);
+    color: rgb(255, 255, 255);
 }
