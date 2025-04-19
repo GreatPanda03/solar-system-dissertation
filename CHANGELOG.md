@@ -8,6 +8,14 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.4.3
+**Date:** 2025/04/19
+<br/>**Additions / Changes:**
+* **1)** Placing a body in Orbit mode while following another body makes the orbit relative to the followed body
+* **2)** Temporarily removed checks for mouse over UI *(was inconsistent)*
+
+---
+
 ### Version: 1.4.2
 **Date:** 2025/04/19
 <br/>**Additions / Changes:**
