@@ -8,6 +8,18 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.4.1
+**Date:** 2025/04/19
+<br/>**Bug Fixes:**
+* **1)** Fixed the properties & explorer windows appearing at the start of the simulation
+* **2)** Fixed not being able to close the properties & explorer windows
+
+**Additions / Changes:**
+* **1)** The "Plane" mode allows bodies to be placed and fired on a plane *(Y = 0)*
+* **2)** New plane visual when selecting "Plane" mode *(only for "Plane" mode)*
+
+---
+
 ### Version: 1.4.0
 **Date:** 2025/04/19
 <br/>**Additions / Changes:**
@@ -52,6 +64,7 @@ All dates are in the form **YYYY/MM/DD**.
 * **1)** New Explorer panel (not yet usable)
 * **2)** New panel to distinguish between Body List and Explorer
 * **3)** Can follow a planet when selecting a planet *(follows the planet until deselected)*
+* **4)** Added a new background plane texture (currently invisible)
 
 ---
 
