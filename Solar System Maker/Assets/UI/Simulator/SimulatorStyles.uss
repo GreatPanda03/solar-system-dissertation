@@ -1,3 +1,36 @@
+.toolbar {
+    height: 50px;
+    max-height: 50px;
+    min-height: 50px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: flex-start;
+    flex-direction: column;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.title {
+    -unity-text-align: middle-left;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    padding-right: 0;
+    padding-left: 0;
+    flex-basis: auto;
+    width: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.options {
+    width: 100%;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 5px;
+    padding-left: 0;
+    flex-direction: row;
+}
+
 .bodyButton {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -36,6 +69,20 @@
     transition-duration: 0.25s;
 }
 
+.saveButton {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    height: 100%;
+    font-size: 12px;
+    background-color: rgb(3, 190, 17);
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    transition-duration: 0.25s;
+    margin-right: 5px;
+}
+
 .exitButton {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -62,11 +109,151 @@
     transition-duration: 0.25s;
 }
 
-.title {
+.propertiesPanel {
+    position: absolute;
+    width: 200px;
+    height: auto;
+    left: 250px;
+    top: 50px;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.propertiesTitle {
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    padding-right: 0;
+    padding-left: 0;
+    flex-basis: auto;
+    width: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.divider {
+    height: 3px;
+    max-height: 3px;
+    min-height: 3px;
+    background-color: rgba(255, 255, 255, 0.59);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.propertiesNoBody {
+    height: auto;
+    color: rgb(255, 255, 255);
+    white-space: normal;
+    word-spacing: 0;
+    -unity-text-align: upper-center;
+    -unity-font-style: italic;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+}
+
+.propertiesGroup {
+    margin-top: 5px;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.propertiesSubtitle {
     -unity-text-align: middle-left;
     color: rgb(255, 255, 255);
     -unity-font-style: bold;
     padding-right: 0;
+    padding-left: 0;
+    flex-basis: auto;
+    width: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.propertiesField {
+    max-height: 30px;
+}
+
+.propertiesPanel .unity-label {
+    color: rgb(255, 255, 255);
+    min-width: auto;
+}
+
+.propertiesPanel .unity-base-text-field__input {
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.propertiesFields .unity-label {
+    color: rgb(255, 255, 255);
+    min-width: auto;
+    flex-basis: 40%;
+    -unity-text-align: upper-left;
+}
+
+.propertiesClose {
+    width: 10px;
+    height: 10px;
+    max-height: 10px;
+    min-height: 10px;
+    min-width: 10px;
+    max-width: 10px;
+    background-color: rgba(255, 255, 255, 0);
+    color: rgb(255, 6, 6);
+    -unity-font-style: bold;
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
     padding-left: 10px;
-    flex-basis: 100%;
+}
+
+.toolboxButton {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 5px;
+    transition-duration: 0.25s;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-top: 0;
+}
+
+.toolboxButton:hover {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 5px;
+    transition-duration: 0.25s;
 }

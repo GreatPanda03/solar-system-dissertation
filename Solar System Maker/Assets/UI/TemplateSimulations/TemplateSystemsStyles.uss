@@ -1,0 +1,92 @@
+.container {
+    background-color: rgba(0, 0, 0, 0.78);
+    padding-right: 5px;
+    padding-left: 5px;
+    width: 600px;
+    height: 500px;
+    max-height: 500px;
+    max-width: 600px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.header {
+    flex-basis: 10%;
+    justify-content: center;
+}
+
+.closeButton {
+    background-color: rgb(255, 88, 88);
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    max-height: 60%;
+    position: absolute;
+    height: 60%;
+    min-height: 60%;
+    color: rgb(255, 255, 255);
+}
+
+.divider {
+    height: 3px;
+    max-height: 3px;
+    min-height: 3px;
+    background-color: rgba(255, 255, 255, 0.59);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.title {
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    align-items: stretch;
+    position: relative;
+    font-size: 16px;
+}
+
+.content {
+    flex-basis: 80%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    white-space: nowrap;
+    -unity-text-align: middle-left;
+}
+
+.templateList {
+    flex-basis: 70%;
+}
+
+.templateViewer {
+    flex-basis: 30%;
+}
+
+.viewerTitle {
+    -unity-font-style: bold;
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+}
+
+.viewerDescription {
+    height: auto;
+    color: rgb(255, 255, 255);
+    white-space: normal;
+    word-spacing: 0;
+    -unity-text-align: upper-center;
+}
+
+.loadButton {
+    max-width: 50px;
+    background-color: rgb(56, 173, 73);
+}
+
+.footer {
+    align-items: center;
+}
