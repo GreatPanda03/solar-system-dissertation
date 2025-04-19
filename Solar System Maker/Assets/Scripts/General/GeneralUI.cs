@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.Interactions;
 using UnityEngine.UIElements;
 
 public static class GeneralUI
@@ -7,20 +9,27 @@ public static class GeneralUI
     // returns true if the mouse is over any UI element of any UI document
     public static bool IsPointerOverAnyUI()
     {
+        /*
         Vector2 mousePosition = Input.mousePosition;
         mousePosition.y = Screen.height - mousePosition.y;
 
         var uiDocuments = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
 
-        foreach (var doc in uiDocuments)
+        foreach (var document in uiDocuments)
         {
-            if (!doc.enabled || doc.rootVisualElement == null)
+            if (!document.enabled || document.rootVisualElement == null)
                 continue;
 
-            var picked = doc.rootVisualElement.panel?.Pick(mousePosition);
+            var root = document.rootVisualElement;
+            var picked = root.panel?.Pick(mousePosition);
+
             if (picked != null)
+            {
+                Debug.Log(picked);
                 return true;
+            }
         }
+        */
 
         return false;
     }

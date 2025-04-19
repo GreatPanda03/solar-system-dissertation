@@ -722,7 +722,6 @@ GameObject:
   - component: {fileID: 895624880}
   - component: {fileID: 895624879}
   - component: {fileID: 895624878}
-  - component: {fileID: 895624881}
   m_Layer: 0
   m_Name: GridPlane
   m_TagString: Untagged
@@ -820,25 +819,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 895624876}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &895624881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 895624876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a321af17d0121764d83d91984c6c2eaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  majorLineColor: {r: 1, g: 1, b: 1, a: 1}
-  minorLineColor: {r: 1, g: 1, b: 1, a: 0.2}
-  spacing: 1
-  gridSize: 100
-  majorLineEvery: 10
-  cameraHeightFadeStart: 30
-  cameraHeightFadeEnd: 60
 --- !u!1 &918391666
 GameObject:
   m_ObjectHideFlags: 0

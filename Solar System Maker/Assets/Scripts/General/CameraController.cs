@@ -91,7 +91,12 @@ public class CameraController : MonoBehaviour
     // runs the camera in Simulator mode
     private void RunSimulatorMode()
     {
-        Camera.main.transform.position += Input.mouseScrollDelta.y * 3 * Camera.main.transform.forward;
+        Debug.Log(GeneralUI.IsPointerOverAnyUI());
+
+        if (!GeneralUI.IsPointerOverAnyUI())
+        {
+            Camera.main.transform.position += Input.mouseScrollDelta.y * 3 * Camera.main.transform.forward;
+        }
 
         Movement();
 
@@ -166,7 +171,10 @@ public class CameraController : MonoBehaviour
         // Vector3.Lerp(cameraPos, targetPos, 0.1f);
 
         // zooming with scroll wheel
-        followDistance = Math.Max(subject.Radius, followDistance - Input.mouseScrollDelta.y * 3);
+        if (!GeneralUI.IsPointerOverAnyUI())
+        {
+            followDistance = Math.Max(subject.Radius, followDistance - Input.mouseScrollDelta.y * 3);
+        }
 
         // TODO: make rotation smoother! rotate around the subject rather than rotating the camera
 

@@ -366,11 +366,19 @@ public class SimulatorUIController : MonoBehaviour
             {
                 position = (Vector3) RunOrbitPlacement();
 
-                Body closestBody = GetBodyClosestToPreview();
+                if (selectedBody != null)
+                {
+                    velocity = GetStableOrbitVelocity(selectedBody, bodyPreview);
+                    DrawOrbitBetweenBodies(selectedBody, bodyPreview, velocity);
+                }
+                else
+                {
+                    Body targetBody = GetBodyClosestToPreview();
 
-                if (closestBody != null)
-                    velocity = GetStableOrbitVelocity(closestBody, bodyPreview);
-                    DrawOrbitBetweenBodies(closestBody, bodyPreview, velocity);
+                    if (targetBody != null)
+                        velocity = GetStableOrbitVelocity(targetBody, bodyPreview);
+                        DrawOrbitBetweenBodies(targetBody, bodyPreview, velocity);
+                }                
             }
 
             bodyPreview.Entity.transform.position = position;
@@ -390,7 +398,7 @@ public class SimulatorUIController : MonoBehaviour
         //   detecting any bodies that have been selected with LMB
         //   (only if a body preview isn't already being placed, to prevent interference)
         //   (also if it's in the world space, not UI)
-        if (bodyPreview == null && Input.GetMouseButtonDown(0) && GeneralUI.IsPointerOverAnyUI())
+        if (bodyPreview == null && Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
         {
             Vector3 screenPosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
@@ -438,7 +446,10 @@ public class SimulatorUIController : MonoBehaviour
     // allows the user to freely place bodies relative to the camera
     private Vector3 RunFreePlacement()
     {
-        distanceFromCamera = Math.Max(0, distanceFromCamera - Input.mouseScrollDelta.y * 3);
+        if (!GeneralUI.IsPointerOverAnyUI())
+        {
+            distanceFromCamera = Math.Max(0, distanceFromCamera - Input.mouseScrollDelta.y * 3);
+        }
 
         if (startVelocityPoint == null)
         {
@@ -458,7 +469,7 @@ public class SimulatorUIController : MonoBehaviour
     private Vector3 GetFreeVelocityDrag()
     {
         // starting the trajectory
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
         {
             Vector3 screenPosition = Input.mousePosition;
             screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
@@ -506,7 +517,7 @@ public class SimulatorUIController : MonoBehaviour
     private Vector3 GetPlaneVelocityDrag()
     {
         // starting the trajectory
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
         {
             startVelocityPoint = GetMouseOnPlane();
         }
