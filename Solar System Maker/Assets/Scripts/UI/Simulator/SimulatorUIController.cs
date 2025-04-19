@@ -12,9 +12,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 
@@ -40,7 +39,7 @@ public class SimulatorUIController : MonoBehaviour
     private float distanceFromCamera = 30f;
 
     // plane placement mode
-    // private Vector3 plane = new Vector3();
+    private Plane placementPlane = new Plane(Vector3.up, Vector3.zero);
 
 
     #region UI Setup
@@ -166,6 +165,49 @@ public class SimulatorUIController : MonoBehaviour
     #endregion Toolbox Functions
 
 
+        #region Explorer
+
+    // creates a new entry in the explorer for the given body
+    public void RefreshExplorer()
+    {
+        ui.Q<ScrollView>("ExplorerList").Clear();
+
+        foreach (Body body in simController.GetBodies())
+        {
+            CreateExplorerEntry(body);
+        }
+    }
+
+    // creates an entry for the given body
+    public TemplateContainer CreateExplorerEntry(Body body)
+    {
+        VisualTreeAsset explorerEntryTemplate = GameObject.Find("ExplorerUI").GetComponent<UIDocument>().visualTreeAsset;
+        TemplateContainer explorerEntry = explorerEntryTemplate.Instantiate();
+
+        explorerEntry.Q<Label>("ExplorerEntry_Type").text = body.Type;
+        explorerEntry.Q<Label>("ExplorerEntry_Name").text = body.Name;
+
+        ui.Q<ScrollView>("ExplorerList").Add(explorerEntry);
+
+        explorerEntry.RegisterCallback<ClickEvent>(e =>
+        {
+            selectedBody = body;
+            Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+            Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
+            ShowProperties();
+        });
+
+        return explorerEntry;
+    }
+
+    public void OnExplorerCloseClicked()
+    {
+        ui.Q<VisualElement>("ExplorerContainer").style.display = DisplayStyle.None;
+    }
+
+    #endregion Explorer
+
+
     #region Mode Selection
 
     public void SetMode(Mode mode)
@@ -263,6 +305,17 @@ public class SimulatorUIController : MonoBehaviour
         bodyPreview.CreateEntity();
         bodyPreview.Entity.transform.name = "Preview";
 
+        LineRenderer pathDrawer = bodyPreview.Entity.AddComponent<LineRenderer>();
+        pathDrawer.material = new Material(Shader.Find("Sprites/Default"));
+        pathDrawer.widthMultiplier = 0.2f;
+
+        // line that fades out
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] {new(Color.white, 0), new(Color.white, 1)},
+            new GradientAlphaKey[] {new(1, 0), new(0, 1)});
+        pathDrawer.colorGradient = gradient;
+
         Material m = bodyPreview.Entity.GetComponent<MeshRenderer>().material;
         m.color = new Color(m.color.r, m.color.g, m.color.b, 0.25f);   
     }
@@ -271,7 +324,11 @@ public class SimulatorUIController : MonoBehaviour
     {
         if (bodyPreview != null)
         {
-            if (bodyPreview.Entity != null) Destroy(bodyPreview.Entity);
+            if (bodyPreview.Entity != null) 
+            {
+                bodyPreview.Entity.GetComponent<LineRenderer>().enabled = false;
+                Destroy(bodyPreview.Entity);
+            }
             bodyPreview = null;
         }
     }
@@ -291,21 +348,29 @@ public class SimulatorUIController : MonoBehaviour
 
         RunBodySelection();
 
-        if (bodyPreview != null)
+        if (bodyPreview != null && bodyPreview.Entity != null)
         {
             if (mode == Mode.FreePlacement)
             {
                 position = RunFreePlacement();
                 velocity = GetFreeVelocityDrag();
+                DrawTrajectory(bodyPreview, velocity);
             }
             else if (mode == Mode.PlanePlacement)
             {
                 position = RunPlanePlacement();
                 velocity = GetPlaneVelocityDrag();
+                DrawTrajectory(bodyPreview, velocity);
             }
             else if (mode == Mode.OrbitPlacement)
             {
-                RunOrbitPlacement(out position, out velocity);
+                position = (Vector3) RunOrbitPlacement();
+
+                Body closestBody = GetBodyClosestToPreview();
+
+                if (closestBody != null)
+                    velocity = GetStableOrbitVelocity(closestBody, bodyPreview);
+                    DrawOrbitBetweenBodies(closestBody, bodyPreview, velocity);
             }
 
             bodyPreview.Entity.transform.position = position;
@@ -465,9 +530,8 @@ public class SimulatorUIController : MonoBehaviour
     private Vector3? GetMouseOnPlane()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane plane = new Plane(Vector3.up, Vector3.zero);
 
-        if (plane.Raycast(ray, out float distance))
+        if (placementPlane.Raycast(ray, out float distance))
         {
             return ray.GetPoint(distance);
         }
@@ -483,12 +547,64 @@ public class SimulatorUIController : MonoBehaviour
     #region Orbit Placement
 
     // allows the user to place bodies in an orbit relative to other bodies
-    private void RunOrbitPlacement(out Vector3 position, out Vector3 velocity)
+    // * forms an orbit around the closest body
+    private Vector3? RunOrbitPlacement()
     {
-        position = Vector3.zero;
-        velocity = Vector3.zero;
+        Vector3? position = GetMouseOnPlane();
+        return position != null ? position : bodyPreview.Entity.transform.position;
     }
 
+    // returns the body which is closest to the body preview
+    private Body GetBodyClosestToPreview()
+    {
+        List<Body> bodies = simController.GetBodies();
+
+        if (bodies.Count == 0) return null;
+
+        Vector3 position = bodyPreview.Entity.transform.position;
+        Body closest = bodies[0];
+        float distance = Vector3.Distance(position, closest.Entity.transform.position);
+
+        for (int b = 1; b < bodies.Count; b++)
+        {
+            float newDistance = Vector3.Distance(position, bodies[b].Entity.transform.position);
+
+            if (newDistance < distance)
+            {
+                closest = bodies[b];
+                distance = Vector3.Distance(position, closest.Entity.transform.position);
+            }
+        }
+
+        return closest;
+    }
+
+    // returns the velocity required for the given child body to have 
+    //   a stable orbit around the given parent body
+    private Vector3 GetStableOrbitVelocity(Body parent, Body child)
+    {
+        Vector3 centre = parent.Entity.transform.position;
+        Vector3 edge = child.Entity.transform.position;
+
+        float r = Vector3.Distance(centre, edge);
+        Vector3 gravityDirection = (edge - centre).normalized;
+        Vector3 velocityDirection = Vector3.Cross(gravityDirection, Vector3.up);
+
+        float G = simController.simulation.settings.GravityConstant;
+        float M = parent.Mass;
+
+        Debug.Log(gravityDirection);
+        Debug.Log(velocityDirection);
+
+        Vector3 velocity = velocityDirection * Mathf.Sqrt(G * M / r);
+
+        return velocity;
+    }
+
+    #endregion Orbit Placement
+
+
+    #region Final Placement
 
     // places an instance of the selected body down (if any)
     private void RunBodyPlacement(Vector3 position, Vector3 velocity)
@@ -524,11 +640,14 @@ public class SimulatorUIController : MonoBehaviour
             }
 
             RemoveEntityPreview();
+
             SetEntityPreview(selectedBodyItem);
+
+            bodyPreview.Entity.transform.position = position;
         }
     }
 
-    #endregion Orbit Placement
+    #endregion Final Placement
 
 
     #region Body Properties
@@ -657,47 +776,53 @@ public class SimulatorUIController : MonoBehaviour
     #endregion Body Properties
 
 
-    #region Explorer
+    #region Path Drawing
 
-    // creates a new entry in the explorer for the given body
-    public void RefreshExplorer()
+    // draws a trajectory for the given body based on the given vector
+    private void DrawTrajectory(Body body, Vector3 trajectory)
     {
-        ui.Q<ScrollView>("ExplorerList").Clear();
+        Vector3 origin = body.Entity.transform.position;
 
-        foreach (Body body in simController.GetBodies())
+    	LineRenderer pathDrawer = body.Entity.GetComponent<LineRenderer>();
+	    pathDrawer.positionCount = 2;
+
+        pathDrawer.SetPosition(0, origin);
+        pathDrawer.SetPosition(1, origin + trajectory * 30);
+    }
+
+    // draws the orbit of one body around another
+    private void DrawOrbitBetweenBodies(Body parent, Body child, Vector3 childVelocity)
+    {
+        Vector3 centre = parent.Entity.transform.position;
+        Vector3 edge = child.Entity.transform.position;
+
+        float G = simController.simulation.settings.GravityConstant;
+        float M = parent.Mass;
+
+        int resolution = 100;
+        float step = 1f; // time step
+        Vector3[] points = new Vector3[resolution];
+
+        LineRenderer pathDrawer = child.Entity.GetComponent<LineRenderer>();
+	    pathDrawer.positionCount = resolution;
+
+        for (int p = 0; p < resolution; p++)
         {
-            CreateExplorerEntry(body);
+            points[p] = edge;
+
+            // same formula used to calculate forces between bodies!
+            Vector3 direction = (centre - edge).normalized;
+            float rSquared = (centre - edge).sqrMagnitude;
+            Vector3 acceleration = direction * (G * M / rSquared);
+
+            childVelocity += acceleration * step;
+            edge += childVelocity * step;
         }
+
+        pathDrawer.SetPositions(points);
     }
 
-    // creates an entry for the given body
-    public TemplateContainer CreateExplorerEntry(Body body)
-    {
-        VisualTreeAsset explorerEntryTemplate = GameObject.Find("ExplorerUI").GetComponent<UIDocument>().visualTreeAsset;
-        TemplateContainer explorerEntry = explorerEntryTemplate.Instantiate();
-
-        explorerEntry.Q<Label>("ExplorerEntry_Type").text = body.Type;
-        explorerEntry.Q<Label>("ExplorerEntry_Name").text = body.Name;
-
-        ui.Q<ScrollView>("ExplorerList").Add(explorerEntry);
-
-        explorerEntry.RegisterCallback<ClickEvent>(e =>
-        {
-            selectedBody = body;
-            Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
-            Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
-            ShowProperties();
-        });
-
-        return explorerEntry;
-    }
-
-    public void OnExplorerCloseClicked()
-    {
-        ui.Q<VisualElement>("ExplorerContainer").style.display = DisplayStyle.None;
-    }
-
-    #endregion Explorer
+    #endregion Path Drawing
 
 
     #region Auxiliary
