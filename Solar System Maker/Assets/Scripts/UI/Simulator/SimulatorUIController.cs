@@ -57,6 +57,8 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
+        ui.Q<Button>("ExplorerClose").clicked += OnExplorerCloseClicked;
+        ui.Q<VisualElement>("ExplorerContainer").style.display = DisplayStyle.None;
 
         ui.Q<Button>("Modes").clicked += OnModesClicked;
         ui.Q<Button>("FreePlacement").clicked += OnFreePlacementClicked;
@@ -64,7 +66,7 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("OrbitPlacement").clicked += OnOrbitPlacementClicked;
         ui.Q<VisualElement>("ModeList").style.display = DisplayStyle.None;
 
-        OnFreePlacementClicked(); // select Free mode by default
+        SelectModeItem("FreePlacement");
 
         ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
         ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
@@ -73,6 +75,7 @@ public class SimulatorUIController : MonoBehaviour
 
         InitialisePropertyFields();
         ui.Q<Button>("PropertiesClose").clicked += OnPropertiesCloseClicked;
+        HideProperties();
 
         Debug.Log("[SIMULATOR] SUCCESS: UI Loaded");
     }
@@ -98,11 +101,14 @@ public class SimulatorUIController : MonoBehaviour
     public void EnableInterface()
     {
         isActive = true;
+        OnFreePlacementClicked(); // select Free mode by default
     }
 
     // disables the interface and reverts all values to their defaults
     public void DisableInterface()
     {
+        GameObject.Find("GridPlane").GetComponent<Renderer>().enabled = false;
+
         isActive = false;
         selectedBodyItem = null;
         if (bodyPreview != null) 
@@ -146,17 +152,6 @@ public class SimulatorUIController : MonoBehaviour
             .SetScene(CameraController.Mode.MainMenu);
     }
 
-    // hides the properties window when the close button is clicked
-    public void OnPropertiesCloseClicked()
-    {
-        HideProperties();
-
-        selectedBody = null;
-        Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
-        Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
-        ShowProperties();
-}
-
     #endregion General UI
 
 
@@ -164,11 +159,11 @@ public class SimulatorUIController : MonoBehaviour
 
     public void OnExplorerClicked()
     {
-        // VisualElement explorer = ui.Q<VisualElement>("ExplorerList");
-        // explorer.style.display = explorer.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+        VisualElement explorer = ui.Q<VisualElement>("ExplorerContainer");
+        explorer.style.display = explorer.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
-    #endregion
+    #endregion Toolbox Functions
 
 
     #region Mode Selection
@@ -192,9 +187,6 @@ public class SimulatorUIController : MonoBehaviour
     {
         if (Enum.TryParse(modeName, out Mode newMode))
         {
-            Debug.Log(mode);
-            Debug.Log(mode.ToString());
-
             Button oldButton = ui.Q<Button>(mode.ToString());
             oldButton.RemoveFromClassList("selectedButton");
 
@@ -202,6 +194,9 @@ public class SimulatorUIController : MonoBehaviour
             newButton.AddToClassList("selectedButton");
             
             mode = newMode;
+
+            GameObject.Find("GridPlane").GetComponent<Renderer>().enabled
+                = newMode == Mode.PlanePlacement;
         }
     }
 
@@ -301,17 +296,19 @@ public class SimulatorUIController : MonoBehaviour
             if (mode == Mode.FreePlacement)
             {
                 position = RunFreePlacement();
-                velocity = GetVelocityDrag();
+                velocity = GetFreeVelocityDrag();
             }
             else if (mode == Mode.PlanePlacement)
             {
                 position = RunPlanePlacement();
-                velocity = GetVelocityDrag();
+                velocity = GetPlaneVelocityDrag();
             }
             else if (mode == Mode.OrbitPlacement)
             {
                 RunOrbitPlacement(out position, out velocity);
             }
+
+            bodyPreview.Entity.transform.position = position;
 
             RunBodyPlacement(position, velocity);
         }
@@ -368,22 +365,21 @@ public class SimulatorUIController : MonoBehaviour
         }
     }
 
+    #endregion Placement & Tools
+
+
+    #region Free Placement
+
     // allows the user to freely place bodies relative to the camera
     private Vector3 RunFreePlacement()
     {
-        // SPAWN DISTANCE
-        //   updating spawn distance from camera with scrolling
         distanceFromCamera = Math.Max(0, distanceFromCamera - Input.mouseScrollDelta.y * 3);
 
-        // BODY PREVIEW
-        //   displays a "ghost" representation of the selected body
-        //   at the target location (only updates position if not being fired)
         if (startVelocityPoint == null)
         {
             Vector3 screenPosition = Input.mousePosition;
             screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
-            bodyPreview.Entity.transform.position = worldPosition;
 
             return worldPosition;
         }
@@ -392,26 +388,11 @@ public class SimulatorUIController : MonoBehaviour
             return bodyPreview.Entity.transform.position;
         }
     }
-
-    // allows the user to place bodies on a fixed plane
-    private Vector3 RunPlanePlacement()
-    {
-        return Vector3.zero;
-    }
-
-    // allows the user to place bodies in an orbit relative to other bodies
-    private void RunOrbitPlacement(out Vector3 position, out Vector3 velocity)
-    {
-        position = Vector3.zero;
-        velocity = Vector3.zero;
-    }
-
+    
     // returns a velocity based on the distance the mouse has moved after right click (if any)
-    private Vector3 GetVelocityDrag()
+    private Vector3 GetFreeVelocityDrag()
     {
-        // BODY TRAJECTORY (start)
-        //   set the starting velocity point to the mouse's position in the world on LMB click
-        //   * don't really need to check for previewEntity since no direct operations...
+        // starting the trajectory
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 screenPosition = Input.mousePosition;
@@ -419,8 +400,7 @@ public class SimulatorUIController : MonoBehaviour
             startVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
         }
 
-        // BODY TRAJECTORY (end)
-        //   stop tracking the starting velocity on LMB lift (marks that 0 velocity will be applied)
+        // ending the trajectory
         if (Input.GetMouseButtonUp(0))
         {
             startVelocityPoint = null;
@@ -432,11 +412,83 @@ public class SimulatorUIController : MonoBehaviour
             screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
             Vector3 endVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
 
-            return (Vector3) (endVelocityPoint - startVelocityPoint) / 100.0f;
+            return (Vector3) (startVelocityPoint - endVelocityPoint) / 100.0f;
         }
 
         return Vector3.zero;
     }
+
+    #endregion Free Placement
+
+
+    #region Plane Placement
+
+    // allows the user to place bodies on a fixed plane
+    private Vector3 RunPlanePlacement()
+    {
+        if (startVelocityPoint == null)
+        {
+            Vector3? position = GetMouseOnPlane();
+            return (Vector3) (position != null ? position : bodyPreview.Entity.transform.position);
+        }
+        else
+        {
+            return bodyPreview.Entity.transform.position;
+        }
+    }
+
+    // returns a velocity trajectory for plane mode from the mouse positions
+    private Vector3 GetPlaneVelocityDrag()
+    {
+        // starting the trajectory
+        if (Input.GetMouseButtonDown(0))
+        {
+            startVelocityPoint = GetMouseOnPlane();
+        }
+
+        // ending the trajectory
+        if (Input.GetMouseButtonUp(0))
+        {
+            startVelocityPoint = null;
+            return Vector3.zero;
+        }
+        else if (startVelocityPoint != null)
+        {
+            Vector3? endVelocityPoint = GetMouseOnPlane();
+            return endVelocityPoint != null ? (Vector3) (startVelocityPoint - endVelocityPoint) / 100.0f : Vector3.zero;
+        }
+
+        return Vector3.zero;
+    }
+
+    // returns the point where the user's mouse intersects the plane Y = 0 (if any)
+    private Vector3? GetMouseOnPlane()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, Vector3.zero);
+
+        if (plane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+        else
+        {
+            return null;
+        }   
+    }
+
+    #endregion Plane Placement
+
+
+    #region Orbit Placement
+
+    // allows the user to place bodies in an orbit relative to other bodies
+    private void RunOrbitPlacement(out Vector3 position, out Vector3 velocity)
+    {
+        position = Vector3.zero;
+        velocity = Vector3.zero;
+    }
+
 
     // places an instance of the selected body down (if any)
     private void RunBodyPlacement(Vector3 position, Vector3 velocity)
@@ -476,10 +528,10 @@ public class SimulatorUIController : MonoBehaviour
         }
     }
 
-    #endregion Placement & Tools
+    #endregion Orbit Placement
 
 
-    #region Properties
+    #region Body Properties
     
     // changes the selected body's properties when any property field is changed
     private void InitialisePropertyFields()
@@ -591,10 +643,21 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<VisualElement>("Properties").style.display = DisplayStyle.None;
     }
 
-    #endregion Properties
+       // hides the properties window when the close button is clicked
+    public void OnPropertiesCloseClicked()
+    {
+        HideProperties();
+
+        selectedBody = null;
+        Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
+        Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+        ShowProperties();
+    }
+
+    #endregion Body Properties
 
 
-    #region Explorer List Functions 
+    #region Explorer
 
     // creates a new entry in the explorer for the given body
     public void RefreshExplorer()
@@ -629,7 +692,12 @@ public class SimulatorUIController : MonoBehaviour
         return explorerEntry;
     }
 
-    #endregion
+    public void OnExplorerCloseClicked()
+    {
+        ui.Q<VisualElement>("ExplorerContainer").style.display = DisplayStyle.None;
+    }
+
+    #endregion Explorer
 
 
     #region Auxiliary
@@ -644,5 +712,5 @@ public class SimulatorUIController : MonoBehaviour
         return null;
     }
 
-    #endregion
+    #endregion Auxiliary
 }

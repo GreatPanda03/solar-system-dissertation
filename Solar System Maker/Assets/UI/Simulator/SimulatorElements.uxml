@@ -9,6 +9,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="Properties" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: 10px; left: auto; right: 10px;">
+            <ui:Button text="X" name="PropertiesClose" class="propertiesClose" style="position: absolute;" />
             <ui:Label text="Properties" name="PropertiesTitle" class="propertiesTitle" />
             <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
             <ui:VisualElement name="PropertyGroups" style="flex-grow: 1; display: none;">
@@ -38,7 +39,6 @@
                 </ui:GroupBox>
             </ui:VisualElement>
             <ui:Label text="Select a body in the system to see its properties" name="NoSelectedBody" class="propertiesNoBody" />
-            <ui:Button text="X" name="PropertiesClose" class="propertiesClose" style="position: absolute;" />
         </ui:VisualElement>
         <ui:VisualElement name="ExplorerContainer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 10px;">
             <ui:Label text="Explorer" name="ExplorerTitle" class="propertiesTitle" />
