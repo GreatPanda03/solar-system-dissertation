@@ -2,9 +2,21 @@
 
 This changelog covers a list of features and fixes which have been made for the application.
 
-Versions are in the form **X.Y.Z**: *X* represents a significant feature which covers a range of functionality; *Y* represents single / small feature changes; and *Z* represents fixes or bulk patches.
+Versions are in the form **X.Y.Z**: *X* represents a significant feature which covers a range of functionality; *Y* represents single / small feature changes; and *Z* represents fixes or build-ups to the same feature as a gradual release.
 
 All dates are in the form **YYYY/MM/DD**.
+
+---
+
+### Version: 1.4.0
+**Date:** 2025/04/19
+<br/>**Additions / Changes:**
+* **1)** New mode panel to select a placement mode *(free, plane, or orbit placement)*
+* **2)** New mode button to toggle the mode panel
+* **3)** Code reorganisation to accommodate placement types
+* **4)** Can now use the mouse scroll wheel to zoom in / out
+* **5)** Zooming with a body preview moves the entire camera rather than the preview
+* **Note:** only "Free" mode works - "Plane" and "Orbit" mode are a WIP
 
 ---
 
