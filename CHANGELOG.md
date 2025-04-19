@@ -8,6 +8,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.4.2
+**Date:** 2025/04/19
+<br/>**Additions / Changes:**
+* **1)** "Orbit" mode allows bodies to be placed and fired in an orbit around the closest body
+* **2)** New visual orbit around attractor when preparing to place a body in orbit
+* **3)** New visual direction indicator when preparing to fire a body at a trajectory
+
+---
+
 ### Version: 1.4.1
 **Date:** 2025/04/19
 <br/>**Bug Fixes:**
@@ -15,7 +24,7 @@ All dates are in the form **YYYY/MM/DD**.
 * **2)** Fixed not being able to close the properties & explorer windows
 
 **Additions / Changes:**
-* **1)** The "Plane" mode allows bodies to be placed and fired on a plane *(Y = 0)*
+* **1)** "Plane" mode allows bodies to be placed and fired on a plane *(Y = 0)*
 * **2)** New plane visual when selecting "Plane" mode *(only for "Plane" mode)*
 
 ---
