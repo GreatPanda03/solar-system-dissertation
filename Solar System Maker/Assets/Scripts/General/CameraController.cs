@@ -91,7 +91,10 @@ public class CameraController : MonoBehaviour
     // runs the camera in Simulator mode
     private void RunSimulatorMode()
     {
+        Camera.main.transform.position += Input.mouseScrollDelta.y * 3 * Camera.main.transform.forward;
+
         Movement();
+
         if (Input.GetMouseButton(1)) { // turn on right mouse button click
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Confined;

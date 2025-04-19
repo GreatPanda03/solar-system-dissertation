@@ -21,18 +21,26 @@ using UnityEngine.UIElements;
 // CLASS DEFINITION
 public class SimulatorUIController : MonoBehaviour
 {
+
+    public enum Mode { FreePlacement, PlanePlacement, OrbitPlacement };
+    private Mode mode;
+
     private SimulatorController simController;
     public VisualElement ui;
 
+    // general mode
     private bool isActive = false;
-
     public GameObject simulatorSpace;
     private string selectedBodyItem;
     private Body bodyPreview;
+    private Body selectedBody;
+
+    // free placement mode
     private Vector3? startVelocityPoint; // positional point, not velocity
     private float distanceFromCamera = 30f;
 
-    private Body selectedBody;
+    // plane placement mode
+    // private Vector3 plane = new Vector3();
 
 
     #region UI Setup
@@ -40,17 +48,28 @@ public class SimulatorUIController : MonoBehaviour
     // initialises basic Simulator functions
     public void Initialise()
     {
+        SetMode(Mode.FreePlacement);
+
         simController = GameObject.Find("Simulator").GetComponent<SimulatorController>();
         ui = GameObject.Find("SimulatorUI").GetComponent<UIDocument>().rootVisualElement;
 
         ui.Q<Button>("SaveSimulation").clicked += OnSaveSimulationClicked;
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
-        ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
 
+        ui.Q<Button>("Modes").clicked += OnModesClicked;
+        ui.Q<Button>("FreePlacement").clicked += OnFreePlacementClicked;
+        ui.Q<Button>("PlanePlacement").clicked += OnPlanePlacementClicked;
+        ui.Q<Button>("OrbitPlacement").clicked += OnOrbitPlacementClicked;
+        ui.Q<VisualElement>("ModeList").style.display = DisplayStyle.None;
+
+        OnFreePlacementClicked(); // select Free mode by default
+
+        ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
         ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
         ui.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
+        ui.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
 
         InitialisePropertyFields();
         ui.Q<Button>("PropertiesClose").clicked += OnPropertiesCloseClicked;
@@ -143,12 +162,6 @@ public class SimulatorUIController : MonoBehaviour
 
     #region Toolbox Functions
 
-    public void OnBodiesClicked()
-    {
-        VisualElement bodyList = ui.Q<VisualElement>("BodyList");
-        bodyList.style.display = bodyList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
-    }
-
     public void OnExplorerClicked()
     {
         // VisualElement explorer = ui.Q<VisualElement>("ExplorerList");
@@ -158,6 +171,43 @@ public class SimulatorUIController : MonoBehaviour
     #endregion
 
 
+    #region Mode Selection
+
+    public void SetMode(Mode mode)
+    {
+        this.mode = mode;
+    }
+
+    public void OnModesClicked()
+    {
+        VisualElement modeList = ui.Q<VisualElement>("ModeList");
+        modeList.style.display = modeList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+    }
+
+    private void OnFreePlacementClicked()    { SelectModeItem("FreePlacement"); }
+    private void OnPlanePlacementClicked()   { SelectModeItem("PlanePlacement"); }
+    private void OnOrbitPlacementClicked()   { SelectModeItem("OrbitPlacement"); }
+
+    public void SelectModeItem(string modeName)
+    {
+        if (Enum.TryParse(modeName, out Mode newMode))
+        {
+            Debug.Log(mode);
+            Debug.Log(mode.ToString());
+
+            Button oldButton = ui.Q<Button>(mode.ToString());
+            oldButton.RemoveFromClassList("selectedButton");
+
+            Button newButton = ui.Q<Button>(modeName);
+            newButton.AddToClassList("selectedButton");
+            
+            mode = newMode;
+        }
+    }
+
+    #endregion 
+
+
     #region Body Selection & Preview
 
     public Body GetSelectedBody()
@@ -165,8 +215,14 @@ public class SimulatorUIController : MonoBehaviour
         return selectedBody;
     }
 
-    private void OnAddStarClicked() { OnBodyItemClicked("Star"); }
-    private void OnAddPlanetClicked() { OnBodyItemClicked("Planet"); }
+    public void OnBodiesClicked()
+    {
+        VisualElement bodyList = ui.Q<VisualElement>("BodyList");
+        bodyList.style.display = bodyList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+    }
+
+    private void OnAddStarClicked()     { OnBodyItemClicked("Star"); }
+    private void OnAddPlanetClicked()   { OnBodyItemClicked("Planet"); }
 
     private void OnBodyItemClicked(string bodyType)
     {
@@ -175,7 +231,6 @@ public class SimulatorUIController : MonoBehaviour
         if (selectedBodyItem == null) return;
         SetEntityPreview(bodyType);
     }
-
 
     // sets the selected item from the body list and sets a visual indicator
     public void SelectBodyItem(string bodyName)
@@ -235,26 +290,40 @@ public class SimulatorUIController : MonoBehaviour
     void Update()
     {
         if (!isActive) return;
+        
+        Vector3 position = Vector3.zero;
+        Vector3 velocity = Vector3.zero;
 
-        // BODY ITEM SELECTION TOGGLE
-        //   removes the current selected body to have an "empty hand"
-        if (selectedBodyItem != null && Input.GetKeyDown(KeyCode.E))
+        RunBodySelection();
+
+        if (bodyPreview != null)
         {
-            SelectBodyItem(selectedBodyItem); // as if the button is being toggled off
-            RemoveEntityPreview();
-        }
+            if (mode == Mode.FreePlacement)
+            {
+                position = RunFreePlacement();
+                velocity = GetVelocityDrag();
+            }
+            else if (mode == Mode.PlanePlacement)
+            {
+                position = RunPlanePlacement();
+                velocity = GetVelocityDrag();
+            }
+            else if (mode == Mode.OrbitPlacement)
+            {
+                RunOrbitPlacement(out position, out velocity);
+            }
 
-        // BODY PREVIEW
-        //   displays a "ghost" representation of the selected body
-        //   at the target location (only updates position if not being fired)
-        if (bodyPreview != null && bodyPreview.Entity != null && startVelocityPoint == null)
-        {
-            Vector3 screenPosition = Input.mousePosition;
-            screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
-            bodyPreview.Entity.transform.position = worldPosition;
+            RunBodyPlacement(position, velocity);
         }
+    }
 
+    #endregion Inputs Loop
+
+
+    #region Placement & Tools
+
+    private void RunBodySelection()
+    {
         // BODY SELECTION (in space)
         //   detecting any bodies that have been selected with LMB
         //   (only if a body preview isn't already being placed, to prevent interference)
@@ -290,11 +359,56 @@ public class SimulatorUIController : MonoBehaviour
             }
         }
 
-        if (bodyPreview == null && selectedBody == null)
+        // BODY ITEM SELECTION TOGGLE
+        //   removes the current selected body to have an "empty hand"
+        if (selectedBodyItem != null && Input.GetKeyDown(KeyCode.E))
         {
-            Camera.main.transform.position += Input.mouseScrollDelta.y * 3 * Camera.main.transform.forward;
+            SelectBodyItem(selectedBodyItem); // as if the button is being toggled off
+            RemoveEntityPreview();
         }
+    }
 
+    // allows the user to freely place bodies relative to the camera
+    private Vector3 RunFreePlacement()
+    {
+        // SPAWN DISTANCE
+        //   updating spawn distance from camera with scrolling
+        distanceFromCamera = Math.Max(0, distanceFromCamera - Input.mouseScrollDelta.y * 3);
+
+        // BODY PREVIEW
+        //   displays a "ghost" representation of the selected body
+        //   at the target location (only updates position if not being fired)
+        if (startVelocityPoint == null)
+        {
+            Vector3 screenPosition = Input.mousePosition;
+            screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+            bodyPreview.Entity.transform.position = worldPosition;
+
+            return worldPosition;
+        }
+        else
+        {
+            return bodyPreview.Entity.transform.position;
+        }
+    }
+
+    // allows the user to place bodies on a fixed plane
+    private Vector3 RunPlanePlacement()
+    {
+        return Vector3.zero;
+    }
+
+    // allows the user to place bodies in an orbit relative to other bodies
+    private void RunOrbitPlacement(out Vector3 position, out Vector3 velocity)
+    {
+        position = Vector3.zero;
+        velocity = Vector3.zero;
+    }
+
+    // returns a velocity based on the distance the mouse has moved after right click (if any)
+    private Vector3 GetVelocityDrag()
+    {
         // BODY TRAJECTORY (start)
         //   set the starting velocity point to the mouse's position in the world on LMB click
         //   * don't really need to check for previewEntity since no direct operations...
@@ -310,28 +424,28 @@ public class SimulatorUIController : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             startVelocityPoint = null;
+            return Vector3.zero;
+        }
+        else if (startVelocityPoint != null)
+        {
+            Vector3 screenPosition = Input.mousePosition;
+            screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
+            Vector3 endVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
+
+            return (Vector3) (endVelocityPoint - startVelocityPoint) / 100.0f;
         }
 
-        // SPAWN DISTANCE
-        //   updating spawn distance from camera with scrolling
-        float cameraOffset = distanceFromCamera - Input.mouseScrollDelta.y * 3;
-        distanceFromCamera = Math.Max(0, cameraOffset);
+        return Vector3.zero;
+    }
 
+    // places an instance of the selected body down (if any)
+    private void RunBodyPlacement(Vector3 position, Vector3 velocity)
+    {
+        
         // BODY PLACEMENT
         //   place the selected body down on input
-        if (bodyPreview != null && Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            Vector3 position = bodyPreview.Entity.transform.position;
-            Vector3 velocity = Vector3.zero;
-
-            if (startVelocityPoint != null) 
-            {
-                Vector3 screenPosition = Input.mousePosition;
-                screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
-                Vector3 endVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
-                velocity = ((Vector3) startVelocityPoint - endVelocityPoint) / 100; // opposite to mouse dir.
-            }
-
             if (selectedBodyItem == "Star")
             {
                 Star star = new()
@@ -362,11 +476,10 @@ public class SimulatorUIController : MonoBehaviour
         }
     }
 
-    #endregion Inputs Loop
+    #endregion Placement & Tools
 
 
     #region Properties
-
     
     // changes the selected body's properties when any property field is changed
     private void InitialisePropertyFields()

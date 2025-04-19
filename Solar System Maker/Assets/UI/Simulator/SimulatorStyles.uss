@@ -236,3 +236,24 @@
     padding-bottom: 10px;
     padding-left: 10px;
 }
+
+.toolboxButton {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 5px;
+    transition-duration: 0.25s;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-top: 0;
+}
+
+.toolboxButton:hover {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 5px;
+    transition-duration: 0.25s;
+}
