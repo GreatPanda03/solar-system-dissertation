@@ -8,6 +8,14 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.5.2
+**Date:** 2025/04/20
+**Additions / Changes:**
+* **1)** Added a button to select a base distance scale *(metres, kilometres, AU, etc.)*
+* **2)** Adjusted styling and order for toolbox buttons
+
+---
+
 ### Version: 1.5.1
 **Date:** 2025/04/20
 <br/>**Bug Fixes:**
