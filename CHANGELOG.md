@@ -8,6 +8,20 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.5.1
+**Date:** 2025/04/20
+<br/>**Bug Fixes:**
+* **1)** Trajectories for launching and stable orbits now scale correctly
+* **2)** Deselecting a body now always hides the properties window *(as intended)*
+* **3)** Stable orbits around moving bodies are now properly calculated *(initial velocity of "parent" considered)*
+* **Note:** the camera still zooms relative to the origin
+
+**Additions / Changes:**
+* **1)** Property window values update per frame rather than on body selection
+* **2)** Stable orbit paths are now fixed circles around the "parent" body *(for "limitless" size)*
+
+---
+
 ### Version: 1.5.0
 **Date:** 2025/04/20
 <br/>**Additions / Changes:**
