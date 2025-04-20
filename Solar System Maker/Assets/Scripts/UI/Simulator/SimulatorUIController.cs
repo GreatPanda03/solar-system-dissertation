@@ -195,7 +195,6 @@ public class SimulatorUIController : MonoBehaviour
             selectedBody = body;
             Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
             Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
-            ShowProperties();
         });
 
         return explorerEntry;
@@ -344,6 +343,7 @@ public class SimulatorUIController : MonoBehaviour
     {
         if (!isActive) return;
 
+        // system scaling
         float scroll = Input.mouseScrollDelta.y;
         float zoomAdjustment = scroll > 0 ? -0.1f : (scroll < 0 ? 0.1f : 0);
 
@@ -365,27 +365,31 @@ public class SimulatorUIController : MonoBehaviour
             */
         }
 
+        // property updates
+        if (selectedBody != null) ShowProperties();
+
+        // body selection & placement
         RunBodySelection();
 
         if (bodyPreview != null && bodyPreview.Entity != null)
         {
             double scale = SimulatorController.GetScaleCoefficient();
 
-            if (mode == Mode.FreePlacement)
+            if (mode == Mode.FreePlacement)         // visual position & velocity
             {
-                bodyPreview.Position = RunFreePlacement();
-                bodyPreview.Velocity = GetFreeVelocityDrag();
+                bodyPreview.Position = RunFreePlacement() / (float) scale;      
+                bodyPreview.Velocity = GetFreeVelocityDrag() / (float) scale;
                 PathDrawer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
             }
-            else if (mode == Mode.PlanePlacement)
+            else if (mode == Mode.PlanePlacement)   // visual position & velocity
             {
-                bodyPreview.Position = RunPlanePlacement();
-                bodyPreview.Velocity = GetPlaneVelocityDrag();
+                bodyPreview.Position = RunPlanePlacement() / (float) scale;     
+                bodyPreview.Velocity = GetPlaneVelocityDrag() / (float) scale;
                 PathDrawer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
             }
-            else if (mode == Mode.OrbitPlacement)
+            else if (mode == Mode.OrbitPlacement)   // visual position, but TRUE velocity
             {
-                bodyPreview.Position = (Vector3) RunOrbitPlacement();
+                bodyPreview.Position = (Vector3) RunOrbitPlacement() / (float) scale;
 
                 if (selectedBody != null)
                 {
@@ -406,8 +410,6 @@ public class SimulatorUIController : MonoBehaviour
 
             SimulatorController.ApplyScale(bodyPreview);
 
-            bodyPreview.Entity.transform.position = bodyPreview.Position;
-
             RunBodyPlacement();
         }
     }
@@ -417,12 +419,9 @@ public class SimulatorUIController : MonoBehaviour
 
     #region Placement & Tools
 
+    // selects and follows the clicked body (if any)
     private void RunBodySelection()
     {
-        // BODY SELECTION (in space)
-        //   detecting any bodies that have been selected with LMB
-        //   (only if a body preview isn't already being placed, to prevent interference)
-        //   (also if it's in the world space, not UI)
         if (bodyPreview == null && Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
         {
             Vector3 screenPosition = Input.mousePosition;
@@ -441,7 +440,6 @@ public class SimulatorUIController : MonoBehaviour
                         selectedBody = body;
                         Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
                         Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
-                        ShowProperties();
                     }
                 }
             }
@@ -450,12 +448,11 @@ public class SimulatorUIController : MonoBehaviour
                 selectedBody = null;
                 Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
                 Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
-                ShowProperties();
+                HideProperties();
             }
         }
 
-        // BODY ITEM SELECTION TOGGLE
-        //   removes the current selected body to have an "empty hand"
+        // reverts to an "empty hand"
         if (selectedBodyItem != null && Input.GetKeyDown(KeyCode.E))
         {
             SelectBodyItem(selectedBodyItem); // as if the button is being toggled off
@@ -469,6 +466,7 @@ public class SimulatorUIController : MonoBehaviour
     #region Free Placement
 
     // allows the user to freely place bodies relative to the camera
+    // * position is based on the mouse's position on the screen
     private Vector3 RunFreePlacement()
     {
         /*
@@ -493,6 +491,7 @@ public class SimulatorUIController : MonoBehaviour
     }
     
     // returns a velocity based on the distance the mouse has moved after right click (if any)
+    // * velocity is based on the mouse's position on the screen
     private Vector3 GetFreeVelocityDrag()
     {
         // starting the trajectory
@@ -527,6 +526,7 @@ public class SimulatorUIController : MonoBehaviour
     #region Plane Placement
 
     // allows the user to place bodies on a fixed plane
+    // * position is based on the mouse's position on the screen
     private Vector3 RunPlanePlacement()
     {
         if (startVelocityPoint == null)
@@ -539,6 +539,7 @@ public class SimulatorUIController : MonoBehaviour
     }
 
     // returns a velocity trajectory for plane mode from the mouse positions
+    // * velocity is based on the mouse's position on the screen
     private Vector3 GetPlaneVelocityDrag()
     {
         // starting the trajectory
@@ -563,6 +564,7 @@ public class SimulatorUIController : MonoBehaviour
     }
 
     // returns the point where the user's mouse intersects the plane Y = 0 (if any)
+    // * position is based on the mouse's position on the screen
     private Vector3? GetMouseOnPlane()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -582,15 +584,15 @@ public class SimulatorUIController : MonoBehaviour
 
     #region Orbit Placement
 
-    // allows the user to place bodies in an orbit relative to other bodies
-    // * forms an orbit around the closest body
+    // allows the user to place bodies in an orbit relative to other bodies (plane as a reference)
+    // * position is based on the mouse's position on the screen
     private Vector3? RunOrbitPlacement()
     {
         Vector3? position = GetMouseOnPlane();
         return position != null ? position : bodyPreview.Entity.transform.position;
     }
 
-    // returns the body which is closest to the body preview
+    // auxiliary: returns the body which is closest to the body preview
     private Body GetBodyClosestToPreview()
     {
         List<Body> bodies = simController.GetBodies();
@@ -615,8 +617,8 @@ public class SimulatorUIController : MonoBehaviour
         return closest;
     }
 
-    // returns the velocity required for the given child body to have 
-    //   a stable orbit around the given parent body
+    // returns the velocity required for the given child body to have a stable orbit around the given parent body
+    // * velocity is based on the true positions of each body, which is then scaled accordingly later
     private Vector3 GetStableOrbitVelocity(Body parent, Body child)
     {
         Vector3 centre = parent.Position;
@@ -629,11 +631,7 @@ public class SimulatorUIController : MonoBehaviour
         float G = simController.simulation.settings.GravityConstant;
         float M = parent.Mass;
 
-        Vector3 velocity = velocityDirection * Mathf.Sqrt(G * M / r);
-
-        Debug.Log(centre);
-        Debug.Log(edge);
-        Debug.Log(velocity);
+        Vector3 velocity = parent.Velocity + (velocityDirection * Mathf.Sqrt(G * M / r));
 
         return velocity;
     }
@@ -646,9 +644,6 @@ public class SimulatorUIController : MonoBehaviour
     // places an instance of the selected body down (if any)
     private void RunBodyPlacement()
     {
-        // TODO: find out why position and velocity need to be divided by scale
-        // * i did it intuitively... but WHY does it work??
-
         if (Input.GetKeyDown(KeyCode.Q))
         {
             Vector3 oldPosition = bodyPreview.Entity.transform.position;
@@ -658,8 +653,8 @@ public class SimulatorUIController : MonoBehaviour
             {
                 Star star = new()
                 {
-                    Position = bodyPreview.Position / (float) scale,
-                    Velocity = bodyPreview.Velocity / (float) scale
+                    Position = bodyPreview.Position,
+                    Velocity = bodyPreview.Velocity
                 };
                 star.CreateEntity();
                 simController.AddBody(star);
@@ -670,8 +665,8 @@ public class SimulatorUIController : MonoBehaviour
             {
                 Planet planet = new()
                 {
-                    Position = bodyPreview.Position / (float) scale,
-                    Velocity = bodyPreview.Velocity / (float) scale
+                    Position = bodyPreview.Position,
+                    Velocity = bodyPreview.Velocity
                 };
                 planet.CreateEntity();
                 simController.AddBody(planet);
@@ -810,7 +805,6 @@ public class SimulatorUIController : MonoBehaviour
         selectedBody = null;
         Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
         Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
-        ShowProperties();
     }
 
     #endregion Body Properties
