@@ -8,6 +8,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.5.0
+**Date:** 2025/04/20
+<br/>**Additions / Changes:**
+* **1)** Added a basic ability to zoom with the scrollwheel to scale the system
+* **Note 1:** trajectories at a scale other than x1 don't scale as they should yet *(mis-sized trajectory velocities and positions)*
+* **Note 2:** the camera allow zooms relative to the origin, not the current camera position
+
+---
+
 ### Version: 1.4.3
 **Date:** 2025/04/19
 <br/>**Additions / Changes:**
