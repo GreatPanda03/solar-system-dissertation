@@ -11,6 +11,7 @@
 // LIBRARIES
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -342,48 +343,72 @@ public class SimulatorUIController : MonoBehaviour
     void Update()
     {
         if (!isActive) return;
-        
-        Vector3 position = Vector3.zero;
-        Vector3 velocity = Vector3.zero;
+
+        float scroll = Input.mouseScrollDelta.y;
+        float zoomAdjustment = scroll > 0 ? -0.1f : (scroll < 0 ? 0.1f : 0);
+
+        if (zoomAdjustment != 0)
+        {
+             SimulatorController.AdjustZoomFactor(zoomAdjustment);
+
+            string zoomText = string.Format("<b>Scale:</b> 1 Kilometer x {0:0.000}", 
+                Math.Pow(10, SimulatorController.zoomFactor));
+
+            ui.Q<Label>("Scale").text = zoomText;
+
+            /*
+            double scale = SimulatorController.GetScaleCoefficient();
+            Vector3 offset = Camera.main.transform.position;
+            Camera.main.transform.position = (offset * (float) scale) - offset;
+
+            Debug.Log(scale);
+            */
+        }
 
         RunBodySelection();
 
         if (bodyPreview != null && bodyPreview.Entity != null)
         {
+            double scale = SimulatorController.GetScaleCoefficient();
+
             if (mode == Mode.FreePlacement)
             {
-                position = RunFreePlacement();
-                velocity = GetFreeVelocityDrag();
-                DrawTrajectory(bodyPreview, velocity);
+                bodyPreview.Position = RunFreePlacement();
+                bodyPreview.Velocity = GetFreeVelocityDrag();
+                PathDrawer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
             }
             else if (mode == Mode.PlanePlacement)
             {
-                position = RunPlanePlacement();
-                velocity = GetPlaneVelocityDrag();
-                DrawTrajectory(bodyPreview, velocity);
+                bodyPreview.Position = RunPlanePlacement();
+                bodyPreview.Velocity = GetPlaneVelocityDrag();
+                PathDrawer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
             }
             else if (mode == Mode.OrbitPlacement)
             {
-                position = (Vector3) RunOrbitPlacement();
+                bodyPreview.Position = (Vector3) RunOrbitPlacement();
 
                 if (selectedBody != null)
                 {
-                    velocity = GetStableOrbitVelocity(selectedBody, bodyPreview);
-                    DrawOrbitBetweenBodies(selectedBody, bodyPreview, velocity);
+                    bodyPreview.Velocity = GetStableOrbitVelocity(selectedBody, bodyPreview);
+                    PathDrawer.DrawOrbitBetweenBodies(selectedBody, bodyPreview, bodyPreview.Velocity);
                 }
                 else
                 {
                     Body targetBody = GetBodyClosestToPreview();
 
                     if (targetBody != null)
-                        velocity = GetStableOrbitVelocity(targetBody, bodyPreview);
-                        DrawOrbitBetweenBodies(targetBody, bodyPreview, velocity);
+                    {
+                        bodyPreview.Velocity = GetStableOrbitVelocity(targetBody, bodyPreview);
+                        PathDrawer.DrawOrbitBetweenBodies(targetBody, bodyPreview, bodyPreview.Velocity);
+                    }
                 }                
             }
 
-            bodyPreview.Entity.transform.position = position;
+            SimulatorController.ApplyScale(bodyPreview);
 
-            RunBodyPlacement(position, velocity);
+            bodyPreview.Entity.transform.position = bodyPreview.Position;
+
+            RunBodyPlacement();
         }
     }
 
@@ -446,10 +471,12 @@ public class SimulatorUIController : MonoBehaviour
     // allows the user to freely place bodies relative to the camera
     private Vector3 RunFreePlacement()
     {
+        /*
         if (!GeneralUI.IsPointerOverAnyUI())
         {
             distanceFromCamera = Math.Max(0, distanceFromCamera - Input.mouseScrollDelta.y * 3);
         }
+        */
 
         if (startVelocityPoint == null)
         {
@@ -488,7 +515,7 @@ public class SimulatorUIController : MonoBehaviour
             screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
             Vector3 endVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
 
-            return (Vector3) (startVelocityPoint - endVelocityPoint) / 100.0f;
+            return (Vector3) (startVelocityPoint - endVelocityPoint) / 10f;
         }
 
         return Vector3.zero;
@@ -505,12 +532,10 @@ public class SimulatorUIController : MonoBehaviour
         if (startVelocityPoint == null)
         {
             Vector3? position = GetMouseOnPlane();
-            return (Vector3) (position != null ? position : bodyPreview.Entity.transform.position);
+            if (position != null) return (Vector3) position;
         }
-        else
-        {
-            return bodyPreview.Entity.transform.position;
-        }
+        
+        return bodyPreview.Entity.transform.position;
     }
 
     // returns a velocity trajectory for plane mode from the mouse positions
@@ -531,7 +556,7 @@ public class SimulatorUIController : MonoBehaviour
         else if (startVelocityPoint != null)
         {
             Vector3? endVelocityPoint = GetMouseOnPlane();
-            return endVelocityPoint != null ? (Vector3) (startVelocityPoint - endVelocityPoint) / 100.0f : Vector3.zero;
+            return endVelocityPoint != null ? (Vector3) (startVelocityPoint - endVelocityPoint) / 10f : Vector3.zero;
         }
 
         return Vector3.zero;
@@ -572,18 +597,18 @@ public class SimulatorUIController : MonoBehaviour
 
         if (bodies.Count == 0) return null;
 
-        Vector3 position = bodyPreview.Entity.transform.position;
+        Vector3 origin = bodyPreview.Position;
         Body closest = bodies[0];
-        float distance = Vector3.Distance(position, closest.Entity.transform.position);
+        float distance = Vector3.Distance(origin, closest.Position);
 
         for (int b = 1; b < bodies.Count; b++)
         {
-            float newDistance = Vector3.Distance(position, bodies[b].Entity.transform.position);
+            float newDistance = Vector3.Distance(origin, bodies[b].Position);
 
             if (newDistance < distance)
             {
                 closest = bodies[b];
-                distance = Vector3.Distance(position, closest.Entity.transform.position);
+                distance = newDistance;
             }
         }
 
@@ -594,8 +619,8 @@ public class SimulatorUIController : MonoBehaviour
     //   a stable orbit around the given parent body
     private Vector3 GetStableOrbitVelocity(Body parent, Body child)
     {
-        Vector3 centre = parent.Entity.transform.position;
-        Vector3 edge = child.Entity.transform.position;
+        Vector3 centre = parent.Position;
+        Vector3 edge = child.Position;
 
         float r = Vector3.Distance(centre, edge);
         Vector3 gravityDirection = (edge - centre).normalized;
@@ -604,10 +629,11 @@ public class SimulatorUIController : MonoBehaviour
         float G = simController.simulation.settings.GravityConstant;
         float M = parent.Mass;
 
-        Debug.Log(gravityDirection);
-        Debug.Log(velocityDirection);
-
         Vector3 velocity = velocityDirection * Mathf.Sqrt(G * M / r);
+
+        Debug.Log(centre);
+        Debug.Log(edge);
+        Debug.Log(velocity);
 
         return velocity;
     }
@@ -618,19 +644,22 @@ public class SimulatorUIController : MonoBehaviour
     #region Final Placement
 
     // places an instance of the selected body down (if any)
-    private void RunBodyPlacement(Vector3 position, Vector3 velocity)
+    private void RunBodyPlacement()
     {
-        
-        // BODY PLACEMENT
-        //   place the selected body down on input
+        // TODO: find out why position and velocity need to be divided by scale
+        // * i did it intuitively... but WHY does it work??
+
         if (Input.GetKeyDown(KeyCode.Q))
         {
+            Vector3 oldPosition = bodyPreview.Entity.transform.position;
+            double scale = SimulatorController.GetScaleCoefficient();
+
             if (selectedBodyItem == "Star")
             {
                 Star star = new()
                 {
-                    Position = position,
-                    Velocity = velocity
+                    Position = bodyPreview.Position / (float) scale,
+                    Velocity = bodyPreview.Velocity / (float) scale
                 };
                 star.CreateEntity();
                 simController.AddBody(star);
@@ -641,8 +670,8 @@ public class SimulatorUIController : MonoBehaviour
             {
                 Planet planet = new()
                 {
-                    Position = position,
-                    Velocity = velocity
+                    Position = bodyPreview.Position / (float) scale,
+                    Velocity = bodyPreview.Velocity / (float) scale
                 };
                 planet.CreateEntity();
                 simController.AddBody(planet);
@@ -654,7 +683,7 @@ public class SimulatorUIController : MonoBehaviour
 
             SetEntityPreview(selectedBodyItem);
 
-            bodyPreview.Entity.transform.position = position;
+            bodyPreview.Entity.transform.position = oldPosition;
         }
     }
 
@@ -785,55 +814,6 @@ public class SimulatorUIController : MonoBehaviour
     }
 
     #endregion Body Properties
-
-
-    #region Path Drawing
-
-    // draws a trajectory for the given body based on the given vector
-    private void DrawTrajectory(Body body, Vector3 trajectory)
-    {
-        Vector3 origin = body.Entity.transform.position;
-
-    	LineRenderer pathDrawer = body.Entity.GetComponent<LineRenderer>();
-	    pathDrawer.positionCount = 2;
-
-        pathDrawer.SetPosition(0, origin);
-        pathDrawer.SetPosition(1, origin + trajectory * 30);
-    }
-
-    // draws the orbit of one body around another
-    private void DrawOrbitBetweenBodies(Body parent, Body child, Vector3 childVelocity)
-    {
-        Vector3 centre = parent.Entity.transform.position;
-        Vector3 edge = child.Entity.transform.position;
-
-        float G = simController.simulation.settings.GravityConstant;
-        float M = parent.Mass;
-
-        int resolution = 100;
-        float step = 1f; // time step
-        Vector3[] points = new Vector3[resolution];
-
-        LineRenderer pathDrawer = child.Entity.GetComponent<LineRenderer>();
-	    pathDrawer.positionCount = resolution;
-
-        for (int p = 0; p < resolution; p++)
-        {
-            points[p] = edge;
-
-            // same formula used to calculate forces between bodies!
-            Vector3 direction = (centre - edge).normalized;
-            float rSquared = (centre - edge).sqrMagnitude;
-            Vector3 acceleration = direction * (G * M / rSquared);
-
-            childVelocity += acceleration * step;
-            edge += childVelocity * step;
-        }
-
-        pathDrawer.SetPositions(points);
-    }
-
-    #endregion Path Drawing
 
 
     #region Auxiliary

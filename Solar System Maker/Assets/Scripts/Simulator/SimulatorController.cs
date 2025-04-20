@@ -6,6 +6,7 @@
 // LIBRARIES
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 
 // CLASS DEFINITION
@@ -15,8 +16,17 @@ public class SimulatorController : MonoBehaviour
     private bool isActive = false;
     public Simulation simulation;
 
+    public static double UNITS_PER_WORLDSPACE = 1;
+    public static double currentScale;
+    public static double zoomFactor = 0f;
+
 
     #region Simulator Setup
+
+    public void Start()
+    {
+        SetScale("1 Kilometer");
+    }
 
     // enables the Simulator
     public void EnableSimulator()
@@ -72,6 +82,38 @@ public class SimulatorController : MonoBehaviour
     #endregion Simulator Methods
 
 
+    #region Scaling Methods
+
+    public static void SetScale(string scale)
+    {
+        currentScale = UnitReference.DISTANCE_UNITS[scale];
+    }
+
+    public static void SetZoomFactor(double scale)
+    {
+        zoomFactor = scale;
+    }
+
+    public static double GetScaleCoefficient()
+    {
+        return currentScale / Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;
+    }
+
+    public static void AdjustZoomFactor(double change)
+    {
+        SetZoomFactor(zoomFactor + change);
+    }
+
+    public static void ApplyScale(Body body)
+    {
+        double scale = GetScaleCoefficient();
+        body.Entity.transform.localScale = (float) (body.Radius * scale) * new Vector3(1,1,1);
+        body.Entity.transform.position = (float) scale * body.Position;
+    }
+
+    #endregion Scaling Methods
+
+
     #region Physics Methods
 
     // main physics loop - applies planet forces between each other
@@ -81,7 +123,7 @@ public class SimulatorController : MonoBehaviour
 
         if (simulation.settings.GravityAlgorithm == "Newtonian Physics")
         {
-            ApplyNewtonianPhysics_v1();
+            ApplyPhysics();
         }
     }
     
@@ -91,11 +133,9 @@ public class SimulatorController : MonoBehaviour
     // * per body A, apply that body's force to body Bs,
     //     and the forces of body Bs to itself
     // * then, because body A is done, update its forces for this round
-    public void ApplyNewtonianPhysics_v1()
+    public void ApplyPhysics()
     {
         List<Body> bodies = simulation.bodies;
-
-        // O(nlogn)!!!
 
         for (int a = 0; a < bodies.Count; a++)
         {
@@ -111,6 +151,8 @@ public class SimulatorController : MonoBehaviour
             }
 
             bodyA.Update();
+
+            ApplyScale(bodyA);
         }
     }
     
@@ -120,7 +162,7 @@ public class SimulatorController : MonoBehaviour
     // * WIP...
 
     /*
-    public void ApplyNewtonianPhysics_v2()
+    public void ApplyPhysics_V2()
     {
         List<Body> bodies = simulation.bodies;
 

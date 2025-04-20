@@ -41,7 +41,7 @@ public class Body
         get => entity;
         set {
             entity = value;
-            UpdateEntity();
+            // TOOD: make proper set
         }
     }
 
@@ -56,7 +56,6 @@ public class Body
         get => radius;
         set {
             radius = value;
-            UpdateScale();
         }
     }
 
@@ -170,12 +169,6 @@ public class Body
         return (float) Math.Pow(3 * mass / (4 * Math.PI), 1f / 3f);
     }
 
-    public void UpdateScale()
-    {
-        if (entity == null) return;
-        entity.transform.localScale = 2 * radius * new Vector3(1,1,1);
-    }
-
     // returns the force applied between two objects
     // * F1 = F2 = G * (m1 * m2) / r^2
     // * NOTE: the force's magnitude is the same, but the direction is different
@@ -202,26 +195,20 @@ public class Body
     // updates the body's physics
     public void Update()
     {
-        velocity += acceleration;
-        position += velocity;
+        float dt = Time.deltaTime;
+
+        // TODO: use dt
+
+        velocity += acceleration; // * dt;
+        position += velocity; // * dt;
         acceleration = new Vector3(0,0,0);
-        entity.transform.position = position;
     }
 
     // returns a new generic Body entity
     public void CreateEntity() {
         GameObject prefab = Resources.Load<GameObject>($"Prefabs/{this.Type}");
         entity = GameObject.Instantiate(prefab);
-        UpdateEntity();
-    }
-
-    // full entity update (if any) to match the body's actual values
-    public void UpdateEntity()
-    {
-        if (entity == null) return;
-        entity.transform.name = name;
-        entity.transform.position = position;
-        UpdateScale();
+        entity.name = this.Name;
     }
 
     #endregion Entity Methods

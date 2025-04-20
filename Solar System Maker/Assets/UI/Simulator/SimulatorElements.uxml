@@ -40,7 +40,7 @@
             </ui:VisualElement>
             <ui:Label text="Select a body in the system to see its properties" name="NoSelectedBody" class="propertiesNoBody" />
         </ui:VisualElement>
-        <ui:VisualElement name="ExplorerContainer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 10px;">
+        <ui:VisualElement name="ExplorerContainer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 40px;">
             <ui:Label text="Explorer" name="ExplorerTitle" class="propertiesTitle" />
             <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
             <ui:ScrollView name="ExplorerList" style="height: auto; max-height: 200px;" />
@@ -72,5 +72,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Label text="&lt;b&gt;Scale:&lt;/b&gt; 1 AU" name="Scale" style="position: absolute; -unity-text-align: upper-right; color: rgb(255, 255, 255); bottom: 0; right: 0;" />
     </ui:VisualElement>
 </ui:UXML>
