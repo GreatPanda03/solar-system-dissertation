@@ -30,7 +30,7 @@ public static class PathDrawer
         float M = parent.Mass;
 
         int resolution = 100;
-        float step = 1f; // time step
+        // float step = 1f; // time step
         Vector3[] points = new Vector3[resolution + 1];
 
         LineRenderer pathDrawer = child.Entity.GetComponent<LineRenderer>();

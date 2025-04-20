@@ -65,8 +65,19 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("PlanePlacement").clicked += OnPlanePlacementClicked;
         ui.Q<Button>("OrbitPlacement").clicked += OnOrbitPlacementClicked;
         ui.Q<VisualElement>("ModeList").style.display = DisplayStyle.None;
-
         SelectModeItem("FreePlacement");
+
+        ui.Q<Button>("Distance").clicked += OnDistanceClicked;
+        ui.Q<Button>("Centimetre").clicked += OnCentimetreClicked;
+        ui.Q<Button>("Metre").clicked += OnMetreClicked;
+        ui.Q<Button>("Kilometre").clicked += OnKilometreClicked;
+        ui.Q<Button>("Mile").clicked += OnMileClicked;
+        ui.Q<Button>("LunarDistance").clicked += OnLunarDistanceClicked;
+        ui.Q<Button>("AU").clicked += OnAUClicked;
+        ui.Q<VisualElement>("DistanceList").style.display = DisplayStyle.None;
+        SelectDistanceItem("Kilometre");
+
+        UpdateZoomScaleLabel();
 
         ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
         ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
@@ -242,7 +253,42 @@ public class SimulatorUIController : MonoBehaviour
         }
     }
 
-    #endregion 
+    #endregion Mode Selection
+
+
+    #region Distance Selection
+
+    
+    public void OnDistanceClicked()
+    {
+        VisualElement distanceList = ui.Q<VisualElement>("DistanceList");
+        distanceList.style.display = distanceList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+    }
+
+    private void OnCentimetreClicked()      { SelectDistanceItem("Centimetre"); }
+    private void OnMetreClicked()           { SelectDistanceItem("Metre"); }
+    private void OnKilometreClicked()       { SelectDistanceItem("Kilometre"); }
+    private void OnMileClicked()            { SelectDistanceItem("Mile"); }
+    private void OnLunarDistanceClicked()   { SelectDistanceItem("Lunar Distance"); }
+    private void OnAUClicked()              { SelectDistanceItem("AU"); }
+
+    public void SelectDistanceItem(string distanceName)
+    {
+        string oldDistanceName = SimulatorController.currentScale.Replace(" ", "");
+        string newDistanceName = distanceName.Replace(" ", "");
+
+        Button oldButton = ui.Q<Button>(oldDistanceName);
+        oldButton.RemoveFromClassList("selectedButton");
+
+        Button newButton = ui.Q<Button>(newDistanceName);
+        newButton.AddToClassList("selectedButton");
+
+        SimulatorController.SetScale(distanceName);
+        
+        UpdateZoomScaleLabel();
+    }
+
+    #endregion Distance Selection
 
 
     #region Body Selection & Preview
@@ -345,16 +391,12 @@ public class SimulatorUIController : MonoBehaviour
 
         // system scaling
         float scroll = Input.mouseScrollDelta.y;
-        float zoomAdjustment = scroll > 0 ? -0.1f : (scroll < 0 ? 0.1f : 0);
+        float zoomAdjustment = scroll > 0 ? 0.1f : (scroll < 0 ? -0.1f : 0);
 
         if (zoomAdjustment != 0)
         {
-             SimulatorController.AdjustZoomFactor(zoomAdjustment);
-
-            string zoomText = string.Format("<b>Scale:</b> 1 Kilometer x {0:0.000}", 
-                Math.Pow(10, SimulatorController.zoomFactor));
-
-            ui.Q<Label>("Scale").text = zoomText;
+            SimulatorController.AdjustZoomFactor(zoomAdjustment);
+            UpdateZoomScaleLabel();
 
             /*
             double scale = SimulatorController.GetScaleCoefficient();
@@ -412,6 +454,15 @@ public class SimulatorUIController : MonoBehaviour
 
             RunBodyPlacement();
         }
+    }
+
+    // updates the zoom label with the current selected distance and scale
+    private void UpdateZoomScaleLabel()
+    {
+        string zoomText = string.Format("<b>Scale:</b> 1 {0} x {1:0.000}", 
+            SimulatorController.currentScale, 1 / Math.Pow(10, SimulatorController.zoomFactor));
+
+        ui.Q<Label>("Scale").text = zoomText;
     }
 
     #endregion Inputs Loop

@@ -17,7 +17,7 @@ public class SimulatorController : MonoBehaviour
     public Simulation simulation;
 
     public static double UNITS_PER_WORLDSPACE = 1;
-    public static double currentScale;
+    public static string currentScale = "Kilometre";
     public static double zoomFactor = 0f;
 
 
@@ -25,7 +25,7 @@ public class SimulatorController : MonoBehaviour
 
     public void Start()
     {
-        SetScale("1 Kilometer");
+        SetScale("Kilometre");
     }
 
     // enables the Simulator
@@ -86,7 +86,8 @@ public class SimulatorController : MonoBehaviour
 
     public static void SetScale(string scale)
     {
-        currentScale = UnitReference.DISTANCE_UNITS[scale];
+        currentScale = scale;
+        zoomFactor = 0;
     }
 
     public static void SetZoomFactor(double scale)
@@ -96,7 +97,7 @@ public class SimulatorController : MonoBehaviour
 
     public static double GetScaleCoefficient()
     {
-        return currentScale / Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;
+        return 1 / UnitReference.DISTANCE_UNITS[currentScale] * Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;
     }
 
     public static void AdjustZoomFactor(double change)
