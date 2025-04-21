@@ -17,6 +17,7 @@ Shader "Unlit/GridPlaneShader"
     {
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         LOD 100
+        Cull Off
 
         Pass
         {
@@ -69,14 +70,15 @@ Shader "Unlit/GridPlaneShader"
             // * also fades inner grid lines out the further you go (and conversely)
             float4 frag(v2f i) : SV_Target
             {
+
+                // METHOD 1 - layered textures
+                /*
                 float2 worldXZ = i.worldPosition.xz / _GridScale;
                 float logZoom = log10(abs(_WorldSpaceCameraPos.y));
 
                 float grid = 0.0;
                 const int layers = 10;
 
-                // each layer represents 1 order of magnitude
-                /*
                 for (int layer = -2; layer < layers; layer++)
                 {
                     float scale = _GridScale * pow(10.0, layer);
@@ -85,17 +87,22 @@ Shader "Unlit/GridPlaneShader"
 
                     grid += DrawGrid(worldXZ, scale, thickness) * fade;
                 }
-                */
-
-                // fixed grid
-                float scale = _GridScale * pow(10.0, 1);
-                float fade = smoothstep(0.0f, _FadeWidth, 1.0f - abs(logZoom - 1));
-                float thickness = _GridLineThickness;
-
-                grid += DrawGrid(worldXZ, scale, thickness) * fade;
 
                 grid = saturate(grid);
                 return float4(_GridLineColour.rgb, grid * _GridLineColour.a);
+                */
+
+                // METHOD 2 - fixed grid
+                float2 worldXZ = i.worldPosition.xz / _GridScale;
+                float logZoom = log10(abs(_WorldSpaceCameraPos.y));
+
+                float scale = _GridScale * 10;
+                float thickness = _GridLineThickness;
+
+                float grid = DrawGrid(worldXZ, scale, thickness);
+                grid = saturate(grid);
+
+                return grid;
             }
             ENDCG
         }

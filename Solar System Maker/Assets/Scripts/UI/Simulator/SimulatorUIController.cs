@@ -195,8 +195,9 @@ public class SimulatorUIController : MonoBehaviour
         VisualTreeAsset explorerEntryTemplate = GameObject.Find("ExplorerUI").GetComponent<UIDocument>().visualTreeAsset;
         TemplateContainer explorerEntry = explorerEntryTemplate.Instantiate();
 
-        explorerEntry.Q<Label>("ExplorerEntry_Type").text = body.Type;
-        explorerEntry.Q<Label>("ExplorerEntry_Name").text = body.Name;
+        explorerEntry.Q<Label>("Type").text = body.Type;
+        explorerEntry.Q<Label>("Name").text = body.Name;
+        explorerEntry.Q<Button>("Delete").visible = false;
 
         ui.Q<ScrollView>("ExplorerList").Add(explorerEntry);
 
@@ -207,7 +208,30 @@ public class SimulatorUIController : MonoBehaviour
             Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
         });
 
+        explorerEntry.RegisterCallback<MouseEnterEvent>(e =>
+        {
+            explorerEntry.Q<Button>("Delete").visible = true;
+        });
+
+        explorerEntry.RegisterCallback<MouseLeaveEvent>(e =>
+        {
+            explorerEntry.Q<Button>("Delete").visible = false;
+        });
+
+        explorerEntry.Q<Button>("Delete").clicked += () => 
+        {
+            DeleteEntry(explorerEntry, body);
+        };
+
         return explorerEntry;
+    }
+
+    // deletes the body associated with the given entry (and the entry itself)
+    public void DeleteEntry(TemplateContainer entry, Body body)
+    {
+        ui.Q<ScrollView>("ExplorerList").Remove(entry);
+        Destroy(body.Entity);
+        simController.simulation.bodies.Remove(body);
     }
 
     public void OnExplorerCloseClicked()
@@ -414,6 +438,14 @@ public class SimulatorUIController : MonoBehaviour
 
             Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
             Camera.main.transform.position = spacePosition * (float) newScale;
+        }
+
+        // explorer visibility
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            VisualElement explorer = ui.Q<VisualElement>("ExplorerContainer");
+            bool visible = explorer.style.display == DisplayStyle.Flex;
+            explorer.style.display = visible ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
         // property updates

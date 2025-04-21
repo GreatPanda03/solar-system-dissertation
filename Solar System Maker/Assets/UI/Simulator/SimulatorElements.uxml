@@ -41,11 +41,11 @@
             <ui:Label text="Select a body in the system to see its properties" name="NoSelectedBody" class="propertiesNoBody" />
         </ui:VisualElement>
         <ui:VisualElement name="ExplorerContainer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 40px;">
+            <ui:Button text="X" name="ExplorerClose" class="propertiesClose" style="position: absolute;" />
             <ui:Label text="Explorer" name="ExplorerTitle" class="propertiesTitle" />
             <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
             <ui:ScrollView name="ExplorerList" style="height: auto; max-height: 200px;" />
             <ui:Label text="Create bodies to view them in the list." name="NoExplorerContents" class="propertiesNoBody" style="display: none;" />
-            <ui:Button text="X" name="ExplorerClose" class="propertiesClose" style="position: absolute;" />
         </ui:VisualElement>
         <ui:VisualElement name="ToolBox" style="flex-grow: 1; align-content: center; justify-content: flex-end; display: flex; position: absolute; height: 50px; min-height: 0; max-height: 50px; margin-top: 0; -unity-text-align: middle-left; width: auto; bottom: 0; flex-direction: column; max-width: 100%; align-items: stretch; align-self: stretch;">
             <ui:VisualElement name="ItemList" class="bodyList" style="flex-grow: 1; width: 100%; max-height: 100%; background-color: rgba(255, 255, 255, 0.12); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: flex-start; padding-top: 5px; padding-bottom: 5px; flex-direction: row; padding-right: 5px; padding-left: 5px;">

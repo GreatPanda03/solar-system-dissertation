@@ -1,0 +1,21 @@
+.closeButton {
+    width: auto;
+    height: auto;
+    background-color: rgba(255, 255, 255, 0);
+    color: rgb(255, 6, 6);
+    -unity-font-style: bold;
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    justify-content: flex-start;
+    -unity-text-align: middle-center;
+}
