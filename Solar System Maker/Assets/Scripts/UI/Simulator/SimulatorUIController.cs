@@ -11,9 +11,7 @@
 // LIBRARIES
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -391,20 +389,21 @@ public class SimulatorUIController : MonoBehaviour
 
         // system scaling
         float scroll = Input.mouseScrollDelta.y;
-        float zoomAdjustment = scroll > 0 ? 0.1f : (scroll < 0 ? -0.1f : 0);
+        float zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
 
         if (zoomAdjustment != 0)
         {
+            double oldScale = SimulatorController.GetScaleCoefficient();
             SimulatorController.AdjustZoomFactor(zoomAdjustment);
+            double newScale = SimulatorController.GetScaleCoefficient();
             UpdateZoomScaleLabel();
 
-            /*
-            double scale = SimulatorController.GetScaleCoefficient();
-            Vector3 offset = Camera.main.transform.position;
-            Camera.main.transform.position = (offset * (float) scale) - offset;
+            // applying the main zoom offset
+            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 direction = mouseRay.direction * Math.Sign(zoomAdjustment);
 
-            Debug.Log(scale);
-            */
+            Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
+            Camera.main.transform.position = spacePosition * (float) newScale;
         }
 
         // property updates
@@ -475,8 +474,11 @@ public class SimulatorUIController : MonoBehaviour
     {
         if (bodyPreview == null && Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
         {
+            bool bodyFound = false;
             Vector3 screenPosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+            
+            GameObject.Find("GridPlane").GetComponent<Collider>().enabled = false;
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
@@ -491,10 +493,14 @@ public class SimulatorUIController : MonoBehaviour
                         selectedBody = body;
                         Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
                         Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
+                        bodyFound = true;
                     }
                 }
             }
-            else
+
+            GameObject.Find("GridPlane").GetComponent<Collider>().enabled = true;
+            
+            if (!bodyFound)
             {
                 selectedBody = null;
                 Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);

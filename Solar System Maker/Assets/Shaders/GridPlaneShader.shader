@@ -76,6 +76,7 @@ Shader "Unlit/GridPlaneShader"
                 const int layers = 10;
 
                 // each layer represents 1 order of magnitude
+                /*
                 for (int layer = -2; layer < layers; layer++)
                 {
                     float scale = _GridScale * pow(10.0, layer);
@@ -84,6 +85,14 @@ Shader "Unlit/GridPlaneShader"
 
                     grid += DrawGrid(worldXZ, scale, thickness) * fade;
                 }
+                */
+
+                // fixed grid
+                float scale = _GridScale * pow(10.0, 1);
+                float fade = smoothstep(0.0f, _FadeWidth, 1.0f - abs(logZoom - 1));
+                float thickness = _GridLineThickness;
+
+                grid += DrawGrid(worldXZ, scale, thickness) * fade;
 
                 grid = saturate(grid);
                 return float4(_GridLineColour.rgb, grid * _GridLineColour.a);

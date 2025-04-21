@@ -27,9 +27,7 @@ public class CameraController : MonoBehaviour
 
     [Header("Follow Mode")]
     public Body subject;
-
     public float followDistance;
-
     public Vector3 followRotation;
 
 
