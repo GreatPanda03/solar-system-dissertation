@@ -81,6 +81,7 @@
                     <ui:Label text="Body" name="BodyLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255);" />
                     <ui:Button text="Star" name="AddStar" class="bodyButton" style="width: 50px; height: 100%; margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     <ui:Button text="Planet" name="AddPlanet" class="bodyButton" style="width: 65px; height: 100%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                    <ui:Button text="Moon" name="AddMoon" enable-rich-text="true" class="bodyButton" style="width: 55px; height: 100%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 5px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

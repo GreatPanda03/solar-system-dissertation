@@ -60,9 +60,9 @@ public class Planet : Body
 
     // returns a copy of the Planet
     // returns a copy of the Star
-    public new Planet GetCopy()
+    public override Body GetCopy()
     {
-        return new()
+        return new Planet()
         {
             name = name,
             mass = mass,

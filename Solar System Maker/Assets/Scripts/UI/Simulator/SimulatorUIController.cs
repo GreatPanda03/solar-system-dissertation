@@ -80,6 +80,7 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
         ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
         ui.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
+        ui.Q<Button>("AddMoon").clicked += OnAddMoonClicked;
         ui.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
 
         InitialisePropertyFields();
@@ -304,6 +305,7 @@ public class SimulatorUIController : MonoBehaviour
 
     private void OnAddStarClicked()     { OnBodyItemClicked("Star"); }
     private void OnAddPlanetClicked()   { OnBodyItemClicked("Planet"); }
+    private void OnAddMoonClicked()     { OnBodyItemClicked("Moon"); }
 
     private void OnBodyItemClicked(string bodyType)
     {
@@ -342,9 +344,17 @@ public class SimulatorUIController : MonoBehaviour
 
     public void SetEntityPreview(string bodyType)
     {       
-        if      (bodyType == "Star")      { bodyPreview = new Star();   }
-        else if (bodyType == "Planet")    { bodyPreview = new Planet(); }
-        else Debug.LogWarning($"[SIM UI] ERROR: '{bodyType}' is an invalid body type!");
+        Type type = Type.GetType(bodyType);
+
+        // assigning the correct class for the new body
+        if (type != null && typeof(Body).IsAssignableFrom(type))
+        {
+            bodyPreview = (Body) Activator.CreateInstance(type);
+        } 
+        else 
+        {
+            Debug.LogWarning($"[SIM UI] ERROR: '{bodyType}' is not a valid Body type!");
+        }
 
         bodyPreview.CreateEntity();
         bodyPreview.Entity.transform.name = "Preview";
@@ -704,32 +714,14 @@ public class SimulatorUIController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
         {
             Vector3 oldPosition = bodyPreview.Entity.transform.position;
-            double scale = SimulatorController.GetScaleCoefficient();
 
-            if (selectedBodyItem == "Star")
-            {
-                Star star = new()
-                {
-                    Position = bodyPreview.Position,
-                    Velocity = bodyPreview.Velocity
-                };
-                star.CreateEntity();
-                simController.AddBody(star);
+            Body body = bodyPreview.GetCopy();
+            body.Position = bodyPreview.Position;
+            body.Velocity = bodyPreview.Velocity;
 
-                CreateExplorerEntry(star);
-            }
-            else if (selectedBodyItem == "Planet")
-            {
-                Planet planet = new()
-                {
-                    Position = bodyPreview.Position,
-                    Velocity = bodyPreview.Velocity
-                };
-                planet.CreateEntity();
-                simController.AddBody(planet);
-
-                CreateExplorerEntry(planet);
-            }
+            CreateExplorerEntry(body);
+            body.CreateEntity();
+            simController.AddBody(body);
 
             RemoveEntityPreview();
 

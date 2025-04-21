@@ -43,9 +43,9 @@ public class Star : Body
     }
 
     // returns a copy of the Star
-    public new Star GetCopy()
+    public override Body GetCopy()
     {
-        return new()
+        return new Star()
         {
             name = name,
             mass = mass,

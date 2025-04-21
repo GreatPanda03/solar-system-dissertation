@@ -131,9 +131,9 @@ public class Body
     }
 
     // returns a copy of the body
-    public Body GetCopy()
+    public virtual Body GetCopy()
     {
-        return new()
+        return new Body()
         {
             name = name,
             mass = mass,
