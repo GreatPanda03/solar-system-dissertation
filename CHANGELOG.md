@@ -8,6 +8,18 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.1
+**Date:** 2025/04/21
+<br/>**Bug Fixes:**
+* **1)** Made the underside of the grid plane visible also
+
+**Additions / Changes:**
+* **1)** New explorer entry delete button to remove the corresponding body from the system
+* **2)** Added keybind to toggle the Explorer with Tab
+* **3)** Removed grid plane texture fadeout over Y elevation *(is now constantly "opaque")*
+
+---
+
 ### Version: 1.6.0
 **Date:** 2025/04/21
 <br/>**Bug Fixes:** No additional fixes
