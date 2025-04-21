@@ -8,9 +8,21 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.5.3
+**Date:** 2025/04/21
+<br/>**Bug Fixes:**
+* **1)** Fixed grid plane interfering with body selection
+
+**Additions / Changes:**
+* **1)** Semi-working scaling to adjust camera when zooming towards a point in space
+* **2)** Temporarily made grid visual fixed *(will make dynamic later)*
+* **Note:** scaling the camera position with the system is a WIP
+
+---
+
 ### Version: 1.5.2
 **Date:** 2025/04/20
-**Additions / Changes:**
+<br/>**Additions / Changes:**
 * **1)** Added a button to select a base distance scale *(metres, kilometres, AU, etc.)*
 * **2)** Adjusted styling and order for toolbox buttons
 
