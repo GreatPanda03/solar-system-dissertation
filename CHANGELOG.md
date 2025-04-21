@@ -8,6 +8,17 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.0
+**Date:** 2025/04/21
+<br/>**Bug Fixes:** No additional fixes
+* **Note:** Selecting UI doesn't block mouse clicks in space - WIP
+
+**Additions / Changes:**
+* **1)** Added a placeable Moon body *(same core functionality as Stars and Planets, different properties)*
+* **2)** Generalised code for body creation to cover different classes
+
+---
+
 ### Version: 1.5.3
 **Date:** 2025/04/21
 <br/>**Bug Fixes:**
