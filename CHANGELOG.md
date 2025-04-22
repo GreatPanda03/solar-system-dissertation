@@ -8,9 +8,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.3
+**Date:** 2025/04/22
+<br/>**Additions / Changes:**
+* **1)** New icons for toolbar and toolbox options
+
+---
+
 ### Version: 1.6.2
 **Date:** 2025/04/22
-**Additions / Changes:**
+<br/>**Additions / Changes:**
 * **1)** New button to toggle whether the simulation is running
 * **2)** Bodies in "Orbit" mode can only be placed as close to the parent as the distance of their combined radii
 * **3)** Allowed bodies to be selected while holding a body preview
