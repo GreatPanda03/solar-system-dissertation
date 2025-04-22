@@ -8,6 +8,13 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.5
+**Date:** 2025/04/22
+<br/>**Additions / Changes:**
+* **1)** New physical name labels for bodies, which can be edited by changing the name of the body
+
+---
+
 ### Version: 1.6.4
 **Date:** 2025/04/22
 <br/>**Bug Fixes:**
