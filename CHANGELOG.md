@@ -8,6 +8,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.2
+**Date:** 2025/04/22
+**Additions / Changes:**
+* **1)** New button to toggle whether the simulation is running
+* **2)** Bodies in "Orbit" mode can only be placed as close to the parent as the distance of their combined radii
+* **3)** Allowed bodies to be selected while holding a body preview
+* **4)** Selecting a body again deselects it
+
+---
+
 ### Version: 1.6.1
 **Date:** 2025/04/21
 <br/>**Bug Fixes:**
@@ -88,6 +98,7 @@ All dates are in the form **YYYY/MM/DD**.
 * **1)** "Orbit" mode allows bodies to be placed and fired in an orbit around the closest body
 * **2)** New visual orbit around attractor when preparing to place a body in orbit
 * **3)** New visual direction indicator when preparing to fire a body at a trajectory
+* **Note:** making "Plane" mode a standalone placement method is a WIP
 
 ---
 
