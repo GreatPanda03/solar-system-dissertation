@@ -8,6 +8,25 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.4
+**Date:** 2025/04/22
+<br/>**Bug Fixes:**
+* **1)** Fixed property window updates preventing field input *(constantly overwrote edits with the current value)*
+* **2)** Fixed "No bodies" label not showing in explorer window with no bodies present
+* **3)** Fixed explorer entries persisting between simulations
+* **4)** Added handling when deleting a body which is currently being followed
+* **5)** Fixed explorer and properties titles preventing clicks on their close buttons
+
+**Additions / Changes:**
+* **1)** Updated UI for properties window and generalised back-end functions
+* **2)** Removed "Speed" property from the properties window
+* **3.1)** Changing a body's Mass adjusts its Density
+* **3.2)** Changing a body's Radius adjusts its Density
+* **3.3)** Changing a body's Density adjusts its Radius
+* **4)** Some visual changes to UI for explorer window
+
+---
+
 ### Version: 1.6.3
 **Date:** 2025/04/22
 <br/>**Additions / Changes:**
