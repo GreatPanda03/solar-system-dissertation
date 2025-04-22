@@ -83,6 +83,9 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("AddMoon").clicked += OnAddMoonClicked;
         ui.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
 
+        ui.Q<Button>("TogglePlay").clicked += OnTogglePlayClicked;
+        simController.isRunning = true;
+
         InitialisePropertyFields();
         ui.Q<Button>("PropertiesClose").clicked += OnPropertiesCloseClicked;
         HideProperties();
@@ -173,10 +176,24 @@ public class SimulatorUIController : MonoBehaviour
         explorer.style.display = explorer.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
+    public void OnTogglePlayClicked()
+    {
+        if (simController.isRunning)
+        {
+            simController.isRunning = false;
+            ui.Q<Button>("TogglePlay").text = "<b>Simulation:</b>\n" + "Paused";
+        }
+        else
+        {
+            simController.isRunning = true;
+            ui.Q<Button>("TogglePlay").text = "<b>Simulation:</b>\n" + "Running";
+        }
+    }
+
     #endregion Toolbox Functions
 
 
-        #region Explorer
+    #region Explorer
 
     // creates a new entry in the explorer for the given body
     public void RefreshExplorer()
@@ -458,7 +475,7 @@ public class SimulatorUIController : MonoBehaviour
         {
             double scale = SimulatorController.GetScaleCoefficient();
 
-            if (mode == Mode.FreePlacement)         // visual position & velocity
+            if (mode == Mode.FreePlacement)         // visual position & visual velocity
             {
                 bodyPreview.Position = RunFreePlacement() / (float) scale;      
                 bodyPreview.Velocity = GetFreeVelocityDrag() / (float) scale;
@@ -472,23 +489,33 @@ public class SimulatorUIController : MonoBehaviour
             }
             else if (mode == Mode.OrbitPlacement)   // visual position, but TRUE velocity
             {
-                bodyPreview.Position = (Vector3) RunOrbitPlacement() / (float) scale;
+                Body attractor = null;
 
                 if (selectedBody != null)
                 {
-                    bodyPreview.Velocity = GetStableOrbitVelocity(selectedBody, bodyPreview);
-                    PathDrawer.DrawOrbitBetweenBodies(selectedBody, bodyPreview, bodyPreview.Velocity);
+                    attractor = selectedBody;
                 }
                 else
                 {
-                    Body targetBody = GetBodyClosestToPreview();
+                    Body closestBody = GetBodyClosestToPreview();
 
-                    if (targetBody != null)
+                    if (closestBody != null)
                     {
-                        bodyPreview.Velocity = GetStableOrbitVelocity(targetBody, bodyPreview);
-                        PathDrawer.DrawOrbitBetweenBodies(targetBody, bodyPreview, bodyPreview.Velocity);
+                        attractor = closestBody;
                     }
-                }                
+                }
+
+                if (attractor != null) // placement around the body ("capped" at attractor's radius)
+                {
+                    bodyPreview.Position = RunOrbitPlacement(attractor) / (float) scale;
+                    bodyPreview.Velocity = GetStableOrbitVelocity(attractor, bodyPreview);
+                    PathDrawer.DrawOrbitBetweenBodies(attractor, bodyPreview, bodyPreview.Velocity);
+                }
+                else // standard plane placement
+                {
+                    bodyPreview.Position = RunPlanePlacement() / (float) scale;
+                    bodyPreview.Velocity = Vector3.zero;
+                }
             }
 
             SimulatorController.ApplyScale(bodyPreview);
@@ -514,33 +541,58 @@ public class SimulatorUIController : MonoBehaviour
     // selects and follows the clicked body (if any)
     private void RunBodySelection()
     {
-        if (bodyPreview == null && Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
+        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
         {
             bool bodyFound = false;
             Vector3 screenPosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
             
+            // temporarily "blacklists" grid plane & body preview from consuming hits
             GameObject.Find("GridPlane").GetComponent<Collider>().enabled = false;
+
+            if (bodyPreview != null && bodyPreview.Entity != null)
+            {
+                bodyPreview.Entity.GetComponent<Collider>().enabled = false;
+            }
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 if (hit.collider != null)
                 {
-                    // finding the Body object from the hit object (if any)
                     GameObject hitPart = hit.collider.gameObject;
                     Body body = GetBodyFromEntity(hitPart);
 
                     if (body != null)
                     {
-                        selectedBody = body;
-                        Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
-                        Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
-                        bodyFound = true;
+                        if (selectedBody != null)
+                        {
+                            if (body.Entity != selectedBody.Entity)
+                            {
+                                bodyFound = true;
+                            }
+                        }
+                        else
+                        {
+                            bodyFound = true;
+                        }
+                        
+                        if (bodyFound)
+                        {
+                            selectedBody = body;
+                            Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+                            Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
+                            bodyFound = true;
+                        }
                     }
                 }
             }
 
             GameObject.Find("GridPlane").GetComponent<Collider>().enabled = true;
+            
+            if (bodyPreview != null && bodyPreview.Entity != null)
+            {
+                bodyPreview.Entity.GetComponent<Collider>().enabled = false;
+            }
             
             if (!bodyFound)
             {
@@ -672,10 +724,8 @@ public class SimulatorUIController : MonoBehaviour
         {
             return ray.GetPoint(distance);
         }
-        else
-        {
-            return null;
-        }   
+
+        return null;
     }
 
     #endregion Plane Placement
@@ -685,10 +735,27 @@ public class SimulatorUIController : MonoBehaviour
 
     // allows the user to place bodies in an orbit relative to other bodies (plane as a reference)
     // * position is based on the mouse's position on the screen
-    private Vector3? RunOrbitPlacement()
+    // * position is also "capped" at the parent's and bodyPreview's combined radii
+    private Vector3 RunOrbitPlacement(Body parent)
     {
-        Vector3? position = GetMouseOnPlane();
-        return position != null ? position : bodyPreview.Entity.transform.position;
+        Vector3? planePosition = GetMouseOnPlane();
+        Vector3 position = (Vector3) (planePosition != null ? planePosition : bodyPreview.Entity.transform.position);
+
+        // scaled to world position
+        double scale = SimulatorController.GetScaleCoefficient();
+        float radiiSum = (parent.Radius * (float) scale) + (bodyPreview.Radius * (float) scale);
+        Vector3 parentPos = parent.Position * (float) scale;
+        Vector3 vector = position - parentPos; // parent -> bodyPreview
+
+        if (vector.magnitude > radiiSum)
+        {
+            return position;
+        }
+        else
+        {
+            Vector3 direction = vector.normalized;
+            return parentPos + (radiiSum * direction);
+        }
     }
 
     // auxiliary: returns the body which is closest to the body preview
@@ -754,7 +821,7 @@ public class SimulatorUIController : MonoBehaviour
             CreateExplorerEntry(body);
             body.CreateEntity();
             simController.AddBody(body);
-
+            SimulatorController.ApplyScale(body);
             RemoveEntityPreview();
 
             SetEntityPreview(selectedBodyItem);

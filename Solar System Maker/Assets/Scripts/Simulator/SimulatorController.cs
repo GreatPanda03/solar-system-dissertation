@@ -14,6 +14,7 @@ public class SimulatorController : MonoBehaviour
 {
     public GameObject simulatorSpace;
     private bool isActive = false;
+    public bool isRunning = false;
     public Simulation simulation;
 
     public static double UNITS_PER_WORLDSPACE = 1;
@@ -28,16 +29,19 @@ public class SimulatorController : MonoBehaviour
         SetScale("Kilometre");
     }
 
-    // enables the Simulator
     public void EnableSimulator()
     {
         isActive = true;
     }
 
-    // disables the Simulator
     public void DisableSimulator()
     {
         isActive = false;
+    }
+
+    public bool IsActive()
+    {
+        return isActive;
     }
 
     // loads the Simulator with the given simulation
@@ -108,7 +112,7 @@ public class SimulatorController : MonoBehaviour
     public static void ApplyScale(Body body)
     {
         double scale = GetScaleCoefficient();
-        body.Entity.transform.localScale = (float) (body.Radius * scale) * new Vector3(1,1,1);
+        body.Entity.transform.localScale = (float) (body.Radius * 2 * scale) * new Vector3(1,1,1);
         body.Entity.transform.position = (float) scale * body.Position;
     }
 
@@ -124,7 +128,17 @@ public class SimulatorController : MonoBehaviour
 
         if (simulation.settings.GravityAlgorithm == "Newtonian Physics")
         {
-            ApplyPhysics();
+            if (isRunning)
+            {
+                ApplyPhysics();
+            }
+            else
+            {
+                foreach (Body body in GetBodies())
+                {
+                    ApplyScale(body);
+                }
+            }
         }
     }
     

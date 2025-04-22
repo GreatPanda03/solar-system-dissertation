@@ -209,6 +209,7 @@ public class Body
         GameObject prefab = Resources.Load<GameObject>($"Prefabs/{this.Type}");
         entity = GameObject.Instantiate(prefab);
         entity.name = this.Name;
+        entity.transform.position = this.position;
     }
 
     #endregion Entity Methods
