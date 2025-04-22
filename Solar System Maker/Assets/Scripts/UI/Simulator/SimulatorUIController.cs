@@ -130,7 +130,7 @@ public class SimulatorUIController : MonoBehaviour
         selectedBodyItem = null;
         if (bodyPreview != null) 
         {
-            Destroy(bodyPreview.Entity);
+            bodyPreview.DestroyEntity();
             bodyPreview = null;
 
             // TODO: change camera mode to Main Menu?
@@ -280,7 +280,7 @@ public class SimulatorUIController : MonoBehaviour
         }
 
         ui.Q<ScrollView>("List").Remove(entry);
-        Destroy(body.Entity);
+        body.DestroyEntity();
         simController.simulation.bodies.Remove(body);
 
         if (simController.GetBodies().Count == 0)
@@ -461,7 +461,7 @@ public class SimulatorUIController : MonoBehaviour
             if (bodyPreview.Entity != null) 
             {
                 bodyPreview.Entity.GetComponent<LineRenderer>().enabled = false;
-                Destroy(bodyPreview.Entity);
+                bodyPreview.DestroyEntity();
             }
             bodyPreview = null;
         }

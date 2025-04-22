@@ -1,7 +1,6 @@
 // Handles the camera for the main menu orbit demo
 
 // LIBRARIES
-using System;
 using UnityEngine;
 
 

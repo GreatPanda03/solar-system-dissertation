@@ -11,9 +11,8 @@
 
 // LIBRARIES
 using System;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Unity.VisualScripting;
+using TMPro;
 using UnityEngine;
 
 
@@ -32,18 +31,34 @@ public class Body
         get => name;
         set {
             name = value;
-            if (entity != null) entity.transform.name = value;
-            // update physical name label in world space...
+            if (entity != null) entity.transform.name = name;
+            if (label != null)
+            {
+                Debug.Log(name);
+                label.GetComponent<TextMeshProUGUI>().text = entity.name;
+            }
         }   
     }
 
     protected GameObject entity;
-    [JsonIgnore] // recreated at runtime
+    [JsonIgnore] // recreated at runtime anyway
     public GameObject Entity {
         get => entity;
         set {
             entity = value;
-            // TOOD: make proper set
+            entity.name = name;
+            if (label != null)
+                label.GetComponent<TextMeshProUGUI>().text = entity.name;
+        }
+    }
+
+    protected GameObject label;
+    [JsonIgnore] // recreated at runtime anyway
+    public GameObject Label {
+        get => label;
+        set {
+            label = value;
+            label.GetComponent<TextMeshProUGUI>().text = entity.name;
         }
     }
 
@@ -220,10 +235,38 @@ public class Body
 
     // returns a new generic Body entity
     public void CreateEntity() {
-        GameObject prefab = Resources.Load<GameObject>($"Prefabs/{this.Type}");
-        entity = GameObject.Instantiate(prefab);
+        GameObject bodyPrefab = Resources.Load<GameObject>($"Prefabs/{this.Type}");
+        entity = GameObject.Instantiate(bodyPrefab);
         entity.name = this.Name;
         entity.transform.position = this.position;
+
+        GameObject labelPrefab = Resources.Load<GameObject>("Prefabs/BodyLabel");
+        label = GameObject.Instantiate(labelPrefab);
+        label.name = "BodyLabel";
+        label.GetComponent<TextMeshProUGUI>().text = name;
+        label.transform.SetParent(GameObject.Find("Overlay").transform, false);
+    }
+
+    // toggles the visibility of the body's label
+    public void ToggleLabel(bool state)
+    {
+        // TOOD: toggle visibility
+    }
+
+    // destroys the entity's physical components
+    public void DestroyEntity()
+    {
+        if (entity != null)
+        {
+            GameObject.Destroy(entity);
+            entity = null;
+        }
+
+        if (label != null)
+        {
+            GameObject.Destroy(label);
+            label = null;
+        }
     }
 
     #endregion Entity Methods

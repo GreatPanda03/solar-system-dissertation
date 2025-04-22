@@ -7,6 +7,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using TMPro;
 
 
 // CLASS DEFINITION
@@ -112,8 +113,23 @@ public class SimulatorController : MonoBehaviour
     public static void ApplyScale(Body body)
     {
         double scale = GetScaleCoefficient();
-        body.Entity.transform.localScale = (float) (body.Radius * 2 * scale) * new Vector3(1,1,1);
+        float scaledRadius = (float) (body.Radius * scale);
+        body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
         body.Entity.transform.position = (float) scale * body.Position;
+
+        // position label at "top right" of body, relative to the camera
+        if (body.Label != null)
+        {
+            Transform origin = Camera.main.transform;
+            Vector3 point = body.Entity.transform.position;
+            Vector3 edge = scaledRadius * (origin.right + origin.up);
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(point + edge);
+
+            body.Label.transform.position = screenPosition;
+            body.Label.GetComponent<TextMeshProUGUI>().enabled = screenPosition.z >= 0;
+            // ^ technically has a screen position even when BEHIND the camera
+            // * this check stops the label from showing up when behind the camera
+        }
     }
 
     #endregion Scaling Methods
