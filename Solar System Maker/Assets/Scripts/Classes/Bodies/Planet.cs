@@ -16,8 +16,8 @@ public class Planet : Body
 
     protected float habitability;
     public float Habitability {
-        get { return habitability;  }
-        set { habitability = value; }
+        get => habitability;
+        set => habitability = value;
     }
 
     /*
@@ -29,8 +29,8 @@ public class Planet : Body
 
     protected float waterContent;
     public float WaterContent {
-        get { return waterContent;  }
-        set { waterContent = value; }
+        get => waterContent;
+        set => waterContent = value;
     }
 
     public Planet() : base()
@@ -39,7 +39,7 @@ public class Planet : Body
         mass = 10f;
         habitability = 0;
         waterContent = 0;
-        radius = GetRadiusFromMass();
+        radius = GetRadiusFromMassAndDensity();
     }
 
     public Planet(float mass, Vector3 position, Vector3 velocity)

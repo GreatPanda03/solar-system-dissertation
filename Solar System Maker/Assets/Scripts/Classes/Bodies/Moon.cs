@@ -13,7 +13,7 @@ public class Moon : Body
     {
         name = "Moon";
         mass = 1f;
-        radius = GetRadiusFromMass();
+        radius = GetRadiusFromMassAndDensity();
     }
 
     public Moon(float mass, Vector3 position, Vector3 velocity)

@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Simulator/ExplorerEntryStyles.uss?fileID=7433441132597879392&amp;guid=c975995c9fb5d3349a70b5e76f66bf9d&amp;type=3#ExplorerEntryStyles" />
-    <ui:VisualElement name="ExplorerEntry" style="flex-grow: 1; flex-direction: row;">
-        <ui:Label text="Label" name="Type" style="flex-basis: auto; flex-shrink: 1; flex-grow: 0.5; -unity-font-style: bold-and-italic; -unity-text-align: middle-left;" />
-        <ui:Label text="Label" name="Name" style="flex-basis: auto; flex-shrink: 1; flex-grow: 5; -unity-text-align: middle-left;" />
-        <ui:Button text="X" name="Delete" class="closeButton" style="position: relative;" />
+    <ui:VisualElement name="ExplorerEntry" class="entry" style="flex-grow: 1; flex-direction: row;">
+        <ui:Label text="Label" name="Type" style="flex-basis: 35%; flex-shrink: 1; flex-grow: 1; -unity-font-style: bold-and-italic; -unity-text-align: middle-left;" />
+        <ui:Label text="Label" name="Name" style="flex-basis: 55%; flex-shrink: 1; flex-grow: 1; -unity-text-align: middle-left;" />
+        <ui:Button text="X" name="Delete" class="entryDelete" style="position: relative; flex-basis: 10%;" />
     </ui:VisualElement>
 </ui:UXML>

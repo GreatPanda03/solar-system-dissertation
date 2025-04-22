@@ -26,9 +26,9 @@ public class CameraController : MonoBehaviour
     private float currentSpeed;
 
     [Header("Follow Mode")]
-    public Body subject;
-    public float followDistance;
-    public Vector3 followRotation;
+    public static Body subject;
+    public static float followDistance;
+    public static Vector3 followRotation;
 
 
     // retrieves the main camera
@@ -143,11 +143,16 @@ public class CameraController : MonoBehaviour
 
     #region Body Following Mode
 
-    public void SetSubject(Body body)
+    public static void SetSubject(Body body)
     {
         followDistance = 30f;
         followRotation = Camera.main.transform.forward;
         subject = body;
+    }
+
+    public static Body GetSubject()
+    {
+        return subject;
     }
 
     private void RunFollowingMode()
@@ -179,8 +184,6 @@ public class CameraController : MonoBehaviour
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
-
-        
     }
 
     #endregion Body Following Mode

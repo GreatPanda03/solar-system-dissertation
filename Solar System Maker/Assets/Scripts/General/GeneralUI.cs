@@ -1,40 +1,14 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.Interactions;
 using UnityEngine.UIElements;
 
 public static class GeneralUI
 {
 
     // returns true if the mouse is over any UI element of any UI document
-    public static bool IsPointerOverAnyUI()
+    public static bool IsMouseOverUI()
     {
-        /*
-        // invert - mousePosition based on bottom left, UI on top left
-        Vector2 mousePosition = Input.mousePosition;
-        mousePosition.y = Screen.height - mousePosition.y;
-
-        var uiDocuments = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
-
-        foreach (var document in uiDocuments)
-        {
-            if (!document.enabled || document.rootVisualElement == null)
-                continue;
-
-            var root = document.rootVisualElement;
-            var picked = root.panel?.Pick(mousePosition);
-
-            Debug.Log(root);
-
-            if (picked != null)
-            {
-                Debug.Log(picked);
-                return true;
-            }
-        }
-        */
-
-        return false;
+        return EventSystem.current.currentSelectedGameObject != null;
     }
 
     // returns true if the user currently has a text box selected

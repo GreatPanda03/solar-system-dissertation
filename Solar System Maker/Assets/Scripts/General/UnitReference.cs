@@ -9,12 +9,12 @@ public class UnitReference
         = GameObject.Find("Simulator").GetComponent<SimulatorController>(); 
 
     public static Dictionary<string, double> DISTANCE_UNITS = new() {
-        ["Centimetre"]      = 1e-5,
-        ["Metre"]           = 1e-3,
-        ["Kilometre"]       = 1,
-        ["Mile"]            = 1.609_344,
-        ["Lunar Distance"]  = 3.844_00e5,
-        ["AU"]              = 1.495_978_707e8
+        ["Centimetre"]      = 1e-2,
+        ["Metre"]           = 1,
+        ["Kilometre"]       = 1e+3,
+        ["Mile"]            = 1.609_344e+3,
+        ["Lunar Distance"]  = 3.843_99e8,
+        ["AU"]              = 1.495_978_707e11
     };
 
     public static Dictionary<string, double> MASS_UNITS = new() {

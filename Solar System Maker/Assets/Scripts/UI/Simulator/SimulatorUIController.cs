@@ -12,6 +12,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Unity.Properties;
+using Unity.VisualScripting;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -55,7 +58,7 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
-        ui.Q<Button>("ExplorerClose").clicked += OnExplorerCloseClicked;
+        ui.Q("Explorer").Q<Button>("Close").clicked += OnExplorerCloseClicked;
         ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
 
         ui.Q<Button>("Modes").clicked += OnModesClicked;
@@ -87,7 +90,7 @@ public class SimulatorUIController : MonoBehaviour
         simController.isRunning = true;
 
         InitialisePropertyFields();
-        ui.Q<Button>("PropertiesClose").clicked += OnPropertiesCloseClicked;
+        ui.Q<Button>("Close").clicked += OnPropertiesCloseClicked;
         HideProperties();
 
         Debug.Log("[SIMULATOR] SUCCESS: UI Loaded");
@@ -121,6 +124,7 @@ public class SimulatorUIController : MonoBehaviour
     public void DisableInterface()
     {
         GameObject.Find("GridPlane").GetComponent<Renderer>().enabled = false;
+        ClearExplorer();
 
         isActive = false;
         selectedBodyItem = null;
@@ -200,12 +204,31 @@ public class SimulatorUIController : MonoBehaviour
     // creates a new entry in the explorer for the given body
     public void RefreshExplorer()
     {
-        ui.Q<ScrollView>("ExplorerList").Clear();
+        ui.Q<ScrollView>("List").Clear();
 
-        foreach (Body body in simController.GetBodies())
+        List<Body> bodies = simController.GetBodies();
+
+        if (bodies.Count > 0)
         {
-            CreateExplorerEntry(body);
+            ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
+
+            foreach (Body body in simController.GetBodies())
+            {
+                CreateExplorerEntry(body);
+            }
         }
+        else
+        {
+            ui.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
+        }
+    }
+
+    // clears the explorer
+    public void ClearExplorer()
+    {
+        VisualElement explorer = ui.Q<VisualElement>("Explorer");
+        explorer.Q<ScrollView>("List").Clear();
+        explorer.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
     }
 
     // creates an entry for the given body
@@ -218,12 +241,12 @@ public class SimulatorUIController : MonoBehaviour
         explorerEntry.Q<Label>("Name").text = body.Name;
         explorerEntry.Q<Button>("Delete").visible = false;
 
-        ui.Q<ScrollView>("ExplorerList").Add(explorerEntry);
+        ui.Q<ScrollView>("List").Add(explorerEntry);
 
         explorerEntry.RegisterCallback<ClickEvent>(e =>
         {
             selectedBody = body;
-            Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+            CameraController.SetSubject(selectedBody);
             Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
         });
 
@@ -248,13 +271,27 @@ public class SimulatorUIController : MonoBehaviour
     // deletes the body associated with the given entry (and the entry itself)
     public void DeleteEntry(TemplateContainer entry, Body body)
     {
-        ui.Q<ScrollView>("ExplorerList").Remove(entry);
+        if (selectedBody == body) // same as deselecting the current body
+        {
+            selectedBody = null;
+            Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
+            CameraController.SetSubject(selectedBody);
+            HideProperties();
+        }
+
+        ui.Q<ScrollView>("List").Remove(entry);
         Destroy(body.Entity);
         simController.simulation.bodies.Remove(body);
+
+        if (simController.GetBodies().Count == 0)
+        {
+            ui.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
+        }
     }
 
     public void OnExplorerCloseClicked()
     {
+        Debug.Log("closing explorer");
         ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
     }
 
@@ -543,7 +580,7 @@ public class SimulatorUIController : MonoBehaviour
     // selects and follows the clicked body (if any)
     private void RunBodySelection()
     {
-        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
+        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsMouseOverUI())
         {
             bool bodyFound = false;
             Vector3 screenPosition = Input.mousePosition;
@@ -581,7 +618,7 @@ public class SimulatorUIController : MonoBehaviour
                         if (bodyFound)
                         {
                             selectedBody = body;
-                            Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+                            CameraController.SetSubject(selectedBody);
                             Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Following);
                             bodyFound = true;
                         }
@@ -600,7 +637,7 @@ public class SimulatorUIController : MonoBehaviour
             {
                 selectedBody = null;
                 Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
-                Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+                CameraController.SetSubject(selectedBody);
                 HideProperties();
             }
         }
@@ -648,7 +685,7 @@ public class SimulatorUIController : MonoBehaviour
     private Vector3 GetFreeVelocityDrag()
     {
         // starting the trajectory
-        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
+        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsMouseOverUI())
         {
             Vector3 screenPosition = Input.mousePosition;
             screenPosition.z = Camera.main.nearClipPlane + distanceFromCamera;
@@ -696,7 +733,7 @@ public class SimulatorUIController : MonoBehaviour
     private Vector3 GetPlaneVelocityDrag()
     {
         // starting the trajectory
-        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsPointerOverAnyUI())
+        if (Input.GetMouseButtonDown(0) && !GeneralUI.IsMouseOverUI())
         {
             startVelocityPoint = GetMouseOnPlane();
         }
@@ -821,6 +858,8 @@ public class SimulatorUIController : MonoBehaviour
             body.Velocity = bodyPreview.Velocity;
 
             CreateExplorerEntry(body);
+            ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
+
             body.CreateEntity();
             simController.AddBody(body);
             SimulatorController.ApplyScale(body);
@@ -840,25 +879,27 @@ public class SimulatorUIController : MonoBehaviour
     // changes the selected body's properties when any property field is changed
     private void InitialisePropertyFields()
     {
-        VisualElement propertiesFrame = ui.Q<VisualElement>("Properties");
-        
-        VisualElement bodyFields = propertiesFrame.Q("BodyFields");
-        foreach (VisualElement field in bodyFields.Children()) // all elements will be fields
-        {
-            string name = field.name;
-            string property = name[(name.IndexOf("_") + 1)..]; // the part after the "_"
+        VisualElement properties = ui.Q<VisualElement>("Properties");
+        VisualElement groups = properties.Q<VisualElement>("Groups");
 
-            if (field is FloatField floatField)
+        foreach (VisualElement group in groups.Children())
+        {
+            foreach (VisualElement field in group.Children())
             {
-                InitialisePropertyField(floatField, property);
-            }
-            else if (field is TextField textField)
-            {
-                InitialisePropertyField(textField, property);
-            }
-            else if (field is DropdownField dropdownField)
-            {
-                InitialisePropertyField(dropdownField, property);
+                string property = field.name;
+
+                if (field is TextField textField)
+                {
+                    InitialisePropertyField(textField, property);
+                }
+                else if (field is FloatField floatField)
+                {
+                    InitialisePropertyField(floatField, property);
+                }
+                else if (field is Vector3Field vectorField)
+                {
+                    InitialisePropertyField(vectorField, property);
+                }
             }
         }
 
@@ -869,8 +910,6 @@ public class SimulatorUIController : MonoBehaviour
     //   the corresponding property is updated with the value provided
     private void InitialisePropertyField<T>(BaseField<T> field, string property)
     {   
-        // Debug.Log(property);
-
         field.RegisterCallback<KeyDownEvent>((e) =>{
             if (e.keyCode == KeyCode.Return && selectedBody != null)
             {
@@ -892,50 +931,54 @@ public class SimulatorUIController : MonoBehaviour
     public void ShowProperties()
     {
         VisualElement properties = ui.Q<VisualElement>("Properties");
+        VisualElement groups = properties.Q<VisualElement>("Groups");
 
         if (selectedBody == null)
         {
-            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.None;
-            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.Flex;
+            groups.style.display = DisplayStyle.None;
+            properties.Q<Label>("NoSelection").style.display = DisplayStyle.Flex;
         }
         else 
         {
-            properties.Q<Label>("NoSelectedBody").style.display = DisplayStyle.None;
-            properties.Q<VisualElement>("PropertyGroups").style.display = DisplayStyle.Flex;
+            Type type = selectedBody.GetType();
+            var properties_ = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-            // general body properties
-            VisualElement bodyProperties = properties.Q<VisualElement>("Properties_Body");
-            bodyProperties.style.display = DisplayStyle.Flex;
-
-            bodyProperties.Q<TextField>("Body_Name").value = selectedBody.Name;
-            bodyProperties.Q<FloatField>("Body_Mass").value = selectedBody.Mass;
-            bodyProperties.Q<FloatField>("Body_Radius").value = selectedBody.Radius;
-            bodyProperties.Q<FloatField>("Body_Speed").value = selectedBody.Velocity.magnitude;
-            bodyProperties.Q<FloatField>("Body_SurfaceTemp").value = selectedBody.SurfaceTemp;
-            bodyProperties.Q<FloatField>("Body_Density").value = selectedBody.Density;
-
-            // Debug.Log(selectedBody.GetType().GetProperty("Radius").GetValue(selectedBody, null));
-
-            // initially hiding all "particular" property groups
-            VisualElement starProperties = properties.Q<VisualElement>("Properties_Star");
-            VisualElement planetProperties = properties.Q<VisualElement>("Properties_Planet");
-
-            starProperties.style.display = DisplayStyle.None;
-            planetProperties.style.display = DisplayStyle.None;
-
-            // star properties
-            if (selectedBody is Star star)
+            foreach (var property in properties_)
             {
-                starProperties.style.display = DisplayStyle.Flex;
-                starProperties.Q<FloatField>("Star_Luminosity").value = star.Luminosity;
+                VisualElement field = groups.Q(property.Name);
+                if (field == null) continue;
 
-            } // planet properties
-            else if (selectedBody is Planet planet)
-            {
-                planetProperties.style.display = DisplayStyle.Flex;
-                planetProperties.Q<FloatField>("Planet_WaterContent").value = planet.WaterContent;
-                planetProperties.Q<FloatField>("Planet_Habitability").value = planet.Habitability;
+                if (property.GetValue(selectedBody) == null)
+                {
+                    field.style.display = DisplayStyle.None;
+                }
+                else
+                {   
+                    field.style.display = DisplayStyle.Flex;
+
+                    // don't update when focused (to permit editing)
+                    if (field is TextField textField)
+                    {
+                        if (textField.focusController.focusedElement == textField) continue;
+                        textField.value = (string) property.GetValue(selectedBody);
+                    } 
+                    else if (field is FloatField floatField)
+                    {
+                        if (floatField.focusController.focusedElement == floatField) continue;
+                        floatField.value = (float) property.GetValue(selectedBody);
+                    } 
+                    else if (field is Vector3Field vectorField)
+                    {
+                        if (vectorField.focusController.focusedElement == vectorField) continue;
+                        vectorField.value = (Vector3) property.GetValue(selectedBody);
+                    }
+                }
             }
+
+            properties.Q<Label>("NoSelection").style.display = DisplayStyle.None;
+            groups.Q<VisualElement>("Star").style.display = selectedBody is Star ? DisplayStyle.Flex : DisplayStyle.None;
+            groups.Q<VisualElement>("Planet").style.display = selectedBody is Planet ? DisplayStyle.Flex : DisplayStyle.None;
+            groups.style.display = DisplayStyle.Flex;
         }
 
         properties.style.display = DisplayStyle.Flex;
@@ -954,7 +997,7 @@ public class SimulatorUIController : MonoBehaviour
 
         selectedBody = null;
         Camera.main.GetComponent<CameraController>().SetScene(CameraController.Mode.Simulator);
-        Camera.main.GetComponent<CameraController>().SetSubject(selectedBody);
+        CameraController.SetSubject(selectedBody);
     }
 
     #endregion Body Properties

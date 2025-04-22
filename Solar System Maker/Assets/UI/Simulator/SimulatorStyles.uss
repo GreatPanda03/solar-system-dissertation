@@ -69,10 +69,10 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
 }
 
 .propertiesTitle {
@@ -85,6 +85,26 @@
     width: auto;
     padding-top: 0;
     padding-bottom: 0;
+    font-size: 14px;
+    max-height: 15px;
+    min-height: 15px;
+    height: 15px;
+}
+
+.propertiesSubtitle {
+    -unity-text-align: middle-left;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    padding-right: 0;
+    padding-left: 0;
+    flex-basis: auto;
+    width: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+    max-height: 10px;
+    min-height: 10px;
+    height: 10px;
+    font-size: 12px;
 }
 
 .divider {
@@ -124,25 +144,23 @@
     padding-left: 0;
 }
 
-.propertiesSubtitle {
-    -unity-text-align: middle-left;
-    color: rgb(255, 255, 255);
-    -unity-font-style: bold;
-    padding-right: 0;
-    padding-left: 0;
-    flex-basis: auto;
-    width: auto;
-    padding-top: 0;
-    padding-bottom: 0;
-}
-
 .propertiesField {
-    max-height: 30px;
+    max-height: 20px;
+    font-size: 12px;
+    margin-top: 1px;
+    margin-right: 1px;
+    margin-bottom: 1px;
+    margin-left: 1px;
 }
 
 .propertiesPanel .unity-label {
     color: rgb(255, 255, 255);
     min-width: auto;
+    flex-basis: 40%;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
 }
 
 .propertiesPanel .unity-base-text-field__input {
@@ -154,6 +172,8 @@
     padding-right: 0;
     padding-bottom: 0;
     padding-left: 0;
+    -unity-text-align: middle-left;
+    flex-basis: auto;
 }
 
 .propertiesFields .unity-label {
@@ -161,6 +181,11 @@
     min-width: auto;
     flex-basis: 40%;
     -unity-text-align: upper-left;
+    font-size: 12px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
 }
 
 .propertiesClose {

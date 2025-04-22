@@ -16,8 +16,8 @@ public class Star : Body
 
     protected float luminosity;
     public float Luminosity {
-        get { return luminosity;  }
-        set { luminosity = value; }
+        get => luminosity;
+        set => luminosity = value;
     }
 
     public Star() : base()
@@ -25,7 +25,7 @@ public class Star : Body
         name = "Star";
         mass = 1000f;
         luminosity = 1f;
-        radius = GetRadiusFromMass();
+        radius = GetRadiusFromMassAndDensity();
     }
 
     public Star(float mass, Vector3 position, Vector3 velocity)

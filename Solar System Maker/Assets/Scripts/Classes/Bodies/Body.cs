@@ -11,7 +11,9 @@
 
 // LIBRARIES
 using System;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -36,7 +38,7 @@ public class Body
     }
 
     protected GameObject entity;
-    [JsonIgnore] // recreated a runtime
+    [JsonIgnore] // recreated at runtime
     public GameObject Entity {
         get => entity;
         set {
@@ -48,14 +50,18 @@ public class Body
     protected float mass;
     public float Mass {
         get => mass;
-        set => mass = value; 
+        set {
+            mass = value;
+            density = GetDensityFromMassAndRadius();
+        }
     }
 
     protected float radius;
     public float Radius {
         get => radius;
-        set {
+        set { 
             radius = value;
+            density = GetDensityFromMassAndRadius();
         }
     }
 
@@ -87,7 +93,10 @@ public class Body
     protected float density;
     public float Density {
         get => density; 
-        set => density = value; 
+        set {
+            density = value;
+            radius = GetRadiusFromMassAndDensity();
+        }
     }
     
     // private Texture texture {
@@ -114,7 +123,7 @@ public class Body
         surfaceTemp = 0f;
         density = 1f;
 
-        radius = GetRadiusFromMass();
+        radius = GetRadiusFromMassAndDensity();
     }
 
     public Body(float mass, Vector3 position, Vector3 velocity)
@@ -127,7 +136,7 @@ public class Body
         surfaceTemp = 0f;
         density = 1f;
 
-        radius = GetRadiusFromMass();
+        radius = GetRadiusFromMassAndDensity();
     }
 
     // returns a copy of the body
@@ -163,10 +172,15 @@ public class Body
 
     #region Entity Methods
 
-    // auxiliary: returns a radius value from the body's mass
-    public float GetRadiusFromMass()
+    // auxiliary: returns values in relation to "p = m / v"
+    public float GetRadiusFromMassAndDensity()
     {
-        return (float) Math.Pow(3 * mass / (4 * Math.PI), 1f / 3f);
+        return Mathf.Pow(mass / density * 0.75f / Mathf.PI, 1f / 3f);
+    }
+
+    public float GetDensityFromMassAndRadius()
+    {
+        return mass * 0.75f / Mathf.PI / Mathf.Pow(radius, 3);
     }
 
     // returns the force applied between two objects
