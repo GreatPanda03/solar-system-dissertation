@@ -18,11 +18,12 @@ All dates are in the form **YYYY/MM/DD**.
 ### Version: 1.6.4
 **Date:** 2025/04/22
 <br/>**Bug Fixes:**
-* **1)** Fixed property window updates preventing field input *(constantly overwrote edits with the current value)*
-* **2)** Fixed "No bodies" label not showing in explorer window with no bodies present
-* **3)** Fixed explorer entries persisting between simulations
-* **4)** Added handling when deleting a body which is currently being followed
-* **5)** Fixed explorer and properties titles preventing clicks on their close buttons
+* **1)** Clicking on UI elements now blocks the click from passing through *(no more deselection when clicking UI!)*
+* **2)** Fixed property window updates preventing field input *(constantly overwrote edits with the current value)*
+* **3)** Fixed "No bodies" label not showing in explorer window with no bodies present
+* **4)** Fixed explorer entries persisting between simulations
+* **5)** Added handling when deleting a body which is currently being followed
+* **6)** Fixed explorer and properties titles preventing clicks on their close buttons
 
 **Additions / Changes:**
 * **1)** Updated UI for properties window and generalised back-end functions
@@ -162,7 +163,7 @@ All dates are in the form **YYYY/MM/DD**.
 ### Version: 1.3.1
 **Date:** 2025/04/18
 <br/>**Bug Fixes:**
-* **1)** Fixed body not being followed aftering selecting it in the explorer
+* **1)** Fixed bodies not being followed after selecting the corresponding explorer entry
 
 **Additions / Changes:**
 * **1)** Editing a body's details now updates the corresponding entry in the explorer
@@ -173,7 +174,7 @@ All dates are in the form **YYYY/MM/DD**.
 **Date:** 2025/04/18
 <br/>**Bug Fixes:**
 * **1)** Closing the properties window while following a body stops following the body
-* **2)** The camera no longer moves when pressing movement keys while a textbox is selected
+* **2)** Pressing movement keys (WASD) while a textbox is selected no longer moves the camera
 
 **Additions / Changes:**
 * **1)** Creating a body created a new entry in the explorer when adding a body
@@ -188,10 +189,10 @@ All dates are in the form **YYYY/MM/DD**.
 * **1)** Selecting a text box with a preview body selected no longer places a body behind the UI
 
 **Additions / Changes:**
-* **1)** New Explorer panel (not yet usable)
+* **1)** New Explorer panel *(not yet usable)*
 * **2)** New panel to distinguish between Body List and Explorer
-* **3)** Can follow a planet when selecting a planet *(follows the planet until deselected)*
-* **4)** Added a new background plane texture (currently invisible)
+* **3)** Bodies can be followed by selecting them *(follows the planet until deselected)*
+* **4)** Added a new grid plane with a texture *(currently invisible, WIP)*
 
 ---
 
