@@ -1,15 +1,3 @@
-.toolbar {
-    height: 50px;
-    max-height: 50px;
-    min-height: 50px;
-    align-items: flex-start;
-    justify-content: flex-start;
-    align-self: flex-start;
-    flex-direction: column;
-    padding-right: 5px;
-    padding-left: 5px;
-}
-
 .title {
     -unity-text-align: middle-left;
     color: rgb(255, 255, 255);
@@ -29,48 +17,6 @@
     padding-bottom: 5px;
     padding-left: 0;
     flex-direction: row;
-}
-
-.bodyButton {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    margin-right: 0;
-    transition-duration: 0.25s;
-    margin-left: 5px;
-}
-
-.bodyButton:hover {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    margin-right: 0;
-    transition-duration: 0.25s;
-    margin-left: 5px;
-}
-
-.selectedButton {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    margin-right: 0;
-    background-color: rgb(162, 217, 255);
-    transition-duration: 0.25s;
-    margin-left: 5px;
-}
-
-.selectedButton:hover {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    margin-right: 0;
-    background-color: rgb(107, 198, 255);
-    transition-duration: 0.25s;
-    margin-left: 5px;
 }
 
 .saveButton {
@@ -241,6 +187,24 @@
     padding-left: 10px;
 }
 
+.toolboxBar {
+    bottom: 0;
+    position: absolute;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    flex-direction: row;
+}
+
+.toolboxList {
+    flex-direction: row;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+}
+
 .toolboxButton {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -251,14 +215,53 @@
     margin-left: 5px;
     margin-top: 0;
     margin-right: 0;
+    width: 30px;
+    height: 30px;
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
 }
 
 .toolboxButton:hover {
+    transition-property: rotate;
+    transition-duration: 0.25s;
+    rotate: 10deg;
+}
+
+.toolboxButtonIcon {
+    flex-grow: 1;
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.selectedButton {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     margin-right: 0;
+    background-color: rgb(162, 217, 255);
     transition-duration: 0.25s;
     margin-left: 5px;
+}
+
+.selectedButton:hover {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 0;
+    background-color: rgb(107, 198, 255);
+    transition-duration: 0.25s;
+    margin-left: 5px;
+}
+
+.toolboxBar {
+    bottom: 0;
+    position: absolute;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    flex-direction: row;
 }

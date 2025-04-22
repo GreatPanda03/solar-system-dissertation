@@ -1,90 +1,98 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Simulator/SimulatorStyles.uss?fileID=7433441132597879392&amp;guid=f640695c10d59ba4199d931b7b100157&amp;type=3#SimulatorStyles" />
-    <ui:VisualElement name="Root" style="flex-grow: 1; display: flex;">
-        <ui:VisualElement name="ToolBar" class="toolbar" style="flex-grow: 1; height: 50px; width: 100%; flex-direction: column; max-height: 50px; min-height: 50px;">
-            <ui:Label text="Simulation Name" name="Title" class="title" style="width: auto;" />
-            <ui:VisualElement name="Options" class="options" style="flex-grow: 1; width: auto; max-height: none; background-color: rgba(255, 255, 255, 0); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: flex-start;">
-                <ui:Button text="Save" name="SaveSimulation" class="saveButton" style="width: 50px; height: 100%;" />
-                <ui:Button text="Exit" name="ExitSimulator" class="exitButton" style="width: 50px; height: 100%;" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="Properties" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: 10px; left: auto; right: 10px;">
-            <ui:Button text="X" name="PropertiesClose" class="propertiesClose" style="position: absolute;" />
-            <ui:Label text="Properties" name="PropertiesTitle" class="propertiesTitle" />
-            <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
-            <ui:VisualElement name="PropertyGroups" style="flex-grow: 1; display: none;">
-                <ui:GroupBox name="Properties_Body" class="propertiesGroup">
-                    <ui:Label text="General" name="Properties_BodyTitle" class="propertiesSubtitle" />
-                    <ui:VisualElement name="BodyFields" class="propertiesFields" style="flex-grow: 1;">
-                        <ui:TextField label="Name" placeholder-text="(blank)" name="Body_Name" tooltip="Name" class="propertiesField" />
-                        <ui:FloatField label="Mass" value="10" name="Body_Mass" tooltip="Mass" class="propertiesField" />
-                        <ui:FloatField label="Radius" value="10" name="Body_Radius" tooltip="Radius" class="propertiesField" />
-                        <ui:FloatField label="Speed" value="10" name="Body_Speed" tooltip="Speed (Magnitude)" readonly="true" class="propertiesField" />
-                        <ui:FloatField label="Surface Temp." value="10" name="Body_SurfaceTemp" tooltip="Surface Temperature" class="propertiesField" />
-                        <ui:FloatField label="Density" value="10" name="Body_Density" tooltip="Density" class="propertiesField" />
-                    </ui:VisualElement>
-                </ui:GroupBox>
-                <ui:GroupBox name="Properties_Star" class="propertiesGroup">
-                    <ui:Label text="Star" name="Properties_StarTitle" class="propertiesSubtitle" />
-                    <ui:VisualElement name="StarFields" class="propertiesFields" style="flex-grow: 1;">
-                        <ui:FloatField label="Luminosity" value="0" name="Star_Luminosity" tooltip="Luminosity" class="propertiesField" />
-                    </ui:VisualElement>
-                </ui:GroupBox>
-                <ui:GroupBox name="Properties_Planet" class="propertiesGroup">
-                    <ui:Label text="Planet" name="Properties_PlanetTitle" class="propertiesSubtitle" />
-                    <ui:VisualElement name="PlanetFields" class="propertiesFields" style="flex-grow: 1;">
-                        <ui:FloatField label="Water Content" value="0" name="Planet_WaterContent" tooltip="Water Content" class="propertiesField" />
-                        <ui:FloatField label="Habitability" value="0" name="Planet_Habitability" tooltip="Habitability" readonly="true" class="propertiesField" />
-                    </ui:VisualElement>
-                </ui:GroupBox>
-            </ui:VisualElement>
-            <ui:Label text="Select a body in the system to see its properties" name="NoSelectedBody" class="propertiesNoBody" />
-        </ui:VisualElement>
-        <ui:VisualElement name="ExplorerContainer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 40px;">
-            <ui:Button text="X" name="ExplorerClose" class="propertiesClose" style="position: absolute;" />
-            <ui:Label text="Explorer" name="ExplorerTitle" class="propertiesTitle" />
-            <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
-            <ui:ScrollView name="ExplorerList" style="height: auto; max-height: 200px;" />
-            <ui:Label text="Create bodies to view them in the list." name="NoExplorerContents" class="propertiesNoBody" style="display: none;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="ToolBox" style="flex-grow: 1; align-content: center; justify-content: flex-end; display: flex; position: absolute; height: 50px; min-height: 0; max-height: 50px; margin-top: 0; -unity-text-align: middle-left; width: auto; bottom: 0; flex-direction: column; max-width: 100%; align-items: stretch; align-self: stretch;">
-            <ui:VisualElement name="ItemList" class="bodyList" style="flex-grow: 1; width: 100%; max-height: 100%; background-color: rgba(255, 255, 255, 0.12); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: flex-start; padding-top: 5px; padding-bottom: 5px; flex-direction: row; padding-right: 5px; padding-left: 5px;">
-                <ui:Button text="Explorer" name="Explorer" class="toolboxButton" style="width: 75px; height: 100%; margin-left: 0;" />
-                <ui:Button text="Modes" name="Modes" enable-rich-text="true" class="toolboxButton" style="width: 65px; height: 100%;" />
-                <ui:Button text="Distance" name="Distance" enable-rich-text="true" class="toolboxButton" style="width: 75px; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; display: flex;" />
-                <ui:Button text="Bodies" name="Bodies" enable-rich-text="true" class="toolboxButton" style="width: 65px; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                <ui:Button text="&lt;b&gt;Simulation:&lt;/b&gt;&#10;Running" name="TogglePlay" enable-rich-text="true" class="toolboxButton" style="width: 100px; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; display: flex;" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="SubToolBox" style="flex-grow: 1; align-content: center; justify-content: flex-end; display: flex; position: absolute; height: 50px; min-height: 0; max-height: 50px; margin-top: 0; -unity-text-align: middle-left; width: auto; bottom: 60px; flex-direction: column; max-width: 100%; align-items: auto; align-self: stretch;">
-            <ui:VisualElement name="ModeList" style="flex-grow: 1; align-content: auto; justify-content: flex-start; display: flex; position: relative; height: 50px; max-height: 50px; min-height: 50px; align-items: auto; margin-top: 0; flex-direction: column; align-self: flex-start; margin-bottom: 5px;">
-                <ui:VisualElement name="ItemList" class="bodyList" style="flex-grow: 1; width: 100%; max-height: 50px; background-color: rgba(255, 255, 255, 0.12); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: stretch; padding-top: 5px; padding-bottom: 5px; flex-direction: row; padding-right: 5px; padding-left: 5px;">
-                    <ui:Label text="Mode" name="ModeLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
-                    <ui:Button text="Free" name="FreePlacement" class="toolboxButton" style="width: 55px; height: 100%; margin-left: 0;" />
-                    <ui:Button text="Plane" name="PlanePlacement" class="toolboxButton" style="width: 60px; height: 100%;" />
-                    <ui:Button text="Orbit" name="OrbitPlacement" class="toolboxButton" style="width: 60px; height: 100%;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="DistanceList" style="flex-grow: 1; align-content: auto; justify-content: flex-start; display: flex; position: relative; height: 50px; max-height: 50px; min-height: 50px; align-items: auto; margin-top: 0; flex-direction: column; align-self: flex-start; margin-bottom: 5px;">
-                <ui:VisualElement name="ItemList" class="bodyList" style="flex-grow: 1; width: 100%; max-height: 50px; background-color: rgba(255, 255, 255, 0.12); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: stretch; padding-top: 5px; padding-bottom: 5px; flex-direction: row; padding-right: 5px; padding-left: 5px;">
-                    <ui:Label text="Distance" name="DistanceLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
-                    <ui:Button text="cm" name="Centimetre" tooltip="Centimetres" class="toolboxButton" style="width: 35px; height: 100%; margin-left: 0;" />
-                    <ui:Button text="m" name="Metre" tooltip="Metres" class="toolboxButton" style="width: 35px; height: 100%;" />
-                    <ui:Button text="km" name="Kilometre" tooltip="Kilometres" class="toolboxButton" style="width: 35px; height: 100%;" />
-                    <ui:Button text="mi" name="Mile" tooltip="Miles" class="toolboxButton" style="width: 35px; height: 100%;" />
-                    <ui:Button text="LD" name="LunarDistance" tooltip="Lunar Distances" class="toolboxButton" style="width: 35px; height: 100%;" />
-                    <ui:Button text="AU" name="AU" tooltip="Astronomical Units" class="toolboxButton" style="width: 35px; height: 100%;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="BodyList" style="flex-grow: 1; align-content: stretch; justify-content: flex-end; display: flex; position: relative; height: 50px; max-height: 50px; min-height: 50px; flex-direction: column-reverse; align-self: flex-start; align-items: auto; margin-bottom: 5px;">
-                <ui:VisualElement name="ItemList" class="bodyList" style="flex-grow: 1; width: 100%; max-height: 50px; background-color: rgba(255, 255, 255, 0.12); align-content: auto; bottom: auto; top: auto; justify-content: flex-start; align-self: stretch; align-items: stretch; padding-top: 5px; padding-bottom: 5px; flex-direction: row; padding-right: 5px; padding-left: 5px;">
-                    <ui:Label text="Body" name="BodyLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255);" />
-                    <ui:Button text="Star" name="AddStar" class="bodyButton" style="width: 50px; height: 100%; margin-top: 0; margin-right: 5px; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                    <ui:Button text="Planet" name="AddPlanet" class="bodyButton" style="width: 65px; height: 100%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
-                    <ui:Button text="Moon" name="AddMoon" enable-rich-text="true" class="bodyButton" style="width: 55px; height: 100%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 5px;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:Label text="&lt;b&gt;Scale:&lt;/b&gt; 1 AU" name="Scale" style="position: absolute; -unity-text-align: upper-right; color: rgb(255, 255, 255); bottom: 0; right: 0;" />
+    <ui:VisualElement name="ToolBar" class="toolbar" style="flex-grow: 1; height: 30px; width: 100%; flex-direction: row; max-height: 30px; min-height: 30px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 0;">
+        <ui:Button name="ExitSimulator" tooltip="Exit Simulation" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/ExitSimulation&apos;);" />
+        </ui:Button>
+        <ui:Button name="SaveSimulation" tooltip="Save Simulation" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/SaveSimulation&apos;);" />
+        </ui:Button>
+        <ui:Label text="Simulation Name" name="Title" class="title" style="width: auto; height: 100%; -unity-text-align: lower-left; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 10px;" />
     </ui:VisualElement>
+    <ui:VisualElement name="Properties" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: 10px; left: auto; right: 10px;">
+        <ui:Button text="X" name="PropertiesClose" class="propertiesClose" style="position: absolute;" />
+        <ui:Label text="Properties" name="PropertiesTitle" class="propertiesTitle" />
+        <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
+        <ui:VisualElement name="PropertyGroups" style="flex-grow: 1; display: none;">
+            <ui:GroupBox name="Properties_Body" class="propertiesGroup">
+                <ui:Label text="General" name="Properties_BodyTitle" class="propertiesSubtitle" />
+                <ui:VisualElement name="BodyFields" class="propertiesFields" style="flex-grow: 1;">
+                    <ui:TextField label="Name" placeholder-text="(blank)" name="Body_Name" tooltip="Name" class="propertiesField" />
+                    <ui:FloatField label="Mass" value="10" name="Body_Mass" tooltip="Mass" class="propertiesField" />
+                    <ui:FloatField label="Radius" value="10" name="Body_Radius" tooltip="Radius" class="propertiesField" />
+                    <ui:FloatField label="Speed" value="10" name="Body_Speed" tooltip="Speed (Magnitude)" readonly="true" class="propertiesField" />
+                    <ui:FloatField label="Surface Temp." value="10" name="Body_SurfaceTemp" tooltip="Surface Temperature" class="propertiesField" />
+                    <ui:FloatField label="Density" value="10" name="Body_Density" tooltip="Density" class="propertiesField" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+            <ui:GroupBox name="Properties_Star" class="propertiesGroup">
+                <ui:Label text="Star" name="Properties_StarTitle" class="propertiesSubtitle" />
+                <ui:VisualElement name="StarFields" class="propertiesFields" style="flex-grow: 1;">
+                    <ui:FloatField label="Luminosity" value="0" name="Star_Luminosity" tooltip="Luminosity" class="propertiesField" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+            <ui:GroupBox name="Properties_Planet" class="propertiesGroup">
+                <ui:Label text="Planet" name="Properties_PlanetTitle" class="propertiesSubtitle" />
+                <ui:VisualElement name="PlanetFields" class="propertiesFields" style="flex-grow: 1;">
+                    <ui:FloatField label="Water Content" value="0" name="Planet_WaterContent" tooltip="Water Content" class="propertiesField" />
+                    <ui:FloatField label="Habitability" value="0" name="Planet_Habitability" tooltip="Habitability" readonly="true" class="propertiesField" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+        </ui:VisualElement>
+        <ui:Label text="Select a body in the system to see its properties" name="NoSelectedBody" class="propertiesNoBody" />
+    </ui:VisualElement>
+    <ui:VisualElement name="Explorer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 40px;">
+        <ui:Button text="X" name="ExplorerClose" class="propertiesClose" style="position: absolute;" />
+        <ui:Label text="Explorer" name="ExplorerTitle" class="propertiesTitle" />
+        <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
+        <ui:ScrollView name="ExplorerList" style="height: auto; max-height: 200px;" />
+        <ui:Label text="Create bodies to view them in the list." name="NoExplorerContents" class="propertiesNoBody" style="display: none;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="ToolBox" class="toolboxBar">
+        <ui:Button name="Explorer" tooltip="Explorer" class="toolboxButton" style="width: 30px; height: 30px; margin-left: 0; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255);">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Explorer.png?fileID=2800000&amp;guid=68d64274fbde6ec4998749f5c4ed5273&amp;type=3#Explorer&quot;);" />
+        </ui:Button>
+        <ui:Button name="Bodies" tooltip="Bodies" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Bodies.png?fileID=2800000&amp;guid=29b80d331e2cd414b8c363f88e0853f1&amp;type=3#Bodies&quot;);" />
+        </ui:Button>
+        <ui:Button name="Modes" tooltip="Placement Modes" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Modes.png?fileID=2800000&amp;guid=0afd0ed95280851439b76ad51578880f&amp;type=3#Modes&quot;);" />
+        </ui:Button>
+        <ui:Button name="Distance" tooltip="Distance Units" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Distances.png?fileID=2800000&amp;guid=a51eb8f2cb0ac3b45807fb057bb49410&amp;type=3#Distances&quot;);" />
+        </ui:Button>
+        <ui:Button name="TogglePlay" tooltip="Toggle Simulation Run" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Paused&apos;);" />
+        </ui:Button>
+    </ui:VisualElement>
+    <ui:VisualElement name="SubToolBox" class="toolboxBar" style="bottom: 40px; flex-direction: column; margin-left: 0;">
+        <ui:VisualElement name="BodyList" class="toolboxList">
+            <ui:Label text="Body" name="BodyLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255);" />
+            <ui:Button text="Star" name="AddStar" tooltip="Star" class="bodyButton toolboxButton" style="width: 45px;" />
+            <ui:Button text="Planet" name="AddPlanet" tooltip="Planet" class="bodyButton toolboxButton" style="width: 55px;" />
+            <ui:Button text="Moon" name="AddMoon" enable-rich-text="true" tooltip="Moon" class="bodyButton toolboxButton" style="width: 50px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ModeList" class="toolboxList">
+            <ui:Label text="Mode" name="ModeLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
+            <ui:Button name="FreePlacement" tooltip="Free Placement" class="toolboxButton">
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/FreePlacement.png?fileID=2800000&amp;guid=c9aaeae0199c0014089c88f9753c81c3&amp;type=3#FreePlacement&quot;);" />
+            </ui:Button>
+            <ui:Button name="PlanePlacement" tooltip="Plane Placement" class="toolboxButton">
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/PlanePlacement.png?fileID=2800000&amp;guid=cc2df80b634166d4da0d3e29d6407efd&amp;type=3#PlanePlacement&quot;);" />
+            </ui:Button>
+            <ui:Button name="OrbitPlacement" tooltip="Orbit Placement" class="toolboxButton">
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/OrbitPlacement.png?fileID=2800000&amp;guid=20bdd7bcd8c0ce9458d9313246507c42&amp;type=3#OrbitPlacement&quot;);" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="DistanceList" class="toolboxList">
+            <ui:Label text="Distance" name="DistanceLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
+            <ui:Button text="cm" name="Centimetre" tooltip="Centimetres" class="toolboxButton" />
+            <ui:Button text="m" name="Metre" tooltip="Metres" class="toolboxButton" />
+            <ui:Button text="km" name="Kilometre" tooltip="Kilometres" class="toolboxButton" />
+            <ui:Button text="mi" name="Mile" tooltip="Miles" class="toolboxButton" />
+            <ui:Button text="LD" name="LunarDistance" tooltip="Lunar Distance" class="toolboxButton" />
+            <ui:Button text="AU" name="AU" tooltip="Astronomical Unit" class="toolboxButton" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:Label text="&lt;b&gt;Scale:&lt;/b&gt; 1 AU" name="Scale" style="position: absolute; -unity-text-align: upper-right; color: rgb(255, 255, 255); bottom: 0; right: 0;" />
 </ui:UXML>

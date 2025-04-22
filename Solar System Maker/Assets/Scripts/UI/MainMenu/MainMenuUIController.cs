@@ -34,6 +34,8 @@ public static class MainMenuUIController
         // ui.Q<Button>("Tutorial").clicked += OnTutorialButtonClicked;             // WIP
         ui.Q<Button>("ExitApp").clicked += OnExitButtonClicked;
 
+        ui.style.display = DisplayStyle.Flex;
+
         Debug.Log("[MAIN MENU] SUCCESS: UI Loaded");
     }
 
@@ -45,7 +47,7 @@ public static class MainMenuUIController
     // displays the Main Menu interface
     public static void ShowInterface()
     {
-        ui.Q("Root").style.display = DisplayStyle.Flex;
+        ui.style.display = DisplayStyle.Flex;
 
         sampleSimScript.LoadSampleSimulation();
         sampleSimScript.RunSampleSimulation();
@@ -54,7 +56,7 @@ public static class MainMenuUIController
     // hides the Main Menu interface
     public static void HideInterface()
     {
-        ui.Q("Root").style.display = DisplayStyle.None;
+        ui.style.display = DisplayStyle.None;
 
         sampleSimScript.StopSampleSimulation();
         sampleSimScript.ClearSampleSimulation();

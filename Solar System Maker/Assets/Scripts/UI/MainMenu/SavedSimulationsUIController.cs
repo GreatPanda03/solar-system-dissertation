@@ -46,13 +46,13 @@ public static class SavedSimulationsUIController
     public static void ShowInterface()
     {
         LoadSaveEntries();
-        ui.Q("Root").style.display = DisplayStyle.Flex;
+        ui.style.display = DisplayStyle.Flex;
     }
 
     // hides the Saved Simulations interface
     public static void HideInterface()
     {
-        ui.Q("Root").style.display = DisplayStyle.None;
+        ui.style.display = DisplayStyle.None;
         ClearSaveEntries();
     }
 

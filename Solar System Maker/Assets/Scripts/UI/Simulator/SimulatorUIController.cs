@@ -56,7 +56,7 @@ public class SimulatorUIController : MonoBehaviour
 
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
         ui.Q<Button>("ExplorerClose").clicked += OnExplorerCloseClicked;
-        ui.Q<VisualElement>("ExplorerContainer").style.display = DisplayStyle.None;
+        ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
 
         ui.Q<Button>("Modes").clicked += OnModesClicked;
         ui.Q<Button>("FreePlacement").clicked += OnFreePlacementClicked;
@@ -101,13 +101,13 @@ public class SimulatorUIController : MonoBehaviour
     // displays the Simulator interface
     public void ShowInterface()
     {
-        ui.Q("Root").style.display = DisplayStyle.Flex;
+        ui.style.display = DisplayStyle.Flex;
     }
 
     // hides the Simulator interface
     public void HideInterface()
     {
-        ui.Q("Root").style.display = DisplayStyle.None;
+        ui.style.display = DisplayStyle.None;
     }
 
     // enables the interface
@@ -172,7 +172,7 @@ public class SimulatorUIController : MonoBehaviour
 
     public void OnExplorerClicked()
     {
-        VisualElement explorer = ui.Q<VisualElement>("ExplorerContainer");
+        VisualElement explorer = ui.Q<VisualElement>("Explorer");
         explorer.style.display = explorer.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
@@ -181,12 +181,14 @@ public class SimulatorUIController : MonoBehaviour
         if (simController.isRunning)
         {
             simController.isRunning = false;
-            ui.Q<Button>("TogglePlay").text = "<b>Simulation:</b>\n" + "Paused";
+            ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
+                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Playing");
         }
         else
         {
             simController.isRunning = true;
-            ui.Q<Button>("TogglePlay").text = "<b>Simulation:</b>\n" + "Running";
+            ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage
+                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Paused");
         }
     }
 
@@ -253,7 +255,7 @@ public class SimulatorUIController : MonoBehaviour
 
     public void OnExplorerCloseClicked()
     {
-        ui.Q<VisualElement>("ExplorerContainer").style.display = DisplayStyle.None;
+        ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
     }
 
     #endregion Explorer
@@ -460,7 +462,7 @@ public class SimulatorUIController : MonoBehaviour
         // explorer visibility
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            VisualElement explorer = ui.Q<VisualElement>("ExplorerContainer");
+            VisualElement explorer = ui.Q<VisualElement>("Explorer");
             bool visible = explorer.style.display == DisplayStyle.Flex;
             explorer.style.display = visible ? DisplayStyle.None : DisplayStyle.Flex;
         }

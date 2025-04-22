@@ -1,29 +1,27 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/SavedSimulations/SavedSimulationsStyles.uss?fileID=7433441132597879392&amp;guid=1f73784ed9e6fad4ca678484d1d3187f&amp;type=3#SavedSimulationsStyles" />
-    <ui:VisualElement name="Root" style="flex-grow: 1; align-self: center; justify-content: center; display: flex;">
-        <ui:VisualElement name="Container" class="container" style="flex-grow: 1;">
-            <ui:VisualElement name="Header" class="header" style="flex-grow: 1;">
-                <ui:Label text="Saved Systems" name="Title" class="title" />
-                <ui:Button text="Close" name="CloseWindow" class="closeButton" />
-            </ui:VisualElement>
-            <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
-            <ui:VisualElement name="Content" class="content" style="align-content: center; align-items: stretch; justify-content: center;">
-                <ui:ScrollView name="SaveList" class="saveList" />
-                <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1; height: auto; max-height: none; min-height: auto; width: 1px; max-width: 1px; min-width: 1px; background-color: rgba(255, 255, 255, 0.39); margin-right: 5px; margin-left: 5px;" />
-                <ui:VisualElement name="SaveViewer" class="saveViewer" style="flex-grow: 1;">
-                    <ui:Label text="Select a save from the list to view its details." name="NoSelectedSave" class="viewerDescription" style="display: flex; -unity-text-align: upper-center; -unity-font-style: italic;" />
-                    <ui:VisualElement name="SaveDetails" style="flex-grow: 1; display: none;">
-                        <ui:Label text="Template TItle" name="Title" class="viewerTitle" style="display: flex;" />
-                        <ui:Label text="This is some sample text about our solar system!" name="Description" class="viewerDescription" style="height: auto; display: flex;" />
-                        <ui:VisualElement name="ViewerFooter" class="footer" style="flex-grow: 1; flex-basis: 10%; display: flex; max-height: 10%; margin-top: 5px;">
-                            <ui:Button text="Load" name="Load" class="loadButton" />
-                            <ui:Button text="Delete" name="Delete" class="deleteButton" />
-                        </ui:VisualElement>
+    <ui:VisualElement name="Container" class="container" style="flex-grow: 1; display: flex; flex-direction: column;">
+        <ui:VisualElement name="Header" class="header" style="flex-grow: 1;">
+            <ui:Label text="Saved Systems" name="Title" class="title" />
+            <ui:Button text="Close" name="CloseWindow" class="closeButton" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
+        <ui:VisualElement name="Content" class="content" style="align-content: center; align-items: stretch; justify-content: center;">
+            <ui:ScrollView name="SaveList" class="saveList" />
+            <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1; height: auto; max-height: none; min-height: auto; width: 1px; max-width: 1px; min-width: 1px; background-color: rgba(255, 255, 255, 0.39); margin-right: 5px; margin-left: 5px;" />
+            <ui:VisualElement name="SaveViewer" class="saveViewer" style="flex-grow: 1;">
+                <ui:Label text="Select a save from the list to view its details." name="NoSelectedSave" class="viewerDescription" style="display: flex; -unity-text-align: upper-center; -unity-font-style: italic;" />
+                <ui:VisualElement name="SaveDetails" style="flex-grow: 1; display: none;">
+                    <ui:Label text="Template TItle" name="Title" class="viewerTitle" style="display: flex;" />
+                    <ui:Label text="This is some sample text about our solar system!" name="Description" class="viewerDescription" style="height: auto; display: flex;" />
+                    <ui:VisualElement name="ViewerFooter" class="footer" style="flex-grow: 1; flex-basis: 10%; display: flex; max-height: 10%; margin-top: 5px;">
+                        <ui:Button text="Load" name="Load" class="loadButton" />
+                        <ui:Button text="Delete" name="Delete" class="deleteButton" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
-            <ui:VisualElement name="Footer" class="footer" style="flex-grow: 1; flex-basis: 10%; display: flex;" />
         </ui:VisualElement>
+        <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
+        <ui:VisualElement name="Footer" class="footer" style="flex-grow: 1; flex-basis: 10%; display: flex;" />
     </ui:VisualElement>
 </ui:UXML>

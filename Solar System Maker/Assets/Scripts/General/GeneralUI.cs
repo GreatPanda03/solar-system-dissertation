@@ -10,6 +10,7 @@ public static class GeneralUI
     public static bool IsPointerOverAnyUI()
     {
         /*
+        // invert - mousePosition based on bottom left, UI on top left
         Vector2 mousePosition = Input.mousePosition;
         mousePosition.y = Screen.height - mousePosition.y;
 
@@ -22,6 +23,8 @@ public static class GeneralUI
 
             var root = document.rootVisualElement;
             var picked = root.panel?.Pick(mousePosition);
+
+            Debug.Log(root);
 
             if (picked != null)
             {
