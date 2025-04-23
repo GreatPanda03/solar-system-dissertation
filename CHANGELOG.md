@@ -8,6 +8,20 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.6
+**Date:** 2025/04/23
+<br/>**Bug Fixes:**
+* **1)** Selecting a body for the first time caused a frame skip due to loading the "BodyLabel" prefab *(all prefabs are now preloaded)*
+* **Note:** Scrolls over UI are also captured as scrolls in space - this fix is a WIP!
+
+**Additions / Changes:**
+* **1)** Updated all current icons with higher resolution ones
+* **2)** Added a search bar to the explorer to search for bodies in the current system by name
+* **3)** Reduced the thickness of the explorer scroll bar
+* **4)** Body previews are labeled as "New Star" / "New Planet" (etc.), then named after their type ("Star", "Planet", etc.)
+
+---
+
 ### Version: 1.6.5
 **Date:** 2025/04/22
 <br/>**Additions / Changes:**
