@@ -11,14 +11,10 @@
 // LIBRARIES
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Reflection;
-using Unity.Properties;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
-using UnityEditor.UIElements;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 
@@ -38,6 +34,7 @@ public class SimulatorUIController : MonoBehaviour
     private string selectedBodyItem;
     private Body bodyPreview;
     private Body selectedBody;
+    private bool showLabels = true;
 
     // free placement mode
     private Vector3? startVelocityPoint; // positional point, not velocity
@@ -65,6 +62,12 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q("Explorer").Q<Button>("Close").clicked += OnExplorerCloseClicked;
         ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
 
+        ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
+        ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
+        ui.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
+        ui.Q<Button>("AddMoon").clicked += OnAddMoonClicked;
+        ui.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
+
         ui.Q<Button>("Modes").clicked += OnModesClicked;
         ui.Q<Button>("FreePlacement").clicked += OnFreePlacementClicked;
         ui.Q<Button>("PlanePlacement").clicked += OnPlanePlacementClicked;
@@ -84,11 +87,7 @@ public class SimulatorUIController : MonoBehaviour
 
         UpdateZoomScaleLabel();
 
-        ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
-        ui.Q<Button>("AddStar").clicked += OnAddStarClicked;
-        ui.Q<Button>("AddPlanet").clicked += OnAddPlanetClicked;
-        ui.Q<Button>("AddMoon").clicked += OnAddMoonClicked;
-        ui.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
+        ui.Q<Button>("ToggleLabels").clicked += OnToggleLabelClicked;
 
         ui.Q<Button>("TogglePlay").clicked += OnTogglePlayClicked;
         simController.isRunning = true;
@@ -422,6 +421,58 @@ public class SimulatorUIController : MonoBehaviour
     #endregion Distance Selection
 
 
+    #region Label Management
+
+    private void OnToggleLabelClicked()
+    {
+        showLabels = !showLabels;
+
+        VisualElement disabledIcon = ui.Q<Button>("ToggleLabels").Q<VisualElement>("Disabled");
+        disabledIcon.style.display = showLabels ? DisplayStyle.None : DisplayStyle.Flex;
+
+        foreach (Body body in simController.GetBodies())
+        {
+            body.SetLabelVisibility(showLabels);
+        }
+
+        if (bodyPreview != null && bodyPreview.Label != null)
+        {
+            bodyPreview.SetLabelVisibility(showLabels);
+        }
+    }
+    
+    // renders the labels of all bodies
+    private void RenderLabels()
+    {
+        float scale = (float) SimulatorController.GetScaleCoefficient();
+
+        foreach (Body body in simController.GetBodies())
+        {
+            if (body.Label != null) RenderLabel(body, scale);
+        }
+
+        if (bodyPreview != null && bodyPreview.Label != null)
+            RenderLabel(bodyPreview, scale);
+    }
+
+    // positions the body's label at "top right" of body, relative to the camera
+    private void RenderLabel(Body body, float scale)
+    {
+        Transform origin = Camera.main.transform;
+        Vector3 bodyPosition = body.Entity.transform.position;
+        Vector3 bodyEdge = body.Radius * scale * (origin.right + origin.up); // parallel to camera forward
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(bodyPosition + bodyEdge);
+
+        body.Label.transform.position = screenPosition;
+        body.Label.GetComponent<TextMeshProUGUI>().enabled = screenPosition.z >= 0;
+
+        // ^ technically has a screen position even when BEHIND the camera
+        // * this check stops the label from showing up when behind the camera
+    }
+
+    #endregion Label Management
+
+
     #region Body Selection & Preview
 
     public Body GetSelectedBody()
@@ -615,7 +666,10 @@ public class SimulatorUIController : MonoBehaviour
             SimulatorController.ApplyScale(bodyPreview);
 
             RunBodyPlacement();
-        }
+        } // end of preview placement
+
+        // label rendering
+        if (showLabels) RenderLabels();
     }
 
     // updates the zoom label with the current selected distance and scale
@@ -917,6 +971,11 @@ public class SimulatorUIController : MonoBehaviour
             simController.AddBody(body);
             SimulatorController.ApplyScale(body);
             RemoveEntityPreview();
+
+            bool showLabel = ui.Q<Button>("ToggleLabels")
+                .Q<VisualElement>("Disabled").style.display == DisplayStyle.None;
+            
+            body.SetLabelVisibility(showLabel);
 
             SetEntityPreview(selectedBodyItem);
 

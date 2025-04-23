@@ -60,6 +60,10 @@
         <ui:Button name="Distance" tooltip="Distance Units" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Distances.png?fileID=2800000&amp;guid=bf07420b50293f44faf4b820eb72bf0e&amp;type=3#Distances&quot;);" />
         </ui:Button>
+        <ui:Button name="ToggleLabels" tooltip="Toggle Simulation Run" class="toolboxButton">
+            <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/tag&apos;);" />
+        </ui:Button>
         <ui:Button name="TogglePlay" tooltip="Toggle Simulation Run" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Paused&apos;);" />
         </ui:Button>

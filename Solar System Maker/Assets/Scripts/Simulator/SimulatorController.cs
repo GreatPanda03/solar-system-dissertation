@@ -21,6 +21,7 @@ public class SimulatorController : MonoBehaviour
     public static double UNITS_PER_WORLDSPACE = 1;
     public static string currentScale = "Kilometre";
     public static double zoomFactor = 0f;
+    public bool showLabels = true;
 
 
     #region Simulator Setup
@@ -58,11 +59,9 @@ public class SimulatorController : MonoBehaviour
     // clears all bodies in the Simulator
     public void ClearSimulator()
     {
-        GameObject container = GameObject.Find("SimulatorSpace");
-
-        for( int c = container.transform.childCount - 1; c >= 0; c--)
+        foreach (Body body in GetBodies())
         {
-            Destroy(container.transform.GetChild(c).gameObject);
+            body.DestroyEntity();
         }
     }
 
@@ -116,20 +115,6 @@ public class SimulatorController : MonoBehaviour
         float scaledRadius = (float) (body.Radius * scale);
         body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
         body.Entity.transform.position = (float) scale * body.Position;
-
-        // position label at "top right" of body, relative to the camera
-        if (body.Label != null)
-        {
-            Transform origin = Camera.main.transform;
-            Vector3 point = body.Entity.transform.position;
-            Vector3 edge = scaledRadius * (origin.right + origin.up);
-            Vector3 screenPosition = Camera.main.WorldToScreenPoint(point + edge);
-
-            body.Label.transform.position = screenPosition;
-            body.Label.GetComponent<TextMeshProUGUI>().enabled = screenPosition.z >= 0;
-            // ^ technically has a screen position even when BEHIND the camera
-            // * this check stops the label from showing up when behind the camera
-        }
     }
 
     #endregion Scaling Methods

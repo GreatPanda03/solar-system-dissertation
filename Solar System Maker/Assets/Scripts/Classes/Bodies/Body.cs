@@ -247,9 +247,9 @@ public class Body
     }
 
     // toggles the visibility of the body's label
-    public void ToggleLabel(bool state)
+    public void SetLabelVisibility(bool state)
     {
-        // TOOD: toggle visibility
+        label.GetComponent<TextMeshProUGUI>().enabled = state;
     }
 
     // destroys the entity's physical components
