@@ -257,6 +257,7 @@
 .toolboxButtonIcon {
     flex-grow: 1;
     background-color: rgba(255, 255, 255, 0);
+    -unity-background-image-tint-color: rgb(0, 0, 0);
 }
 
 .selectedButton {
@@ -289,4 +290,28 @@
     margin-bottom: 5px;
     margin-left: 5px;
     flex-direction: row;
+}
+
+.unity-scroller--vertical {
+    max-width: 5px;
+    min-width: 5px;
+    width: 5px;
+}
+
+.unity-scroller__low-button {
+    max-width: 5px;
+    min-width: 5px;
+    width: 5px;
+}
+
+.unity-scroller__high-button {
+    max-width: 5px;
+    min-width: 5px;
+    width: 5px;
+}
+
+.unity-scroller__slider {
+    max-width: 5px;
+    min-width: 5px;
+    width: 5px;
 }

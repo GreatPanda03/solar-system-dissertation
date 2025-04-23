@@ -34,7 +34,6 @@ public class Body
             if (entity != null) entity.transform.name = name;
             if (label != null)
             {
-                Debug.Log(name);
                 label.GetComponent<TextMeshProUGUI>().text = entity.name;
             }
         }   

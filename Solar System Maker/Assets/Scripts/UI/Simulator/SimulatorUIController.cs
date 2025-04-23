@@ -11,11 +11,14 @@
 // LIBRARIES
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Reflection;
 using Unity.Properties;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 
@@ -58,6 +61,7 @@ public class SimulatorUIController : MonoBehaviour
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
+        InitialiseExplorerSearchBar();
         ui.Q("Explorer").Q<Button>("Close").clicked += OnExplorerCloseClicked;
         ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
 
@@ -201,6 +205,52 @@ public class SimulatorUIController : MonoBehaviour
 
     #region Explorer
 
+    // enables bodies to be searched for by name
+    public void InitialiseExplorerSearchBar()
+    {
+        VisualElement search = ui.Q<VisualElement>("Explorer").Q<VisualElement>("Search");
+        TextField input = search.Q<TextField>("Input");
+
+        input.RegisterCallback<KeyDownEvent>((e) =>{
+            if (e.keyCode == KeyCode.Return) ApplyExplorerFilters();
+        }, TrickleDown.TrickleDown);
+
+        input.RegisterValueChangedCallback((e) => {
+            ApplyExplorerFilters();
+        });
+
+    }
+
+    // filters all explorer entries by the current explorer filters
+    public void ApplyExplorerFilters()
+    {
+        VisualElement list = ui.Q<VisualElement>("Explorer").Q<VisualElement>("List");
+        VisualElement container = list.Q<VisualElement>("unity-content-container");
+
+        string searchQuery = GetExplorerSearchQuery().ToLower();
+
+        foreach (VisualElement entry in container.Children())
+        {
+            string name = entry.Q<Label>("Name").text.ToLower();
+
+            if (searchQuery == "" || name.Contains(searchQuery))
+            {
+                entry.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                entry.style.display = DisplayStyle.None;
+            }
+        }
+    }
+
+    // auxiliary: returns the current search query
+    public string GetExplorerSearchQuery()
+    {
+        VisualElement search = ui.Q<VisualElement>("Explorer").Q<VisualElement>("Search");
+        return search.Q<TextField>("Input").value;
+    }
+
     // creates a new entry in the explorer for the given body
     public void RefreshExplorer()
     {
@@ -216,6 +266,8 @@ public class SimulatorUIController : MonoBehaviour
             {
                 CreateExplorerEntry(body);
             }
+
+            ApplyExplorerFilters();
         }
         else
         {
@@ -437,7 +489,7 @@ public class SimulatorUIController : MonoBehaviour
         }
 
         bodyPreview.CreateEntity();
-        bodyPreview.Entity.transform.name = "Preview";
+        bodyPreview.Name = "New " + type.ToString();
 
         LineRenderer pathDrawer = bodyPreview.Entity.AddComponent<LineRenderer>();
         pathDrawer.material = new Material(Shader.Find("Sprites/Default"));
@@ -478,23 +530,26 @@ public class SimulatorUIController : MonoBehaviour
         if (!isActive) return;
 
         // system scaling
-        float scroll = Input.mouseScrollDelta.y;
-        float zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
+        // if (!GeneralUI.IsMouseOverUI())
+        // {
+            float scroll = Input.mouseScrollDelta.y;
+            float zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
 
-        if (zoomAdjustment != 0)
-        {
-            double oldScale = SimulatorController.GetScaleCoefficient();
-            SimulatorController.AdjustZoomFactor(zoomAdjustment);
-            double newScale = SimulatorController.GetScaleCoefficient();
-            UpdateZoomScaleLabel();
+            if (zoomAdjustment != 0)
+            {
+                double oldScale = SimulatorController.GetScaleCoefficient();
+                SimulatorController.AdjustZoomFactor(zoomAdjustment);
+                double newScale = SimulatorController.GetScaleCoefficient();
+                UpdateZoomScaleLabel();
 
-            // applying the main zoom offset
-            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Vector3 direction = mouseRay.direction * Math.Sign(zoomAdjustment);
+                // applying the main zoom offset
+                Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Vector3 direction = mouseRay.direction * Math.Sign(zoomAdjustment);
 
-            Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
-            Camera.main.transform.position = spacePosition * (float) newScale;
-        }
+                Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
+                Camera.main.transform.position = spacePosition * (float) newScale;
+            }
+        // }
 
         // explorer visibility
         if (Input.GetKeyDown(KeyCode.Tab))
@@ -659,12 +714,10 @@ public class SimulatorUIController : MonoBehaviour
     // * position is based on the mouse's position on the screen
     private Vector3 RunFreePlacement()
     {
-        /*
-        if (!GeneralUI.IsPointerOverAnyUI())
-        {
+        // if (!GeneralUI.IsMouseOverUI())
+        // {
             distanceFromCamera = Math.Max(0, distanceFromCamera - Input.mouseScrollDelta.y * 3);
-        }
-        */
+        // }
 
         if (startVelocityPoint == null)
         {
@@ -857,15 +910,18 @@ public class SimulatorUIController : MonoBehaviour
             body.Position = bodyPreview.Position;
             body.Velocity = bodyPreview.Velocity;
 
-            CreateExplorerEntry(body);
             ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
 
             body.CreateEntity();
+            body.Name = body.Type;
             simController.AddBody(body);
             SimulatorController.ApplyScale(body);
             RemoveEntityPreview();
 
             SetEntityPreview(selectedBodyItem);
+
+            CreateExplorerEntry(body);
+            ApplyExplorerFilters();
 
             bodyPreview.Entity.transform.position = oldPosition;
         }

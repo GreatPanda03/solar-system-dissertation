@@ -23,6 +23,7 @@ public class MasterController : MonoBehaviour
         Debug.Log("Loading UI...");
 
         // Main Menu UI components (show menu panel, hide all other windows)
+        AssetPreloader.PreloadAssets();
         MainMenuUIController.Initialise();
         NewSimulationUIController.Initialise();
         SavedSimulationsUIController.Initialise();

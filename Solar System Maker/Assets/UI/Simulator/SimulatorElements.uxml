@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/UI/Simulator/SimulatorStyles.uss?fileID=7433441132597879392&amp;guid=f640695c10d59ba4199d931b7b100157&amp;type=3#SimulatorStyles" />
     <ui:VisualElement name="ToolBar" class="toolbar" style="flex-grow: 1; height: 30px; width: 100%; flex-direction: row; max-height: 30px; min-height: 30px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 0;">
         <ui:Button name="ExitSimulator" tooltip="Exit Simulation" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/ExitSimulation&apos;);" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/ExitSimulator&apos;);" />
         </ui:Button>
         <ui:Button name="SaveSimulation" tooltip="Save Simulation" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/SaveSimulation&apos;);" />
@@ -36,21 +36,29 @@
     <ui:VisualElement name="Explorer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 40px;">
         <ui:Button text="X" name="Close" class="propertiesClose" style="position: absolute;" />
         <ui:Label text="Explorer" name="Title" class="propertiesTitle" style="align-self: center;" />
+        <ui:VisualElement name="Filters" style="flex-grow: 1;">
+            <ui:VisualElement name="Search" style="flex-grow: 1; flex-direction: row; align-items: center; margin-top: 5px; margin-bottom: 5px;">
+                <ui:TextField label="Search" placeholder-text="Search by name" name="Input" tooltip="Name" class="propertiesField" style="max-height: 25px; height: 25px; min-height: 25px; align-items: center; width: 160px; max-width: none; min-width: 150px;" />
+                <ui:Button name="Button" tooltip="Bodies" class="toolboxButton" style="width: 20px; height: 20px;">
+                    <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Explorer/Search&apos;); -unity-background-image-tint-color: rgb(0, 0, 0);" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:ScrollView name="List" style="height: auto; max-height: 200px;" />
         <ui:Label text="Create bodies to view them in the list." name="NoBodies" class="propertiesNoBody" style="display: flex; font-size: 12px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;" />
     </ui:VisualElement>
     <ui:VisualElement name="ToolBox" class="toolboxBar">
         <ui:Button name="Explorer" tooltip="Explorer" class="toolboxButton" style="width: 30px; height: 30px; margin-left: 0; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255);">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Explorer.png?fileID=2800000&amp;guid=68d64274fbde6ec4998749f5c4ed5273&amp;type=3#Explorer&quot;);" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Explorer.png?fileID=2800000&amp;guid=1b449c8874814da4cb82ef156c737c84&amp;type=3#Explorer&quot;);" />
         </ui:Button>
         <ui:Button name="Bodies" tooltip="Bodies" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Bodies.png?fileID=2800000&amp;guid=29b80d331e2cd414b8c363f88e0853f1&amp;type=3#Bodies&quot;);" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Bodies.png?fileID=2800000&amp;guid=4a14754fa7647d5449e16fd9d5cc8d1c&amp;type=3#Bodies&quot;);" />
         </ui:Button>
         <ui:Button name="Modes" tooltip="Placement Modes" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Modes.png?fileID=2800000&amp;guid=0afd0ed95280851439b76ad51578880f&amp;type=3#Modes&quot;);" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Modes.png?fileID=2800000&amp;guid=d172ff94ca33f404e92f3c2be36180a6&amp;type=3#Modes&quot;);" />
         </ui:Button>
         <ui:Button name="Distance" tooltip="Distance Units" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Distances.png?fileID=2800000&amp;guid=a51eb8f2cb0ac3b45807fb057bb49410&amp;type=3#Distances&quot;);" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Options/Distances.png?fileID=2800000&amp;guid=bf07420b50293f44faf4b820eb72bf0e&amp;type=3#Distances&quot;);" />
         </ui:Button>
         <ui:Button name="TogglePlay" tooltip="Toggle Simulation Run" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Paused&apos;);" />
@@ -66,13 +74,13 @@
         <ui:VisualElement name="ModeList" class="toolboxList">
             <ui:Label text="Mode" name="ModeLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
             <ui:Button name="FreePlacement" tooltip="Free Placement" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/FreePlacement.png?fileID=2800000&amp;guid=c9aaeae0199c0014089c88f9753c81c3&amp;type=3#FreePlacement&quot;);" />
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/FreePlacement.png?fileID=2800000&amp;guid=535f284cceb4c6a4888c71baed2a9e74&amp;type=3#FreePlacement&quot;);" />
             </ui:Button>
             <ui:Button name="PlanePlacement" tooltip="Plane Placement" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/PlanePlacement.png?fileID=2800000&amp;guid=cc2df80b634166d4da0d3e29d6407efd&amp;type=3#PlanePlacement&quot;);" />
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/PlanePlacement.png?fileID=2800000&amp;guid=23d228f527b6f7f4293db958b576c874&amp;type=3#PlanePlacement&quot;);" />
             </ui:Button>
             <ui:Button name="OrbitPlacement" tooltip="Orbit Placement" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/OrbitPlacement.png?fileID=2800000&amp;guid=20bdd7bcd8c0ce9458d9313246507c42&amp;type=3#OrbitPlacement&quot;);" />
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/Toolbox/Modes/OrbitPlacement.png?fileID=2800000&amp;guid=1777bcebfa279584fa908aedbbee61ce&amp;type=3#OrbitPlacement&quot;);" />
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="DistanceList" class="toolboxList">
