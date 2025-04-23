@@ -8,7 +8,7 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
-### Version: 1.6.7
+### Version: 1.7.2
 **Date:** 2025/04/23
 <br/>**Bug Fixes:**
 * **1)** Fixed labels persisting after leaving a simulation
@@ -18,7 +18,7 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
-### Version: 1.6.6
+### Version: 1.7.1
 **Date:** 2025/04/23
 <br/>**Bug Fixes:**
 * **1)** Selecting a body for the first time caused a frame skip due to loading the "BodyLabel" prefab *(all prefabs are now preloaded)*
@@ -32,7 +32,7 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
-### Version: 1.6.5
+### Version: 1.7.0
 **Date:** 2025/04/22
 <br/>**Additions / Changes:**
 * **1)** New physical name labels for bodies, which can be edited by changing the name of the body
