@@ -8,6 +8,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.6.7
+**Date:** 2025/04/23
+<br/>**Bug Fixes:**
+* **1)** Fixed labels persisting after leaving a simulation
+
+**Additions / Changes:**
+* **1)** Added a button to toggle the visibility of body labels
+
+---
+
 ### Version: 1.6.6
 **Date:** 2025/04/23
 <br/>**Bug Fixes:**
