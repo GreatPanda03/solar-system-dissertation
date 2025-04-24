@@ -2,17 +2,51 @@
     background-color: rgba(0, 0, 0, 0.78);
     height: 300px;
     width: 400px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     padding-top: 1%;
     padding-right: 1%;
     padding-bottom: 1%;
     padding-left: 1%;
+    align-self: center;
 }
 
 .header {
+}
+
+.divider {
+    height: 3px;
+    max-height: 3px;
+    min-height: 3px;
+    background-color: rgba(255, 255, 255, 0.59);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.close {
+    width: 10px;
+    height: 10px;
+    max-height: 10px;
+    min-height: 10px;
+    min-width: 10px;
+    max-width: 10px;
+    background-color: rgba(255, 255, 255, 0);
+    color: rgb(255, 6, 6);
+    -unity-font-style: bold;
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
 }
 
 .title {
@@ -23,13 +57,6 @@
     font-size: 100%;
     justify-content: center;
     align-self: center;
-}
-
-.divider {
-    height: 3px;
-    max-height: 3px;
-    min-height: 3px;
-    background-color: rgba(255, 255, 255, 0.59);
 }
 
 .content {
@@ -43,6 +70,7 @@
 }
 
 .footer {
+    margin-bottom: 5px;
 }
 
 .validation {

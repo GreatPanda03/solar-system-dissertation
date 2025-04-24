@@ -7,9 +7,17 @@ using UnityEngine;
 [Serializable]
 public class Simulation
 {
+
+    #region Attributes
+
     public int id;
     public Settings settings;
     public List<Body> bodies;
+
+    #endregion Attributes
+
+
+    #region Constructor
 
     public Simulation() {
         id = -1;
@@ -17,7 +25,11 @@ public class Simulation
         bodies = new List<Body>();
     }
 
-    // returns a copy of the simulation
+    #endregion Constructor
+
+
+    #region Methods
+
     public Simulation GetCopy()
     {
         List<Body> bodiesCopy = new();
@@ -36,4 +48,6 @@ public class Simulation
     {
         return JsonUtility.ToJson(this);
     }
+
+    #endregion Methods
 }

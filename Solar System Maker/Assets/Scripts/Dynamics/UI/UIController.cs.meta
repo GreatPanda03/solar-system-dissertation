@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 9e3aa0ee722d83a43a661112b24688f8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - uiDocument: {instanceID: 0}
+  - mainMenuUI: {fileID: 9197481963319205126, guid: 6f947e4c83b822b4c82457e1e49909ef, type: 3}
+  - newSimulationUI: {fileID: 9197481963319205126, guid: d1c6ba380eb0c5b4f95d91b091da2225, type: 3}
+  - savedSimulationsUI: {fileID: 9197481963319205126, guid: 3241247828bfe744d95325bbf0938151, type: 3}
+  - saveEntryTemplate: {fileID: 9197481963319205126, guid: 12edb7d03f1914d4faa7e58958c62bfb, type: 3}
+  - templateSimulationsUI: {fileID: 9197481963319205126, guid: 349fd20e6bbf7a54087e4d95687659f4, type: 3}
+  - tutorialUI: {instanceID: 0}
+  - simulatorUI: {fileID: 9197481963319205126, guid: 1efa3a77ecb7ed74cb23eaec8f736c86, type: 3}
+  - explorerEntryTemplate: {fileID: 9197481963319205126, guid: 23251c35d6365954d8d7882e2ea2bc42, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

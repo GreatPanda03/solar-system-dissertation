@@ -11,6 +11,9 @@ using UnityEngine;
 [Serializable]
 public class Star : Body
 {
+
+    #region Attributes
+
     readonly string type = "Star";
     public override string Type { get => type; }
 
@@ -19,6 +22,11 @@ public class Star : Body
         get => luminosity;
         set => luminosity = value;
     }
+
+    #endregion Attributes
+
+
+    #region Constructors
 
     public Star() : base()
     {
@@ -42,7 +50,11 @@ public class Star : Body
         this.luminosity = luminosity;
     }
 
-    // returns a copy of the Star
+    #endregion Constructors
+
+
+    #region Methods
+
     public override Body GetCopy()
     {
         return new Star()
@@ -59,4 +71,6 @@ public class Star : Body
             luminosity = luminosity
         };
     }
+
+    #endregion Methods
 }

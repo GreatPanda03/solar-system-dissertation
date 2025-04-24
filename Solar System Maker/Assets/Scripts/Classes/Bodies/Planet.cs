@@ -11,6 +11,9 @@ using UnityEngine;
 [Serializable]
 public class Planet : Body
 {
+
+    #region Attributes
+
     readonly string type = "Planet";
     public override string Type { get => type; }
 
@@ -32,6 +35,11 @@ public class Planet : Body
         get => waterContent;
         set => waterContent = value;
     }
+
+    #endregion Attributes
+
+
+    #region Constructors
 
     public Planet() : base()
     {
@@ -58,8 +66,11 @@ public class Planet : Body
         this.waterContent = waterContent;
     }
 
-    // returns a copy of the Planet
-    // returns a copy of the Star
+    #endregion Constructors
+
+
+    #region Methods
+
     public override Body GetCopy()
     {
         return new Planet()
@@ -77,4 +88,6 @@ public class Planet : Body
             waterContent = waterContent,
         };
     }
+
+    #endregion
 }

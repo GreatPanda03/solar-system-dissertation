@@ -6,8 +6,16 @@ using UnityEngine;
 [Serializable]
 public class Moon : Body
 {
+
+    #region Attributes
+
     readonly string type = "Moon";
     public override string Type { get => type; }
+
+    #endregion Attributes
+
+
+    #region Constructors
 
     public Moon() : base()
     {
@@ -21,6 +29,11 @@ public class Moon : Body
     {
         name = "Moon";
     }
+
+    #endregion Constructors
+
+    
+    #region Methods
 
     public override Body GetCopy()
     {
@@ -36,4 +49,6 @@ public class Moon : Body
             radius = radius,
         };
     }
+
+    #endregion Methods
 }

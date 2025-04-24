@@ -8,15 +8,11 @@
 * [4] - Andrew Raphael Lukasik, "BFN", www.github.com [Online]. Available at: https://github.com/andrew-raphael-lukasik/BFN
 */
 
-
-// LIBRARIES
 using System;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 
-
-// CLASS DEFINITION
 [Serializable]
 public class Body
 {
@@ -125,7 +121,7 @@ public class Body
     #endregion Attributes
 
 
-    #region Class Methods
+    #region Constructor
 
     public Body()
     {
@@ -152,6 +148,11 @@ public class Body
 
         radius = GetRadiusFromMassAndDensity();
     }
+
+    #endregion Constructor
+
+
+    #region General Methods
 
     // returns a copy of the body
     public virtual Body GetCopy()
@@ -181,7 +182,7 @@ public class Body
         );
     }
 
-    #endregion Class Methods
+    #endregion General Methods
 
 
     #region Entity Methods
@@ -195,22 +196,6 @@ public class Body
     public float GetDensityFromMassAndRadius()
     {
         return mass * 0.75f / Mathf.PI / Mathf.Pow(radius, 3);
-    }
-
-    // returns the force applied between two objects
-    // * F1 = F2 = G * (m1 * m2) / r^2
-    // * NOTE: the force's magnitude is the same, but the direction is different
-    //   > this method returns an attractive force by THIS on OTHER
-    public Vector3 GetForceBetween(Body other, float G)
-    {
-        Vector3 vector = other.Position - this.position;
-        Vector3 direction = vector.normalized;
-        float distance = Math.Max(vector.magnitude, this.radius + other.radius);
-        float magnitude = G * (this.mass * other.mass) / (distance * distance);
-
-        Vector3 force = magnitude * direction;
-
-        return force;
     }
 
     // applies the given force to the body
