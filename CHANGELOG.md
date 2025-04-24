@@ -8,6 +8,24 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.8.0
+**Date:** 2025/04/24
+<br/>**Bug Fixes:** No additional fixes
+* **Note:** with the new overhaul, some screens don't render properly yet *(some screens render in a corner)*
+* **Note:** mouse detection over UI has been temporarily disabled, so clicks will pass through buttons *(function doesn't work, reworking)*
+
+**Additions / Changes:**
+* **1)** Big code refactor across the entire app to consolidate all current features
+    * **a)** Separated Simulator UI from Simulation *(a simulation can now exist without UI)*
+    * **b)** Generalised simulator UI code to make adding new items easier *(like modes and bodies)*
+    * **c)** Separate Physics handler *(physics can be calculated independent of simulations)*
+    * **d)** Separate Rendering handler *(visuals, like lines and labels, can be drawn independent of simulations)*
+    * **e)** Separate UI Controller to handle common UI processes, like screen switching *(easier to add more screens and compartmentalise)*
+* **2)** New time flow button to toggle rewinding, and time label
+* **Note:** the time flow button and label are visual only for now
+
+---
+
 ### Version: 1.7.2
 **Date:** 2025/04/23
 <br/>**Bug Fixes:**
