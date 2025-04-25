@@ -9,9 +9,9 @@ public class CameraController : MonoBehaviour
 {
 
     // a mode for each situation
-    public enum Mode { MainMenu, Simulator, Following }
+    public enum CameraMode { MainMenu, Simulator, Following }
 
-    public static Mode mode { get; private set; }
+    private static CameraMode cameraMode;
 
     [Header("Main Menu Mode")]
     public Vector3 centre;
@@ -31,39 +31,40 @@ public class CameraController : MonoBehaviour
 
 
     // retrieves the main camera
-    private void Initialise()
+    void Start()
     {
-        mode = (int) Mode.MainMenu;
+        cameraMode = CameraMode.MainMenu;
 
-        Debug.Log("[CAMERA] SUCCESS: Camera Loaded");
+        Debug.Log("Camera loaded");
     }
 
 
-    #region Mode Control
+    #region Camera Loop
 
     // sets the current scene to the given enum
-    public static void SetScene(Mode newMode)
+    public static void SetCameraMode(CameraMode newMode)
     {
-        mode = newMode;
+        cameraMode = newMode;
     }
 
     // updates panning per frame (movement & rotation)
     private void Update()
     {
-        if (mode == Mode.MainMenu)
+        if (cameraMode == CameraMode.MainMenu)
         {
             RunMainMenuMode();
         } 
-        else if (mode == Mode.Simulator)
+        else if (cameraMode == CameraMode.Simulator)
         {
             RunSimulatorMode();
         } 
-        else if (mode == Mode.Following)
+        else if (cameraMode == CameraMode.Following)
         {
             RunFollowingMode();
         }
         else
         {
+            Debug.Log($"'{cameraMode}' is invalid!");
             return;
         }
     }
@@ -88,12 +89,12 @@ public class CameraController : MonoBehaviour
     // runs the camera in Simulator mode
     private void RunSimulatorMode()
     {
-        Movement();
+        RunSimulatorMovement();
 
         if (Input.GetMouseButton(1)) { // turn on right mouse button click
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Confined;
-            Rotation();
+            RunSimulatorRotation();
         }
         else
         {
@@ -104,11 +105,11 @@ public class CameraController : MonoBehaviour
 
     // updates the camera's movement based on key presses
     // * NOTE: no need for separate WASD binds - automatically done by input!!!
-    private void Movement()
+    private void RunSimulatorMovement()
     {
         if (UIController.IsTextFieldFocused()) return;
 
-        Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
         if (Input.GetKey(KeyCode.LeftControl))
         {
@@ -128,7 +129,7 @@ public class CameraController : MonoBehaviour
     }
 
     // updates the camera's rotation based on the mouse's turning
-    private void Rotation()
+    private void RunSimulatorRotation()
     {
         Vector3 mouseInput = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0);
         Camera.main.transform.Rotate(sensitivity * mouseInput);
@@ -142,6 +143,7 @@ public class CameraController : MonoBehaviour
 
     #region Body Following Mode
 
+    // sets the given body as the subject to follow
     public static void SetSubject(Body body)
     {
         followDistance = 30f;
@@ -154,6 +156,7 @@ public class CameraController : MonoBehaviour
         return subject;
     }
 
+    // handles following mode
     private void RunFollowingMode()
     {
         if (subject == null) return;

@@ -175,7 +175,7 @@ public class SavedSimulationsHandler
         simController.LoadSimulation(save);
         simController.IsActive = true;
 
-        CameraController.SetScene(CameraController.Mode.Simulator);
+        CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
     }
 
     // deletes the given save entry

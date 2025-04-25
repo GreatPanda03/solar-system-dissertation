@@ -111,7 +111,7 @@ public class SimulatorHandler
 
     public void InitialiseInputs()
     {
-        // NB: makes keydown events persist even when UI not selected
+        // NB: "ui.panel.visualTree" so keybinds persist even when UI not selected!
         ui.panel.visualTree.RegisterCallback<KeyDownEvent>((e) => {
 
             // toggling explorer visibility on "Tab" pressed
@@ -212,7 +212,7 @@ public class SimulatorHandler
         
         uiController.ShowMainMenu();
 
-        CameraController.SetScene(CameraController.Mode.MainMenu);
+        CameraController.SetCameraMode(CameraController.CameraMode.MainMenu);
     }
 
     #endregion Toolbar Methods
@@ -399,7 +399,7 @@ public class SimulatorHandler
         {
             simController.SelectBody(body);
             CameraController.SetSubject(body);
-            CameraController.SetScene(CameraController.Mode.Following);
+            CameraController.SetCameraMode(CameraController.CameraMode.Following);
         });
 
         explorerEntry.RegisterCallback<MouseEnterEvent>(e =>

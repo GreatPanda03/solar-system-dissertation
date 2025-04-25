@@ -50,7 +50,7 @@ public class NewSimulationHandler
         simController.IsActive = true;
 
         // adjusting the camera        
-        CameraController.SetScene(CameraController.Mode.Simulator);
+        CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
     }
 
     // returns to the "Main Menu" on click

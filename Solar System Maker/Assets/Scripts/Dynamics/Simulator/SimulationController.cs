@@ -196,6 +196,15 @@ public class SimulationController : MonoBehaviour
             OnScaleChanged?.Invoke(newScale);
         }
 
+        // switch back to simulator mode when WASD is pressed
+        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        
+        if (input.x != 0 || input.z != 0)
+        {
+            CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+            CameraController.SetSubject(null);
+        }
+
         // body placement
         if (bodyPreview != null && bodyPreview.Entity != null)
         {
@@ -602,7 +611,6 @@ public class SimulationController : MonoBehaviour
         if (Input.GetMouseButtonDown(0) 
             && !GameObject.Find("UI").GetComponent<UIController>().IsMouseOverUI())
         {
-            bool bodyFound = false;
             Vector3 screenPosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
             
@@ -623,24 +631,9 @@ public class SimulationController : MonoBehaviour
 
                     if (body != null)
                     {
-                        if (selectedBody != null)
-                        {
-                            if (body.Entity != selectedBody.Entity)
-                            {
-                                bodyFound = true;
-                            }
-                        }
-                        else
-                        {
-                            bodyFound = true;
-                        }
-                        
-                        if (bodyFound)
-                        {
-                            SelectBody(body);
-                            CameraController.SetSubject(selectedBody);
-                            CameraController.SetScene(CameraController.Mode.Following);
-                        }
+                        SelectBody(body);
+                        CameraController.SetSubject(selectedBody);
+                        CameraController.SetCameraMode(CameraController.CameraMode.Following);
                     }
                 }
             }
@@ -650,13 +643,6 @@ public class SimulationController : MonoBehaviour
             if (bodyPreview != null && bodyPreview.Entity != null)
             {
                 bodyPreview.Entity.GetComponent<Collider>().enabled = false;
-            }
-            
-            if (!bodyFound) // covers: 1) no body found; 2) same body selected
-            {
-                DeselectBody();
-                CameraController.SetScene(CameraController.Mode.Simulator);
-                CameraController.SetSubject(null);
             }
         }
     }
