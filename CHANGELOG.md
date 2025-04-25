@@ -8,6 +8,13 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.8.4
+**Date:** 2025/04/25
+<br/>**Additions / Changes:**
+* **1)** Added an auto-generated sample system to the main menu *(to test auto-generation)*
+
+---
+
 ### Version: 1.8.3
 **Date:** 2025/04/25
 <br/>**Bug Fixes:**
@@ -24,7 +31,7 @@ All dates are in the form **YYYY/MM/DD**.
 **Additions / Changes:**
 * **1)** New "P" keybind to toggle the properties window
 * **2)** New "F" keybind to toggle following for the selected body
-* **3)** New "V" keybind to set to view a followed body at an appropriate scale
+* **3)** New "V" keybind to view a followed body at an appropriate scale
 
 ### Version: 1.8.1
 **Date:** 2025/04/25
