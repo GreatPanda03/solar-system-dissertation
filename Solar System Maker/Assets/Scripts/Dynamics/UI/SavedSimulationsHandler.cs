@@ -173,7 +173,7 @@ public class SavedSimulationsHandler
 
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(save);
-        simController.IsActive = true;
+        simController.FullEnable();
 
         CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
     }

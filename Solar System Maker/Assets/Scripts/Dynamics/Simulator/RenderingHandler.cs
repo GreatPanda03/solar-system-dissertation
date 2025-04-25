@@ -65,9 +65,8 @@ public class RenderingHandler
     // extra: applies the current scale to the given body
     public void ApplyScale(Body body)
     {
-        float scaledRadius = (float) (body.Radius * scale);
-        body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
         body.Entity.transform.position = (float) scale * body.Position;
+        body.Entity.transform.localScale = (float) (body.Radius * 2) * scale * new Vector3(1,1,1);
     }
 
     #endregion Scaling Methods

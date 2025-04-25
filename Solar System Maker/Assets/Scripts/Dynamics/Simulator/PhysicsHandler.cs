@@ -14,6 +14,8 @@ public class PhysicsHandler
 
     #region Constructor
 
+    public PhysicsHandler() {}
+
     public PhysicsHandler(SimulationController simController)
     {
         this.simController = simController;

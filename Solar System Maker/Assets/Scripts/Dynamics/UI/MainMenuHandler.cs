@@ -10,6 +10,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
+using System.Collections.Generic;
 
 public class MainMenuHandler
 {
@@ -27,6 +28,41 @@ public class MainMenuHandler
         ui.Q<Button>("TemplateSimulations").clicked += OnTemplateSimulationsClicked;
         // ui.Q<Button>("Tutorial").clicked += OnTutorialButtonClicked;             // WIP
         ui.Q<Button>("ExitApp").clicked += OnExitClicked;
+        
+        Debug.Log("ui loaded");
+
+        // loading a sample simulation
+        List<Body> bodies = SystemGenerator.GenerateMenuSystem(0.000_1f);
+
+        Debug.Log("system generated");
+
+        Simulation simulation = new()
+        {
+            bodies = bodies,
+            settings = new() { GravityConstant = 0.000_1f }
+        };
+
+        SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
+        simController.LoadSimulation(simulation);
+        simController.renderer.Distance = "Metre";
+        simController.renderer.ZoomFactor = -0.5f;
+
+        simController.IsActive = true;
+        simController.IsRunning = true;
+        simController.ShowLabels = true;
+
+        // clear simulation when main menu is left
+        foreach (VisualElement element in ui.Q<VisualElement>("Container").Children())
+        {
+            if (element is Button button)
+            {
+                button.clicked += () => {
+                    simController.DisableSimulator();
+                    simController.ClearSimulator();
+                    simController = null;
+                };
+            }
+        }
     }
 
     // shows the "New Simulations" interface on click

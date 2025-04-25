@@ -47,7 +47,7 @@ public class NewSimulationHandler
 
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(newSimulation);
-        simController.IsActive = true;
+        simController.FullEnable();
 
         // adjusting the camera        
         CameraController.SetCameraMode(CameraController.CameraMode.Simulator);

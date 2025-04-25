@@ -5,6 +5,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using NUnit.Framework;
 
 public class SimulationController : MonoBehaviour
 {
@@ -50,6 +51,12 @@ public class SimulationController : MonoBehaviour
     public bool IsActive {
         get => isActive;
         set => isActive = value;
+    }
+
+    private bool isInteractable = false;
+    public bool IsInteractable {
+        get => isInteractable;
+        set => isInteractable = value;
     }
 
     private bool showLabels = true;
@@ -102,7 +109,7 @@ public class SimulationController : MonoBehaviour
 
         foreach (Body body in simulation.bodies)
         {
-            if (body.Entity == null) body.CreateEntity();
+            body.CreateEntity();
         }
 
         snapshots = new List<SpaceSnapshot>();
@@ -117,6 +124,22 @@ public class SimulationController : MonoBehaviour
         }
 
         snapshots = null;
+    }
+
+    public void FullEnable()
+    {
+        IsActive = true;
+        IsInteractable = true;
+        IsRunning = true;
+        ShowLabels = true;
+    }
+
+    public void FullDisable()
+    {
+        IsActive = false;
+        IsInteractable = false;
+        IsRunning = false;
+        ShowLabels = false;
     }
 
     #endregion Simulator Setup
@@ -184,20 +207,23 @@ public class SimulationController : MonoBehaviour
         if (!isActive) return;
 
         // run keyboard / mouse controls
-        RunControls();
-
-        // body placement
-        if (bodyPreview != null && bodyPreview.Entity != null)
+        if (IsInteractable)
         {
-            RunPreviewBearings();
-            renderer.ApplyScale(bodyPreview);
-            RunPreviewPlacement();
+            RunControls();
 
-            if (showLabels) renderer.RenderLabel(bodyPreview);
+            // body placement
+            if (bodyPreview != null && bodyPreview.Entity != null)
+            {
+                RunPreviewBearings();
+                renderer.ApplyScale(bodyPreview);
+                RunPreviewPlacement();
+
+                if (showLabels) renderer.RenderLabel(bodyPreview);
+            }
+
+            // body selection
+            RunBodySelection();
         }
-
-        // body selection
-        RunBodySelection();
 
         // label rendering
         if (showLabels)
