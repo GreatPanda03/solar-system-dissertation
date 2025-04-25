@@ -1,12 +1,11 @@
-// Handles the camera for the main menu orbit demo
+// manages camera controls across the application
 
-// LIBRARIES
 using UnityEngine;
 
-
-// CLASS DEFINITION
 public class CameraController : MonoBehaviour
 {
+
+    #region Attributes
 
     // a mode for each situation
     public enum CameraMode { MainMenu, Simulator, Following }
@@ -26,11 +25,13 @@ public class CameraController : MonoBehaviour
 
     [Header("Follow Mode")]
     public static Body subject;
-    public static float followDistance;
-    public static Vector3 followRotation;
+    public static float followDistance = 30f;
+
+    #endregion Attributes
 
 
-    // retrieves the main camera
+    #region Start Up
+
     void Start()
     {
         cameraMode = CameraMode.MainMenu;
@@ -38,10 +39,28 @@ public class CameraController : MonoBehaviour
         Debug.Log("Camera loaded");
     }
 
+    #endregion Start Up
+
+
+    #region Auxiliary Methods
+
+    // restricts the given Quaternion's pitch to the given range
+    // * mainly to stop the camera from going crazy when looking directly up or down
+    public Quaternion RestrictQuaternionPitch(
+        Quaternion rotation, float lowerPitch, float upperPitch)
+    {
+        Vector3 euler = rotation.eulerAngles;
+        if (euler.x > 180) euler.x -= 360; // wrap around
+        euler.x = Mathf.Clamp(euler.x, lowerPitch, upperPitch);
+
+        return Quaternion.Euler(euler.x, euler.y, 0);
+    }
+
+    #endregion
+
 
     #region Camera Loop
 
-    // sets the current scene to the given enum
     public static void SetCameraMode(CameraMode newMode)
     {
         cameraMode = newMode;
@@ -52,7 +71,6 @@ public class CameraController : MonoBehaviour
         return cameraMode;
     }
 
-    // updates panning per frame (movement & rotation)
     private void Update()
     {
         if (cameraMode == CameraMode.MainMenu)
@@ -96,7 +114,7 @@ public class CameraController : MonoBehaviour
     {
         RunSimulatorMovement();
 
-        if (Input.GetMouseButton(1)) { // turn on right mouse button click
+        if (Input.GetMouseButton(1)) {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Confined;
             RunSimulatorRotation();
@@ -109,7 +127,7 @@ public class CameraController : MonoBehaviour
     }
 
     // updates the camera's movement based on key presses
-    // * NOTE: no need for separate WASD binds - automatically done by input!!!
+    // * NB: no need for separate WASD binds - automatically done by input!
     private void RunSimulatorMovement()
     {
         if (UIController.IsTextFieldFocused()) return;
@@ -133,26 +151,33 @@ public class CameraController : MonoBehaviour
         Camera.main.transform.Translate(currentSpeed * Time.deltaTime * input);
     }
 
-    // updates the camera's rotation based on the mouse's turning
+    // updates the camera's rotation with mouse movement
     private void RunSimulatorRotation()
     {
-        Vector3 mouseInput = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0);
-        Camera.main.transform.Rotate(sensitivity * mouseInput);
-        
-        Vector3 eulerRotation = Camera.main.transform.rotation.eulerAngles;
-        Camera.main.transform.rotation = Quaternion.Euler(eulerRotation.x, eulerRotation.y, 0);
+        Vector2 mouseChange = new()
+        {
+            x = -Input.GetAxis("Mouse Y") * sensitivity,
+            y = Input.GetAxis("Mouse X") * sensitivity
+        };
+
+        Vector3 cameraOrientation = Camera.main.transform.rotation.eulerAngles;
+
+        Quaternion cameraRotation = Quaternion.Euler(cameraOrientation.x, cameraOrientation.y, 0);
+        Quaternion addedRotation = Quaternion.Euler(mouseChange.x, mouseChange.y, 0);
+        Quaternion combinedRotation = cameraRotation * addedRotation;
+
+        combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
+
+        Camera.main.transform.rotation = combinedRotation;
     }
 
     #endregion Simulator Mode
 
 
-    #region Body Following Mode
+    #region Following Mode
 
-    // sets the given body as the subject to follow
     public static void SetSubject(Body body)
     {
-        followDistance = 30f;
-        followRotation = Camera.main.transform.forward;
         subject = body;
     }
 
@@ -166,32 +191,36 @@ public class CameraController : MonoBehaviour
     {
         if (subject == null) return;
 
-        Vector3 subjectPos = subject.Entity.transform.position;
-        Vector3 cameraRot = Camera.main.transform.forward;
-        Vector3 targetPos = subjectPos + (cameraRot * -followDistance);
-        
-        Camera.main.transform.position = targetPos;
-        // Vector3.Lerp(cameraPos, targetPos, 0.1f);
+        Vector2 mouseChange = new();
 
-        // TODO: make rotation smoother! rotate around the subject rather than rotating the camera
-
-        // rotating on right click
+        // rotate on right click
         if (Input.GetMouseButton(1)) {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Confined;
-            
-            Vector3 mouseInput = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0);
-            Camera.main.transform.Rotate(sensitivity * mouseInput);
-            
-            Vector3 eulerRotation = Camera.main.transform.rotation.eulerAngles;
-            Camera.main.transform.rotation = Quaternion.Euler(eulerRotation.x, eulerRotation.y, 0);
+
+            mouseChange.x = -Input.GetAxis("Mouse Y") * sensitivity;
+            mouseChange.y = Input.GetAxis("Mouse X") * sensitivity;
         }
         else
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
+
+        Vector3 cameraOrientation = Camera.main.transform.rotation.eulerAngles;
+
+        Quaternion cameraRotation = Quaternion.Euler(cameraOrientation.x, cameraOrientation.y, 0);
+        Quaternion addedRotation = Quaternion.Euler(mouseChange.x, mouseChange.y, 0);
+        Quaternion combinedRotation = cameraRotation * addedRotation;
+
+        combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
+
+        Vector3 origin = subject.Entity.transform.position;
+        Vector3 offset = combinedRotation * new Vector3(0, 0, -followDistance);
+        
+        Camera.main.transform.position = origin + offset;
+        Camera.main.transform.rotation = combinedRotation;
     }
 
-    #endregion Body Following Mode
+    #endregion Following Mode
 }
