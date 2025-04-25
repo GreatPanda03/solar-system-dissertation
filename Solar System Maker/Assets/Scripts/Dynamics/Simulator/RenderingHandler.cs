@@ -2,7 +2,6 @@
 
 using System;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class RenderingHandler
@@ -12,7 +11,7 @@ public class RenderingHandler
 
     SimulationController simController;
     
-    private float UNITS_PER_WORLDSPACE = 1;
+    public readonly float UNITS_PER_WORLDSPACE = 1;
     
     private string distance;
     public string Distance {

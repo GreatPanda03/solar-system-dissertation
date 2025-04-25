@@ -47,6 +47,11 @@ public class CameraController : MonoBehaviour
         cameraMode = newMode;
     }
 
+    public static CameraMode GetCameraMode()
+    {
+        return cameraMode;
+    }
+
     // updates panning per frame (movement & rotation)
     private void Update()
     {

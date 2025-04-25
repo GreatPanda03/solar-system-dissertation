@@ -143,6 +143,13 @@ public class SimulationController : MonoBehaviour
     // removes the given body from the simulation
     public void RemoveBody(Body body)
     {
+        if (selectedBody == body)
+        {
+            DeselectBody();
+            CameraController.SetSubject(null);
+            CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+        }
+
         simulation.bodies.Remove(body);
 
         OnBodyRemoved?.Invoke(body);
@@ -176,34 +183,8 @@ public class SimulationController : MonoBehaviour
     {
         if (!isActive) return;
 
-        // zooming
-        float scroll = Input.mouseScrollDelta.y;
-        float zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
-
-        if (zoomAdjustment != 0)
-        {
-            float oldScale = renderer.Scale;
-            renderer.ZoomFactor += zoomAdjustment;
-            float newScale = renderer.Scale;
-
-            // applying the main zoom offset
-            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Vector3 direction = mouseRay.direction * Math.Sign(zoomAdjustment);
-
-            Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
-            Camera.main.transform.position = spacePosition * (float) newScale;
-
-            OnScaleChanged?.Invoke(newScale);
-        }
-
-        // switch back to simulator mode when WASD is pressed
-        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
-        
-        if (input.x != 0 || input.z != 0)
-        {
-            CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
-            CameraController.SetSubject(null);
-        }
+        // run keyboard / mouse controls
+        RunControls();
 
         // body placement
         if (bodyPreview != null && bodyPreview.Entity != null)
@@ -224,6 +205,101 @@ public class SimulationController : MonoBehaviour
             foreach(Body body in simulation.bodies)
             {
                 renderer.RenderLabel(body);
+            }
+        }
+    }
+
+    // runs basic controls / keybinds
+    public void RunControls()
+    {
+        // on mouse wheel - zoom in / out
+        float scroll = Input.mouseScrollDelta.y;
+        float zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
+
+        if (zoomAdjustment != 0)
+        {
+            float oldScale = renderer.Scale;
+            renderer.ZoomFactor += zoomAdjustment;
+            float newScale = renderer.Scale;
+
+            // applying the main zoom offset
+            Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 direction = mouseRay.direction * Math.Sign(zoomAdjustment);
+
+            Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
+            Camera.main.transform.position = spacePosition * (float) newScale;
+
+            OnScaleChanged?.Invoke(newScale);
+        }
+
+        // when "WASD" pressed - switch back to simulator mode from follow mode
+        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        
+        if (input.x != 0 || input.z != 0)
+        {
+            CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+            CameraController.SetSubject(null);
+        }
+
+        // when "F" pressed - toggle following for the selected body (if any)
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (CameraController.GetCameraMode() == CameraController.CameraMode.Simulator)
+            {
+                if (selectedBody != null)
+                {
+                    CameraController.SetSubject(selectedBody);
+                    CameraController.SetCameraMode(CameraController.CameraMode.Following);
+                }   
+            }
+            else
+            {
+                CameraController.SetSubject(null);
+                CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+            }
+        }
+
+        // when "V" pressed - set an appropriate scale to view the subject (if in follow mode)
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            if (CameraController.GetCameraMode() == CameraController.CameraMode.Following)
+            {
+                float targetDiameter = 5;
+
+                double value = targetDiameter * UnitReference.DISTANCE_UNITS[renderer.Distance] 
+                    / (2 * selectedBody.Radius * renderer.UNITS_PER_WORLDSPACE);
+
+                renderer.ZoomFactor = (float) Math.Log10(value);
+
+                // NB: the mathemagics behind this so i don't forget
+
+                // * adjusts the zoom factor so that the diameter of the body meets the
+                //     target diameter in world space based on the current scale metrics
+
+                // 1. from the renderer, to scale bodies, we have:
+
+                //    > float scaledRadius = body.Radius * scale
+                //    > body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
+
+                // so the target diameter would be:
+
+                //      ~ D = 2 * body.Radius * scale
+                //  ~ scale = D / (2 * body.Radius)                                   (1) 
+
+                // 2. from the renderer, we also have the following to determine scale:
+
+                //    > float scale = 1 / UnitReference.DISTANCE_UNITS[distance]      (2)
+                //         * Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;                
+
+                // 3. substituting (2) into (1), we have:
+
+                //    ~ 1 / U * Math.Pow(10, zoomFactor) * Uws = D / (2 * body.Radius)
+                
+                // -- where "U" is the unit of distance and "Uws" is UNITS_PER_WORLDSPACE (for shorthand)
+
+                // 4. rearranging the equation to make "zoomFactor" the subject, we get:
+
+                //    ~ zoomFactor = log10(D * U / (2 * body.Radius * Uws))
             }
         }
     }

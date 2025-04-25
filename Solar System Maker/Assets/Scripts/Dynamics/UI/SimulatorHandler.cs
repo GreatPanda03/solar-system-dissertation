@@ -126,6 +126,14 @@ public class SimulatorHandler
             {
                 DeselectBodyItem();
             }
+
+            // toggling properties visibility on "P" pressed
+            else if (e.keyCode == KeyCode.P)
+            {
+                bool visible = ui.Q<VisualElement>("Properties").style.display == DisplayStyle.Flex;
+                SetPropertiesVisible(!visible);
+            }
+
         }, TrickleDown.TrickleDown);
 
         // ^ NB: "TrickleDown" means you don't have to press it twice
