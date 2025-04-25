@@ -2,9 +2,31 @@
 
 This changelog covers a list of features and fixes which have been made for the application.
 
-Versions are in the form **X.Y.Z**: *X* represents a significant feature which covers a range of functionality; *Y* represents single / small feature changes; and *Z* represents fixes or build-ups to the same feature as a gradual release.
+Versions are in the form **X.Y.Z**: 
+*X* represents a significant feature which covers a range of functionality; 
+*Y* represents single / small feature changes;
+and *Z* represents fixes or build-ups to the same feature as a gradual release.
 
 All dates are in the form **YYYY/MM/DD**.
+
+---
+
+### Version: 1.9.0
+**Date:** 2025/04/25
+<br/>**Bug Fixes:**
+* **1)** Fixed simulator title not updating to the opened simulation's name
+* **2)** Fixed scale label not updating when adjusting the scale to fit the followed body
+* **3)** Fixed scale label not updating when selecting a distance metric
+* **4)** Fixed distance metric selection not resetting the zoom factor to 0
+* **5)** Fixed main menu camera being "zoomable" after returning to it from a simulation
+
+**Additions / Changes:**
+* **1)** New popup to save the current simulation as a new save or template
+* **2)** Saved systems can now be loaded *(initially paused)*
+* **3)** Removed "Gravity Algorithm" and "Collision Quality" fields from New Simulation interface *(will be separate app options)*
+* **4)** Adjustment to UI for New Simulation window
+* **5)** Decreased near clip range to view smaller scale bodies closer
+* **Note:** currently, only the "New Save" option works when saving the current system
 
 ---
 
