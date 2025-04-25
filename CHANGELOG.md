@@ -8,12 +8,22 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
-### Version: 1.8.1
+### Version: 1.8.2
 **Date:** 2025/04/25
 <br>**Bug Fixes:**
+* **1)** Added appropriate handling when deleting a followed body
+
+**Additions / Changes:**
+* **1)** New "P" keybind to toggle the properties window
+* **2)** New "F" keybind to toggle following for the selected body
+* **3)** New "V" keybind to set to view a followed body at an appropriate scale
+
+### Version: 1.8.1
+**Date:** 2025/04/25
+<br>**Bug Fixes:** No additional fixes
 * **Known Bug:** when "Properties" is open, pressing "A" sometimes starts typing in the "Name" field
 
-<br/>**Additions / Changes:**
+**Additions / Changes:**
 * **1)** Bodies are no longer deselected or unfollowing when clicking into space
 * **2)** Unfollowing now requires movement keys *(WASD)* to be pressed
 
