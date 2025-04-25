@@ -1,4 +1,15 @@
-.container {
+#Outer {
+    min-width: 100%;
+    min-height: 100%;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    width: 100%;
+    flex-grow: 0;
+}
+
+#Container {
     background-color: rgba(0, 0, 0, 0.78);
     height: 300px;
     width: 400px;
@@ -11,21 +22,14 @@
     padding-bottom: 1%;
     padding-left: 1%;
     align-self: center;
+    flex-grow: 0;
 }
 
-.header {
+#Header {
+    margin-bottom: 5%;
 }
 
-.divider {
-    height: 3px;
-    max-height: 3px;
-    min-height: 3px;
-    background-color: rgba(255, 255, 255, 0.59);
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-
-.close {
+#Close {
     width: 10px;
     height: 10px;
     max-height: 10px;
@@ -49,7 +53,7 @@
     padding-left: 10px;
 }
 
-.title {
+#Title {
     color: rgb(255, 255, 255);
     -unity-text-align: middle-center;
     -unity-font-style: bold;
@@ -59,7 +63,7 @@
     align-self: center;
 }
 
-.content {
+#Content {
     flex-basis: 80%;
     flex-direction: row;
     flex-wrap: wrap;
@@ -67,14 +71,26 @@
 
 .field {
     margin-bottom: 2%;
+    min-height: 20%;
+    -unity-text-align: middle-left;
 }
 
-.footer {
+#unity-text-input {
+    margin-bottom: 2%;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    min-height: 100%;
+}
+
+#Footer {
     margin-bottom: 5px;
 }
 
-.validation {
-    color: rgb(224, 84, 37);
+#Validation {
+    color: rgb(224, 185, 37);
     -unity-font-style: bold;
     -unity-text-align: upper-center;
+    min-width: 100%;
 }

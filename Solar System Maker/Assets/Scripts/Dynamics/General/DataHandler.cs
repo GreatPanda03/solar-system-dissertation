@@ -36,8 +36,14 @@ public class DataHandler
     // retrieves all data stored in json files
     public static void LoadAllData()
     {
+        LoadSimulationsData();
+        LoadTemplatesData();
+    }
+
+    // loads all of the user's simulations data
+    public static void LoadSimulationsData()
+    {
         simulationSaves = new List<Simulation>();
-        templateSaves = new List<Simulation>();
 
         string simulationsData;
 
@@ -75,14 +81,53 @@ public class DataHandler
             }
         );
 
-        foreach (Simulation save in simulationSaves)
+        if (simulationSaves == null) 
         {
-            for (int b = 0; b < save.bodies.Count; b++)
+            simulationSaves = new();
+            Debug.Log("No simulations data to load - prepared blank list");
+        }
+    }
+
+    // loads all of the user's template simulations data
+    public static void LoadTemplatesData()
+    {
+                templateSaves = new List<Simulation>();
+
+        string templatesData;
+
+        try
+        {
+            templatesData = File.ReadAllText(simulationSavesPath);
+            Debug.Log("[DATA] SUCCESS: Data Loaded");
+        }
+        catch(FileNotFoundException)
+        {
+            templatesData = "[]";
+            File.WriteAllText(simulationSavesPath, "[]");
+            Debug.Log("[DATA] No existing 'SaveSimulations.txt' file, creating a new one");
+        }
+        catch (Exception e)
+        {
+            templatesData = "[]";
+            Debug.Log("[DATA] ERROR: " + e.Message);
+        }
+
+        Debug.Log("Simulations Data to Load: "
+            + GetPrettyJson(templatesData));
+
+        templateSaves = JsonConvert.DeserializeObject<List<Simulation>>(
+            templatesData,
+            new JsonSerializerSettings()
             {
-                Body body = save.bodies[b];
-                     if (body.Type == "Star")   { body = (Star) body;   }
-                else if (body.Type == "Planet") { body = (Planet) body; };
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
             }
+        );
+
+        if (templateSaves == null) 
+        {
+            templateSaves = new();
+            Debug.Log("No templates data to load - prepared blank list");
         }
     }
 

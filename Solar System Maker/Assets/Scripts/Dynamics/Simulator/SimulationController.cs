@@ -5,7 +5,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using NUnit.Framework;
 
 public class SimulationController : MonoBehaviour
 {
@@ -110,6 +109,7 @@ public class SimulationController : MonoBehaviour
         foreach (Body body in simulation.bodies)
         {
             body.CreateEntity();
+            OnBodyAdded?.Invoke(body);
         }
 
         snapshots = new List<SpaceSnapshot>();
@@ -156,7 +156,7 @@ public class SimulationController : MonoBehaviour
     // adds the given body to the simulation
     public void AddBody(Body body)
     {
-        body.Entity.transform.SetParent(simulatorSpace.transform);
+        body.Entity.transform.parent = simulatorSpace.transform;
         
         simulation.bodies.Add(body);
 
@@ -184,14 +184,12 @@ public class SimulationController : MonoBehaviour
     {
         SetPlaneVisibility(false);
 
-        IsActive = false;
+        FullDisable();
         
         if (bodyPreview != null) 
         {
             bodyPreview.DestroyEntity();
             bodyPreview = null;
-
-            // TODO: change camera mode to Main Menu?
         }
         
         startVelocityPoint = null;
@@ -297,6 +295,8 @@ public class SimulationController : MonoBehaviour
 
                 renderer.ZoomFactor = (float) Math.Log10(value);
 
+                OnScaleChanged?.Invoke(renderer.ZoomFactor);
+
                 // NB: the mathemagics behind this so i don't forget
 
                 // * adjusts the zoom factor so that the diameter of the body meets the
@@ -340,17 +340,14 @@ public class SimulationController : MonoBehaviour
     {
         if (!isActive) return;
 
-        if (simulation.settings.GravityAlgorithm == "Newtonian Physics")
+        if (isRunning)
         {
-            if (isRunning)
-            {
-                ApplyPhysics(); // includes scaling
-            }
-            else
-            {
-                foreach (Body body in GetBodies())
-                    renderer.ApplyScale(body);
-            }
+            ApplyPhysics(); // includes scaling
+        }
+        else
+        {
+            foreach (Body body in GetBodies())
+                renderer.ApplyScale(body);
         }
 
         OnPhysicsUpdate?.Invoke();
@@ -375,7 +372,7 @@ public class SimulationController : MonoBehaviour
                 Body bodyB = bodies[b];
 
                 Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
-                    simulation.settings.GravityConstant);
+                    simulation.settings.GravitationalConstant);
 
                 bodyA.ApplyForce(force);
                 bodyB.ApplyForce(-force);
@@ -409,7 +406,7 @@ public class SimulationController : MonoBehaviour
 
         bodyPreview.CreateEntity();
         bodyPreview.Name = "New " + type.ToString();
-        bodyPreview.Entity.transform.SetParent(simulatorSpace.transform);
+        bodyPreview.Entity.transform.parent = simulatorSpace.transform;
 
         renderer.GiveStreak(bodyPreview);
     }
@@ -487,7 +484,7 @@ public class SimulationController : MonoBehaviour
 
             if (attractor != null) // placement around the body ("capped" at attractor's radius)
             {
-                float G = simulation.settings.GravityConstant;
+                float G = simulation.settings.GravitationalConstant;
                 bodyPreview.Position = RunOrbitPlacement(attractor) / scale;
                 bodyPreview.Velocity = physics.GetStableOrbitVelocity(attractor, bodyPreview, G);
                 renderer.DrawOrbitBetweenBodies(attractor, bodyPreview, bodyPreview.Velocity);

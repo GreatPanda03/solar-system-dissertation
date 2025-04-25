@@ -28,18 +28,16 @@ public class MainMenuHandler
         ui.Q<Button>("TemplateSimulations").clicked += OnTemplateSimulationsClicked;
         // ui.Q<Button>("Tutorial").clicked += OnTutorialButtonClicked;             // WIP
         ui.Q<Button>("ExitApp").clicked += OnExitClicked;
-        
-        Debug.Log("ui loaded");
 
         // loading a sample simulation
-        List<Body> bodies = SystemGenerator.GenerateMenuSystem(0.000_1f);
+        float G = 0.000_1f;
 
-        Debug.Log("system generated");
+        List<Body> bodies = SystemGenerator.GenerateMenuSystem(G);
 
         Simulation simulation = new()
         {
             bodies = bodies,
-            settings = new() { GravityConstant = 0.000_1f }
+            settings = new() { GravitationalConstant = G }
         };
 
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();

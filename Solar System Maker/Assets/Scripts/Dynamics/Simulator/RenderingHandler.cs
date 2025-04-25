@@ -134,7 +134,7 @@ public class RenderingHandler
         Vector3 centre = parent.Position;
         Vector3 edge = child.Position;
 
-        float G = simController.simulation.settings.GravityConstant;
+        float G = simController.simulation.settings.GravitationalConstant;
         float M = parent.Mass;
 
         int resolution = 100;

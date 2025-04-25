@@ -25,8 +25,6 @@ public class TemplateSimulationsHandler
         this.uiController = uiController;
         
         ui.Q<Button>("Close").clicked += OnCloseClicked;
-
-        Debug.Log("[TEMPLATE SIMS] SUCCESS: UI Loaded");
     }
 
     #endregion Constructor

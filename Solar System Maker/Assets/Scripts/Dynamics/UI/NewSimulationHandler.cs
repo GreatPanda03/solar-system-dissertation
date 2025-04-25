@@ -43,11 +43,11 @@ public class NewSimulationHandler
         Simulation newSimulation = DataHandler.CreateSimulationSave();
         newSimulation.settings = settings;
 
-        uiController.ShowSimulator();
-
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(newSimulation);
         simController.FullEnable();
+
+        uiController.ShowSimulator();
 
         // adjusting the camera        
         CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
@@ -71,34 +71,20 @@ public class NewSimulationHandler
 
         if (name.text == "")
         {
-            DisplayValidation("'Name' cannot be blank!");
+            DisplayValidation("<b>'Name'</b> cannot be blank!");
+            return false;
+        }
+
+        // description can be blank
+        
+        var gravitationalConstant = ui.Q<VisualElement>("GravitationalConstant").Q<FloatField>("Input");
+
+        if (gravitationalConstant.value == float.NaN || gravitationalConstant.value == 0)
+        {
+            DisplayValidation("<b>'G'</b> must be greater than 0!");
             return false;
         }
         
-        var gravityConstant = ui.Q<VisualElement>("GravityConstant").Q<FloatField>("Input");
-
-        if (gravityConstant.value == float.NaN)
-        {
-            DisplayValidation("'Gravity Constant' cannot be blank!");
-            return false;
-        }
-        
-        var gravityAlgorithm = ui.Q<VisualElement>("GravityAlgorithm").Q<DropdownField>("Input");
-
-        if (gravityAlgorithm.value == "")
-        {
-            DisplayValidation("'Gravity Algorithm' cannot be blank!");
-            return false;
-        }
-
-        var collisionQuality = ui.Q<VisualElement>("CollisionQuality").Q<DropdownField>("Input");;
-
-        if (collisionQuality.value == null)
-        {
-            DisplayValidation("'Collision Quality' cannot be blank!");
-            return false;
-        }
-
         return true;
     }
 
@@ -106,16 +92,14 @@ public class NewSimulationHandler
     public Settings GetDetailsAsSettings()
     {
         var name = ui.Q<VisualElement>("Name").Q<TextField>("Input");
-        var gravityConstant = ui.Q<VisualElement>("GravityConstant").Q<FloatField>("Input");
-        var gravityAlgorithm = ui.Q<VisualElement>("GravityAlgorithm").Q<DropdownField>("Input");
-        var collisionQuality = ui.Q<VisualElement>("CollisionQuality").Q<DropdownField>("Input");;
+        var description = ui.Q<VisualElement>("Description").Q<TextField>("Input");
+        var gravitationalConstant = ui.Q<VisualElement>("GravitationalConstant").Q<FloatField>("Input");
 
         return new()
         {
-            SimulationName      = name.text,
-            GravityConstant     = gravityConstant.value,
-            GravityAlgorithm    = gravityAlgorithm.value,
-            CollisionQuality    = collisionQuality.value
+            Name = name.text,
+            Description = description.text,
+            GravitationalConstant = gravitationalConstant.value
         };
     }
 

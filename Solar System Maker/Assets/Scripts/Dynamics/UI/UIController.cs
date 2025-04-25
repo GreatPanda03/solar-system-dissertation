@@ -17,6 +17,7 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset tutorialUI;
     public VisualTreeAsset simulatorUI;
     public VisualTreeAsset explorerEntryTemplate;
+    public VisualTreeAsset createSaveTemplate;
     public VisualElement root; // main screen holder
 
     #endregion Attributes
@@ -36,7 +37,7 @@ public class UIController : MonoBehaviour
     #region Screen Methods
 
     // auxiliary: returns the clone of the true root of the given interface
-    public VisualElement GetInterfaceRoot(VisualTreeAsset screen)
+    public static VisualElement CloneInterface(VisualTreeAsset screen)
     {
         VisualElement clone = screen.CloneTree();
         clone.style.width = new Length(100, LengthUnit.Percent);
@@ -49,7 +50,7 @@ public class UIController : MonoBehaviour
     public void ShowMainMenu()
     {
         root.Clear();
-        VisualElement screen = GetInterfaceRoot(mainMenuUI);
+        VisualElement screen = CloneInterface(mainMenuUI);
         root.Add(screen);
         new MainMenuHandler(screen, this);
     }
@@ -58,7 +59,7 @@ public class UIController : MonoBehaviour
     public void ShowNewSimulation()
     {
         root.Clear();
-        VisualElement screen = GetInterfaceRoot(newSimulationUI);
+        VisualElement screen = CloneInterface(newSimulationUI);
         root.Add(screen);
         new NewSimulationHandler(screen, this);
     }
@@ -67,7 +68,7 @@ public class UIController : MonoBehaviour
     public void ShowSavedSimulations()
     {
         root.Clear();
-        VisualElement screen = GetInterfaceRoot(savedSimulationsUI);
+        VisualElement screen = CloneInterface(savedSimulationsUI);
         root.Add(screen);
         new SavedSimulationsHandler(screen, this, saveEntryTemplate);
     }
@@ -76,7 +77,7 @@ public class UIController : MonoBehaviour
     public void ShowTemplateSimulations()
     {
         root.Clear();
-        VisualElement screen = GetInterfaceRoot(templateSimulationsUI);
+        VisualElement screen = CloneInterface(templateSimulationsUI);
         root.Add(screen);
         new TemplateSimulationsHandler(screen, this);
     }
@@ -85,7 +86,7 @@ public class UIController : MonoBehaviour
     public void ShowTutorial()
     {
         root.Clear();
-        VisualElement screen = GetInterfaceRoot(tutorialUI);
+        VisualElement screen = CloneInterface(tutorialUI);
         root.Add(screen);
         new TutorialHandler(screen, this);
     }
@@ -94,13 +95,14 @@ public class UIController : MonoBehaviour
     public void ShowSimulator()
     {
         root.Clear();
-        VisualElement screen = GetInterfaceRoot(simulatorUI);
+        VisualElement screen = CloneInterface(simulatorUI);
         root.Add(screen);
 
         new SimulatorHandler(screen, 
             this, 
             GameObject.Find("Simulator").GetComponent<SimulationController>(), 
-            explorerEntryTemplate);
+            explorerEntryTemplate,
+            createSaveTemplate);
     }
 
     #endregion Screen Methods

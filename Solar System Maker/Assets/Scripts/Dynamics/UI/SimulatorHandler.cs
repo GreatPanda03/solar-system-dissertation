@@ -21,6 +21,7 @@ public class SimulatorHandler
     public UIController uiController;
     private SimulationController simController;
     public VisualTreeAsset explorerEntryTemplate;
+    public VisualTreeAsset createSaveTemplate;
     
     private string selectedBodyItem;
     private VisualElement focusedField;
@@ -31,14 +32,21 @@ public class SimulatorHandler
     #region Constructor
 
     // prepares a new instance of the "Simulator" interface
-    public SimulatorHandler(VisualElement ui, UIController uiController,
-        SimulationController simController, VisualTreeAsset explorerEntryTemplate)
-    {
+    public SimulatorHandler
+    (
+        VisualElement ui, 
+        UIController uiController,
+        SimulationController simController, 
+        VisualTreeAsset explorerEntryTemplate,
+        VisualTreeAsset createSaveTemplate
+    ) {
         this.ui = ui;
         this.uiController = uiController;
         this.simController = simController;
         this.explorerEntryTemplate = explorerEntryTemplate;
+        this.createSaveTemplate = createSaveTemplate;
 
+        ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = simController.simulation.settings.Name;
         ui.Q<Button>("SaveSimulation").clicked += OnSaveSimulationClicked;
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
@@ -46,6 +54,7 @@ public class SimulatorHandler
         InitialiseExplorerSearchBar();
         ui.Q("Explorer").Q<Button>("Close").clicked += OnExplorerCloseClicked;
         ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
+        RefreshExplorer();
 
         ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
         InitialiseBodyItemButtons();
@@ -203,16 +212,14 @@ public class SimulatorHandler
     // saves the simulation on click
     private void OnSaveSimulationClicked()
     {
-        Simulation simulation = simController.simulation;;
-        bool updated = DataHandler.UpdateSimulationSave(simulation.id, simulation);
-        if (!updated) DataHandler.AddSimulationSave(simulation);
-
-        DataHandler.SaveAllData();
+        CreateSavePopup();
     }
 
     // returns to the "Main Menu" interface
     private void OnExitSimulatorClicked()
     {
+        // TODO: check if no save has been made - then prompt accordingly
+
         UnsubscribeEvents();
 
         simController.DisableSimulator();
@@ -549,6 +556,9 @@ public class SimulatorHandler
         newButton.AddToClassList("selectedButton");
 
         simController.renderer.Distance = newItem.Replace("_", " ");
+        simController.renderer.ZoomFactor = 0;
+
+        UpdateScaleLabel();
     }
 
     // NB: a distance is ALWAYS selected - there can never be none
@@ -704,4 +714,124 @@ public class SimulatorHandler
     }
 
     #endregion Properties
+
+
+    #region Creating Saves
+
+    public void CreateSavePopup()
+    {
+        if (ui.Q<VisualElement>("CreateSave") != null) return;
+
+        simController.FullDisable();
+
+        VisualElement popup = UIController.CloneInterface(createSaveTemplate);
+        popup.name = "CreateSave";
+        ui.Add(popup);
+
+        Settings settings = simController.simulation.settings;
+        popup.Q<TextField>("Name").value = settings.Name;
+        popup.Q<TextField>("Description").value = settings.Description;
+        popup.Q<TextField>("GravitationalConstant").value = settings.GravitationalConstant.ToString();
+
+        popup.Q<Button>("SaveSimulation").clicked += () => {
+            if (!ValidateDetails(popup)) return;
+
+            popup.RemoveFromHierarchy();
+
+            Settings settings = GetDetailsAsSettings(popup);
+
+            List<Body> bodyCopies = new();
+            foreach (Body body in simController.simulation.bodies)
+                bodyCopies.Add(body.GetCopy());
+
+            Simulation newSave = DataHandler.CreateSimulationSave();
+            newSave.settings = settings;
+            newSave.bodies = bodyCopies;
+
+            DataHandler.AddSimulationSave(newSave);
+
+            ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = newSave.settings.Name;
+        }; 
+
+        popup.Q<Button>("SaveTemplate").clicked += () => {
+            if (!ValidateDetails(popup)) return;
+
+            popup.RemoveFromHierarchy();
+
+            Settings settings = GetDetailsAsSettings(popup);
+
+            List<Body> bodyCopies = new();
+            foreach (Body body in simController.simulation.bodies)
+                bodyCopies.Add(body.GetCopy());
+
+            Simulation newSave = DataHandler.CreateSimulationSave();
+            newSave.settings = settings;
+            newSave.bodies = bodyCopies;
+
+            Debug.Log("[run template saving process]");
+        };
+
+        popup.Q<Button>("Close").clicked += () => {
+            popup.RemoveFromHierarchy();
+        };
+
+        // pause simulation
+        simController.IsRunning = false;
+
+        ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
+                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Playing");
+    }
+
+    // validates the save's details
+    public bool ValidateDetails(VisualElement popup)
+    {
+        var name = popup.Q<TextField>("Name");
+
+        if (name.value == "")
+        {
+            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
+            return false;
+        }
+
+        // description can be blank
+        
+        var gravitationalConstant = popup.Q<TextField>("GravitationalConstant");
+
+
+        if (gravitationalConstant.value == "")
+        {
+            DisplayValidation(popup, "<b>'G'</b> must be greater than 0!");
+            return false;
+        }
+
+        return true;
+    }
+        
+    // gathers the save's details
+    public Settings GetDetailsAsSettings(VisualElement popup)
+    {
+        var name = popup.Q<TextField>("Name");
+        var description = popup.Q<TextField>("Description");
+        // var gravitationalConstant = popup.Q<TextField>("GravitationalConstant");
+
+        return new()
+        {
+            Name = name.text,
+            Description = description.text,
+            GravitationalConstant = simController.simulation.settings.GravitationalConstant
+        };
+    }
+
+    // displays the given message as a validation notification
+    public void DisplayValidation(VisualElement popup, string message)
+    {
+        popup.Q<Label>("Validation").text = message;
+    }
+
+    public void DestroySavePopup()
+    {
+        ui.Q<VisualElement>("CreateSave").RemoveFromHierarchy();
+    }
+
+    #endregion
 }

@@ -50,7 +50,7 @@
 }
 
 .content {
-    flex-basis: 80%;
+    flex-basis: 90%;
     flex-direction: row;
     flex-wrap: wrap;
     padding-top: 0;

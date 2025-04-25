@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/CreateSave/CreateSaveStyles.uss?fileID=7433441132597879392&amp;guid=47c90824101001949be6341db5492006&amp;type=3#CreateSaveStyles" />
+    <ui:VisualElement name="Outer" style="flex-grow: 1; height: 447px;">
+        <ui:VisualElement name="Container" style="flex-grow: 1;">
+            <ui:VisualElement name="Header" style="flex-grow: 1;">
+                <ui:Button text="X" name="Close" class="close" />
+                <ui:Label text="Create a New Save" name="Title" class="title" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Content" style="flex-grow: 1;">
+                <ui:Label text="&lt;b&gt;Your simulation has been paused.&lt;/b&gt;&#10;Please provide the details below. You can save your simulation as a new save, or a new template." name="Information" />
+                <ui:VisualElement name="Fields" style="flex-grow: 1;">
+                    <ui:TextField label="Name" placeholder-text="(blank)" name="Name" select-all-on-focus="false" select-all-on-mouse-up="false" style="color: rgb(255, 255, 255);" />
+                    <ui:TextField label="Description" placeholder-text="(blank)" name="Description" select-all-on-focus="false" select-all-on-mouse-up="false" />
+                    <ui:TextField label="G (readonly)" placeholder-text="(blank)" name="GravitationalConstant" readonly="true" select-all-on-focus="false" select-all-on-mouse-up="false" />
+                </ui:VisualElement>
+                <ui:Label name="Validation" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Footer" style="flex-grow: 1;">
+                <ui:Button text="Save As Simulation" name="SaveSimulation" class="loadButton" />
+                <ui:Button text="Save As Template" name="SaveTemplate" class="deleteButton" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

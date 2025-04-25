@@ -39,18 +39,14 @@ public class SavedSimulationsHandler
         ui.Q<Button>("Load").clicked += OnLoadClicked;
         ui.Q<Button>("Delete").clicked += OnDeleteClicked;
         ui.Q<Button>("Close").clicked += OnCloseClicked;
+
+        LoadSaves();
     }
 
     #endregion Constructor
 
 
     #region UI Methods
-
-    // loads all the user's saves on click
-    private void OnLoadSavesClicked()
-    {
-        LoadSaves();
-    }
 
     // loads the currently selected saved on click
     public void OnLoadClicked()
@@ -94,7 +90,7 @@ public class SavedSimulationsHandler
     public VisualElement CreateSaveEntry(Simulation save)
     {
         VisualElement newEntry = saveEntryTemplate.Instantiate();
-        newEntry.Q<Label>("Title").text = save.settings.SimulationName;
+        newEntry.Q<Label>("Title").text = save.settings.Name;
 
         return newEntry;
     }
@@ -138,15 +134,15 @@ public class SavedSimulationsHandler
     public void UpdateViewer(Simulation save)
     {
         // updating the save viewer panel accordingly
-        VisualElement saveViewer = ui.Q<VisualElement>("SaveViewer");
-        VisualElement saveDetails = ui.Q<VisualElement>("SaveDetails");
+        VisualElement saveViewer = ui.Q<VisualElement>("Viewer");
+        VisualElement saveDetails = ui.Q<VisualElement>("Details");
         Label title = saveViewer.Q<Label>("Title");
         Label description = saveViewer.Q<Label>("Description");
         Label noSelectedSave = saveViewer.Q<Label>("NoSelectedSave");
 
         if (selectedEntry != null) 
         {
-            string simName = save.settings.SimulationName;
+            string simName = save.settings.Name;
             title.text = simName;
             description.text = $"This is the save file for the simulation called '{simName}'";
 
@@ -169,11 +165,11 @@ public class SavedSimulationsHandler
     {
         Simulation save = saveRef.GetCopy();
 
-        uiController.ShowSimulator();
-
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(save);
         simController.FullEnable();
+
+        uiController.ShowSimulator();
 
         CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
     }

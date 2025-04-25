@@ -178,7 +178,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1e+10
   field of view: 60
   orthographic: 0
@@ -327,10 +327,9 @@ MonoBehaviour:
   simulation:
     id: -1
     settings:
-      simulationName: New Simulation
-      gravityAlgorithm: Newtonian Physics
-      gravityConstant: 0.01
-      collisionQuality: High
+      name: New Simulation
+      description: 
+      gravitationalConstant: 0.01
     bodies: []
   placementMode: 0
   simulatorSpace: {fileID: 562911921}
@@ -757,6 +756,7 @@ MonoBehaviour:
   tutorialUI: {fileID: 0}
   simulatorUI: {fileID: 9197481963319205126, guid: 1efa3a77ecb7ed74cb23eaec8f736c86, type: 3}
   explorerEntryTemplate: {fileID: 9197481963319205126, guid: 23251c35d6365954d8d7882e2ea2bc42, type: 3}
+  createSaveTemplate: {fileID: 9197481963319205126, guid: e32458bc23189494a8194d217742d05b, type: 3}
 --- !u!1 &1776561390
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,31 +10,24 @@ public class Settings
     #region Attributes
 
     [SerializeField]
-    private string simulationName;
-    public string SimulationName {
-        get => simulationName;
-        set => simulationName = value;
+    private string name;
+    public string Name {
+        get => name;
+        set => name = value;
     }
 
     [SerializeField]
-    private string gravityAlgorithm;
-    public string GravityAlgorithm {
-        get => gravityAlgorithm;
-        set => gravityAlgorithm = value;
+    private string description;
+    public string Description {
+        get => description;
+        set => description = value;
     }
 
     [SerializeField]
-    private float gravityConstant;
-    public float GravityConstant {
-        get => gravityConstant;
-        set => gravityConstant = value;
-    }
-
-    [SerializeField]
-    private string collisionQuality;
-    public string CollisionQuality {
-        get => collisionQuality;
-        set => collisionQuality = value;
+    private float gravitationalConstant;
+    public float GravitationalConstant {
+        get => gravitationalConstant;
+        set => gravitationalConstant = value;
     }
 
     #endregion Attributes
@@ -44,10 +37,9 @@ public class Settings
 
     public Settings()
     {
-        simulationName = "New Simulation";
-        gravityAlgorithm = "Newtonian Physics";
-        gravityConstant = 0.01f;
-        collisionQuality = "High";
+        name = "New Simulation";
+        description = "";
+        gravitationalConstant = 0.01f;
     }
 
     #endregion Constructor
@@ -59,10 +51,9 @@ public class Settings
     {
         return new()
         {
-            SimulationName = simulationName,
-            GravityAlgorithm = gravityAlgorithm,
-            GravityConstant = gravityConstant,
-            CollisionQuality = collisionQuality
+            Name = name,
+            Description = description,
+            GravitationalConstant = gravitationalConstant,
         };
     }
 
