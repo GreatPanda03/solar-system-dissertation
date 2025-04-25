@@ -8,6 +8,14 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.8.3
+**Date:** 2025/04/25
+<br/>**Bug Fixes:**
+* **1)** Fixed camera jitter when rotating around a followed body *(smoother transition)*
+* **2)** Limited camera pitch range *(to avoid "spasms" when looking directly upwards)*
+
+---
+
 ### Version: 1.8.2
 **Date:** 2025/04/25
 <br>**Bug Fixes:**
