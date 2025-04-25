@@ -8,6 +8,17 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.8.1
+**Date:** 2025/04/25
+<br>**Bug Fixes:**
+* **Known Bug:** when "Properties" is open, pressing "A" sometimes starts typing in the "Name" field
+
+<br/>**Additions / Changes:**
+* **1)** Bodies are no longer deselected or unfollowing when clicking into space
+* **2)** Unfollowing now requires movement keys *(WASD)* to be pressed
+
+---
+
 ### Version: 1.8.0
 **Date:** 2025/04/24
 <br/>**Bug Fixes:** No additional fixes
