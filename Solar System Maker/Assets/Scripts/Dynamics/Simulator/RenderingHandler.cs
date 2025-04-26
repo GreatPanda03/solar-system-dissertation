@@ -134,9 +134,6 @@ public class RenderingHandler
         Vector3 centre = parent.Position;
         Vector3 edge = child.Position;
 
-        float G = simController.simulation.settings.GravitationalConstant;
-        float M = parent.Mass;
-
         int resolution = 100;
         // float step = 1f; // time step
         Vector3[] points = new Vector3[resolution + 1];
@@ -152,19 +149,7 @@ public class RenderingHandler
 
         for (int p = 0; p <= resolution; p++)
         {
-            /* METHOD 1: force-based path prediction
-            points[p] = (float) scale * edge;
-
-            // same formula used to calculate forces between bodies!
-            Vector3 direction = (centre - edge).normalized;
-            float rSquared = (centre - edge).sqrMagnitude;
-            Vector3 acceleration = direction * (G * M / rSquared);
-
-            childVelocity += (float) scale * step * acceleration;
-            edge += (float) scale * step * childVelocity;
-            */
-
-            // METHOD 2: equation-based path prediction
+            // equation-based path prediction
             float progress = (float) p / resolution;
             float radians = startingAngle + (progress * 2 * Mathf.PI);
 

@@ -2,10 +2,12 @@
 // * all values are relative to SI units (metres, kilogram, etc.)
 
 using System.Collections.Generic;
-using UnityEngine;
 
 public class UnitReference
 {
+    // public static float G = 6.674_301_5e-11f;
+    public static float G = 1;
+
     public static Dictionary<string, double> DISTANCE_UNITS = new() {
         ["Centimetre"]      = 1e-2,
         ["Metre"]           = 1,

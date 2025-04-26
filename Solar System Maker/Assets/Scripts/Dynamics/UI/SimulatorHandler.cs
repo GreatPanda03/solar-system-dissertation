@@ -219,7 +219,7 @@ public class SimulatorHandler
     // displays the simulation's options on click
     public void OnOptionsClicked()
     {
-        Debug.Log("[showing options]");
+        CreateOptionsPopup();
     }
 
     // on click - saves the simulation directly, or prompts for "Save As"
@@ -747,14 +747,110 @@ public class SimulatorHandler
 
     #region Options Popup
 
+    // creates a panel of simulation options which can be edited
     public void CreateOptionsPopup()
     {
+        if (ui.Q<VisualElement>("OptionsPopup") != null) return;
 
+        VisualElement popup = UIController.CloneInterface(optionsPopupTemplate);
+        popup.name = "OptionsPopup";
+        ui.Add(popup);
+
+        Settings settings = simController.simulation.settings;
+        popup.Q<TextField>("Name").value = settings.Name;
+        popup.Q<TextField>("Description").value = settings.Description;
+        popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
+        popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
+
+        popup.Q<Button>("Reset").clicked += () => {
+            Settings settings = simController.simulation.settings;
+            popup.Q<TextField>("Name").value = settings.Name;
+            popup.Q<TextField>("Description").value = settings.Description;
+            popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
+            popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
+        };
+
+        popup.Q<Button>("Save").clicked += () => {
+            if (!ValidateOptionsDetails(popup)) return;
+
+            popup.RemoveFromHierarchy();
+
+            Settings settings = GetOptionsDetailsAsSettings(popup);
+            simController.simulation.settings = settings;
+
+            string quality = popup.Q<DropdownField>("CollisionQuality").value;
+            simController.physics.SetCollisionQuality(quality);
+
+            ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = settings.Name;
+        }; 
+
+        popup.Q<Button>("Close").clicked += () => {
+            popup.RemoveFromHierarchy();
+        };
+
+        ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
+                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Playing");
+    }
+
+    // validates the option panel's details
+    public bool ValidateOptionsDetails(VisualElement popup)
+    {
+        var name = popup.Q<TextField>("Name");
+
+        if (name.value == "")
+        {
+            DisplayOptionsValidation(popup, "<b>'Name'</b> cannot be blank!");
+            return false;
+        }
+
+        // description can be blank
+        
+        var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
+
+        if (gravitationalConstant.value == float.NaN || gravitationalConstant.value == 0)
+        {
+            DisplayOptionsValidation(popup, "<b>'G'</b> must be greater than 0!");
+            return false;
+        }
+
+        var collisionQuality = popup.Q<DropdownField>("CollisionQuality");
+
+        if (collisionQuality.value == "")
+        {
+            DisplayOptionsValidation(popup, "<b>'Collisions'</b> cannot be blank!");
+        }
+
+        return true;
+    }
+        
+    // gathers the settings-related options data
+    public Settings GetOptionsDetailsAsSettings(VisualElement popup)
+    {
+        var name = popup.Q<TextField>("Name");
+        var description = popup.Q<TextField>("Description");
+        var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
+
+        return new()
+        {
+            Name = name.value,
+            Description = description.value,
+            GravitationalConstant = gravitationalConstant.value
+        };
+    }
+
+    // displays the given message as a validation notification
+    public void DisplayOptionsValidation(VisualElement popup, string message)
+    {
+        popup.Q<Label>("Validation").text = message;
+    }
+
+    public void DestroyOptionsPopup()
+    {
+        ui.Q<VisualElement>("OptionsPopup").RemoveFromHierarchy();
     }
 
     #endregion Options Popup
 
-    
 
     #region Save As Popup
 
@@ -778,11 +874,11 @@ public class SimulatorHandler
         popup.Q<TextField>("GravitationalConstant").value = settings.GravitationalConstant.ToString();
 
         popup.Q<Button>("SaveSimulation").clicked += () => {
-            if (!ValidateDetails(popup)) return;
+            if (!ValidateSaveDetails(popup)) return;
 
             popup.RemoveFromHierarchy();
 
-            Settings settings = GetDetailsAsSettings(popup);
+            Settings settings = GetSaveDetailsAsSettings(popup);
 
             List<Body> bodyCopies = new();
             foreach (Body body in simController.simulation.bodies)
@@ -798,11 +894,11 @@ public class SimulatorHandler
         }; 
 
         popup.Q<Button>("SaveTemplate").clicked += () => {
-            if (!ValidateDetails(popup)) return;
+            if (!ValidateSaveDetails(popup)) return;
 
             popup.RemoveFromHierarchy();
 
-            Settings settings = GetDetailsAsSettings(popup);
+            Settings settings = GetSaveDetailsAsSettings(popup);
 
             List<Body> bodyCopies = new();
             foreach (Body body in simController.simulation.bodies)
@@ -827,13 +923,13 @@ public class SimulatorHandler
     }
 
     // validates the save's details
-    public bool ValidateDetails(VisualElement popup)
+    public bool ValidateSaveDetails(VisualElement popup)
     {
         var name = popup.Q<TextField>("Name");
 
         if (name.value == "")
         {
-            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
+            DisplaySaveValidation(popup, "<b>'Name'</b> cannot be blank!");
             return false;
         }
 
@@ -841,10 +937,9 @@ public class SimulatorHandler
         
         var gravitationalConstant = popup.Q<TextField>("GravitationalConstant");
 
-
         if (gravitationalConstant.value == "")
         {
-            DisplayValidation(popup, "<b>'G'</b> must be greater than 0!");
+            DisplaySaveValidation(popup, "<b>'G'</b> must be greater than 0!");
             return false;
         }
 
@@ -852,7 +947,7 @@ public class SimulatorHandler
     }
         
     // gathers the save's details
-    public Settings GetDetailsAsSettings(VisualElement popup)
+    public Settings GetSaveDetailsAsSettings(VisualElement popup)
     {
         var name = popup.Q<TextField>("Name");
         var description = popup.Q<TextField>("Description");
@@ -860,14 +955,14 @@ public class SimulatorHandler
 
         return new()
         {
-            Name = name.text,
-            Description = description.text,
+            Name = name.value,
+            Description = description.value,
             GravitationalConstant = simController.simulation.settings.GravitationalConstant
         };
     }
 
     // displays the given message as a validation notification
-    public void DisplayValidation(VisualElement popup, string message)
+    public void DisplaySaveValidation(VisualElement popup, string message)
     {
         popup.Q<Label>("Validation").text = message;
     }

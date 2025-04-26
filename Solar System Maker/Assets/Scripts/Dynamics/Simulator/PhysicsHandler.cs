@@ -1,5 +1,6 @@
 // manages the physics operations
 
+using System;
 using UnityEngine;
 
 
@@ -8,6 +9,9 @@ public class PhysicsHandler
 
     #region Attributes
     public SimulationController simController;
+
+    public enum CollisionQuality { None, Low, High }
+    public CollisionQuality collisionQuality;
 
     #endregion Attributes
 
@@ -22,6 +26,19 @@ public class PhysicsHandler
     }
 
     #endregion Constructor
+
+
+    #region General Methods
+
+    public void SetCollisionQuality(string newQuality)
+    {
+        if (Enum.TryParse(newQuality, out CollisionQuality quality ))
+        {   
+            collisionQuality = quality;
+        }
+    }
+
+    #endregion
 
 
     #region Physics Methods
@@ -58,6 +75,23 @@ public class PhysicsHandler
         Vector3 velocity = parent.Velocity + (velocityDirection * Mathf.Sqrt(G * M / r));
 
         return velocity;
+    }
+
+    // processes a collision between the two bodies
+    public void ProcessCollision(Body bodyA, Body bodyB)
+    {
+        if (collisionQuality == CollisionQuality.None)
+        {
+            return;
+        }
+        else if (collisionQuality == CollisionQuality.Low)
+        {
+            Debug.Log("[low collision quality processing method]");
+        }
+        else if (collisionQuality == CollisionQuality.High)
+        {
+            Debug.Log("[high collision quality processing method]");
+        }
     }
 
     #endregion Physics Methods

@@ -5,6 +5,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Unity.VisualScripting;
 
 public class SimulationController : MonoBehaviour
 {
@@ -485,7 +486,7 @@ public class SimulationController : MonoBehaviour
 
             if (attractor != null) // placement around the body ("capped" at attractor's radius)
             {
-                float G = simulation.settings.GravitationalConstant;
+                float G = simulation.settings.GravitationalConstant * UnitReference.G;
                 bodyPreview.Position = RunOrbitPlacement(attractor) / scale;
                 bodyPreview.Velocity = physics.GetStableOrbitVelocity(attractor, bodyPreview, G);
                 renderer.DrawOrbitBetweenBodies(attractor, bodyPreview, bodyPreview.Velocity);
