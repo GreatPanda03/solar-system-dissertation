@@ -11,6 +11,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.9.3
+**Date:** 2025/04/26
+<br/>**Additions / Changes:**
+* **1)** Gravitational constant is now given in terms of "G" *("G" is still "1" for now)*
+* **2)** New options popup to change the settings and information of the current simulation
+* **3)** Restored Collision Quality field in options *(currently visual only)*
+
+---
+
 ### Version: 1.9.2
 **Date:** 2025/04/26
 <br/>**Bug Fixes:**
