@@ -74,7 +74,7 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(mainMenuUI);
         root.Add(screen);
         new MainMenuHandler(screen, this);
-        PrepareFieldFocus();
+        PrepareFieldFocus(root);
     }
 
     // shows a new instance of the "New Simulations" interface
@@ -84,7 +84,7 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(newSimulationUI);
         root.Add(screen);
         new NewSimulationHandler(screen, this);
-        PrepareFieldFocus();
+        PrepareFieldFocus(root);
     }
 
     // shows a new instance of the "Saved Simulations" interface
@@ -94,7 +94,7 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(savedSimulationsUI);
         root.Add(screen);
         new SavedSimulationsHandler(screen, this, saveEntryTemplate);
-        PrepareFieldFocus();
+        PrepareFieldFocus(root);
     }
 
     // shows a new instance of the "Template Simulations" interface
@@ -104,7 +104,7 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(templateSimulationsUI);
         root.Add(screen);
         new TemplateSimulationsHandler(screen, this);
-        PrepareFieldFocus();
+        PrepareFieldFocus(root);
     }
 
     // shows a new instance of the "Tutorial" interface
@@ -114,7 +114,7 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(tutorialUI);
         root.Add(screen);
         new TutorialHandler(screen, this);
-        PrepareFieldFocus();
+        PrepareFieldFocus(root);
     }
 
     // shows a new instance of the "Simulator" interface
@@ -131,7 +131,7 @@ public class UIController : MonoBehaviour
             optionsPopupTemplate,
             savePopupTemplate);
 
-        PrepareFieldFocus();
+        PrepareFieldFocus(root);
     }
 
     #endregion Screen Methods
@@ -139,19 +139,18 @@ public class UIController : MonoBehaviour
 
     #region Field Focus
 
-    // registers all field buttons to be marked as a focused field
-    // * also restricts focusing to clicks ONLY (no focus for navigation)
-    public void PrepareFieldFocus()
+    // registers all field buttons of the given element to be marked as a focused field when focused
+    // * also restricts focusing to clicks ONLY (no focus for navigation!)
+    public static void PrepareFieldFocus(VisualElement parent)
     {
-        List<VisualElement> allElements = root.Query<VisualElement>().ToList();
+        List<VisualElement> allElements = parent.Query<VisualElement>().ToList();
 
         foreach (VisualElement element in allElements)
         {
             if (element is TextField || element is FloatField || element is Vector3Field)
             {
                 // only focus if the field is clicked
-                element.RegisterCallback<FocusEvent>((e) =>
-                {       
+                element.RegisterCallback<FocusEvent>((e) => { // after focus gained
                     if (!mousePressedLast)
                     {
                         element.Blur();
@@ -162,7 +161,7 @@ public class UIController : MonoBehaviour
                     }
                 });
 
-                element.RegisterCallback<FocusEvent>((e) => {
+                element.RegisterCallback<FocusOutEvent>((e) => { // before focus lost
                     if (element == focusedField)
                     {
                         focusedField = null;

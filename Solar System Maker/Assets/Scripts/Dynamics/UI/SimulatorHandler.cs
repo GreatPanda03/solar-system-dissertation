@@ -90,6 +90,7 @@ public class SimulatorHandler
         InitialisePropertyFields();
         ui.Q<Button>("Close").clicked += OnPropertiesCloseClicked;
         SetPropertiesVisible(false);
+        UpdateProperties(null); // hide fields too
 
         SubscribeEvents();
         InitialiseInputs();
@@ -129,6 +130,7 @@ public class SimulatorHandler
     {
         // NB: "ui.panel.visualTree" so keybinds persist even when UI not selected!
         ui.panel.visualTree.RegisterCallback<KeyDownEvent>((e) => {
+            if (UIController.FocusedField != null) return;
 
             // toggling explorer visibility on "Tab" pressed
             if (e.keyCode == KeyCode.Tab)
@@ -697,6 +699,7 @@ public class SimulatorHandler
             Type type = body.GetType();
             var properties_ = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
+            // direct property fields
             foreach (var property in properties_)
             {
                 VisualElement field = groups.Q(property.Name);
@@ -729,6 +732,10 @@ public class SimulatorHandler
                 }
             }
 
+            // special case fields
+            properties.Q<FloatField>("Speed").value = body.Velocity.magnitude
+                * simController.renderer.Scale;
+
             properties.Q<Label>("NoSelection").style.display = DisplayStyle.None;
             groups.Q<VisualElement>("Star").style.display = body is Star ? DisplayStyle.Flex : DisplayStyle.None;
             groups.Q<VisualElement>("Planet").style.display = body is Planet ? DisplayStyle.Flex : DisplayStyle.None;
@@ -755,6 +762,8 @@ public class SimulatorHandler
         VisualElement popup = UIController.CloneInterface(optionsPopupTemplate);
         popup.name = "OptionsPopup";
         ui.Add(popup);
+
+        UIController.PrepareFieldFocus(popup);
 
         Settings settings = simController.simulation.settings;
         popup.Q<TextField>("Name").value = settings.Name;
@@ -867,6 +876,8 @@ public class SimulatorHandler
         VisualElement popup = UIController.CloneInterface(savePopupTemplate);
         popup.name = "SavePopup";
         ui.Add(popup);
+
+        UIController.PrepareFieldFocus(popup);
 
         Settings settings = simController.simulation.settings;
         popup.Q<TextField>("Name").value = settings.Name;

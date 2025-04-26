@@ -111,21 +111,20 @@ public class SavedSimulationsHandler
         if (selectedEntry == null)
         {
             selectedEntry = entry;
-            selectedEntry.Q<Button>().AddToClassList("selectedEntry");
-            Debug.Log("selected");
+            selectedEntry.AddToClassList("selectedEntry");
         }
         else
         {
             if (selectedEntry == entry)
             {
-                selectedEntry.Q<Button>().RemoveFromClassList("selectedEntry");
+                selectedEntry.RemoveFromClassList("selectedEntry");
                 selectedEntry = null;
             }
             else
             {
-                selectedEntry.Q<Button>().RemoveFromClassList("selectedEntry");
+                selectedEntry.RemoveFromClassList("selectedEntry");
                 selectedEntry = entry;
-                selectedEntry.Q<Button>().AddToClassList("selectedEntry");
+                selectedEntry.AddToClassList("selectedEntry");
             }
         }
     }

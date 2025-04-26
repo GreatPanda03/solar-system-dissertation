@@ -26,6 +26,7 @@
                 <ui:FloatField label="Radius" value="10" name="Radius" tooltip="Radius" class="propertiesField" />
                 <ui:FloatField label="Surface Temp." value="10" name="SurfaceTemp" tooltip="Surface Temperature" class="propertiesField" />
                 <ui:FloatField label="Density" value="10" name="Density" tooltip="Density" class="propertiesField" />
+                <ui:FloatField label="Speed (read)" value="10" name="Speed" placeholder-text="(blank)" readonly="true" class="propertiesField" />
             </ui:GroupBox>
             <ui:GroupBox name="Star" class="propertiesGroup" style="display: flex;">
                 <ui:Label text="Star" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
