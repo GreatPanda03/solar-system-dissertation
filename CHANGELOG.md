@@ -11,6 +11,13 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.9.2
+**Date:** 2025/04/26
+<br/>**Bug Fixes:**
+* **1)** Fixed issue where pressing movement keys *(WASD)* would focus on fields if the properties window is open
+
+---
+
 ### Version: 1.9.1
 **Date:** 2025/04/26
 <br/>**Bug Fixes:**
