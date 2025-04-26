@@ -11,6 +11,22 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.9.1
+**Date:** 2025/04/26
+<br/>**Bug Fixes:**
+* **1)** Fixed simulation not being interactable at all when closing the "Save As" popup
+* **2)** Fixed followed body's "ghost" persisting between simulations *(creating a new body in a new simulation in orbit mode would show a path around this ghost)*
+* **3)** Amended code for save deletion *(would fail part way through)*
+* **4)** Fixed highlighting and padding when hovering over save entries
+
+**Additions / Changes:**
+* **1)** New save button to save a simulation directly
+* **2)** Saving a new simulation for the first time prompts to "Save As" a new simulation
+* **3)** New options button to access simulation settings and details *(currently visual only)*
+* **4)** Saved simulations are paused when opened
+
+---
+
 ### Version: 1.9.0
 **Date:** 2025/04/25
 <br/>**Bug Fixes:**
