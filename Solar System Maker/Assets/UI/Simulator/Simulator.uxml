@@ -4,8 +4,14 @@
         <ui:Button name="ExitSimulator" tooltip="Exit Simulation" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/ExitSimulator&apos;);" />
         </ui:Button>
-        <ui:Button name="SaveSimulation" tooltip="Save Simulation" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/SaveSimulation&apos;);" />
+        <ui:Button name="Options" tooltip="Save Simulation" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/Options&apos;);" />
+        </ui:Button>
+        <ui:Button name="Save" tooltip="Save Simulation" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/Save&apos;);" />
+        </ui:Button>
+        <ui:Button name="SaveAs" tooltip="Save Simulation" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/SaveAs&apos;);" />
         </ui:Button>
         <ui:Label text="Simulation Name" name="Title" class="title" style="width: auto; height: 100%; -unity-text-align: lower-left; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 10px;" />
     </ui:VisualElement>

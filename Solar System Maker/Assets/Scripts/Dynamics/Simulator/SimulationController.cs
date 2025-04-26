@@ -193,6 +193,7 @@ public class SimulationController : MonoBehaviour
         }
         
         startVelocityPoint = null;
+        CameraController.SetSubject(null);
     }
 
     #endregion Simulator Methods

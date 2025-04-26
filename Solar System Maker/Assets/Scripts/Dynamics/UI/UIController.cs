@@ -17,7 +17,8 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset tutorialUI;
     public VisualTreeAsset simulatorUI;
     public VisualTreeAsset explorerEntryTemplate;
-    public VisualTreeAsset createSaveTemplate;
+    public VisualTreeAsset optionsPopupTemplate;
+    public VisualTreeAsset savePopupTemplate;
     public VisualElement root; // main screen holder
 
     #endregion Attributes
@@ -102,7 +103,8 @@ public class UIController : MonoBehaviour
             this, 
             GameObject.Find("Simulator").GetComponent<SimulationController>(), 
             explorerEntryTemplate,
-            createSaveTemplate);
+            optionsPopupTemplate,
+            savePopupTemplate);
     }
 
     #endregion Screen Methods

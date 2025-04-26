@@ -21,7 +21,8 @@ public class SimulatorHandler
     public UIController uiController;
     private SimulationController simController;
     public VisualTreeAsset explorerEntryTemplate;
-    public VisualTreeAsset createSaveTemplate;
+    public VisualTreeAsset optionsPopupTemplate;
+    public VisualTreeAsset savePopupTemplate;
     
     private string selectedBodyItem;
     private VisualElement focusedField;
@@ -38,16 +39,20 @@ public class SimulatorHandler
         UIController uiController,
         SimulationController simController, 
         VisualTreeAsset explorerEntryTemplate,
-        VisualTreeAsset createSaveTemplate
+        VisualTreeAsset optionsPopupTemplate,
+        VisualTreeAsset savePopupTemplate
     ) {
         this.ui = ui;
         this.uiController = uiController;
         this.simController = simController;
         this.explorerEntryTemplate = explorerEntryTemplate;
-        this.createSaveTemplate = createSaveTemplate;
+        this.optionsPopupTemplate = optionsPopupTemplate;
+        this.savePopupTemplate = savePopupTemplate;
 
         ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = simController.simulation.settings.Name;
-        ui.Q<Button>("SaveSimulation").clicked += OnSaveSimulationClicked;
+        ui.Q<Button>("Options").clicked += OnOptionsClicked;
+        ui.Q<Button>("Save").clicked += OnSaveClicked;
+        ui.Q<Button>("SaveAs").clicked += OnSaveAsClicked;
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
@@ -75,7 +80,9 @@ public class SimulatorHandler
         ui.Q<Button>("ToggleLabels").clicked += OnToggleLabelsClicked;
 
         ui.Q<Button>("TogglePlay").clicked += OnTogglePlayClicked;
-        simController.IsRunning = true;
+    
+        ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
+            = Resources.Load<Texture2D>($"Icons/Toolbox/Options/{(simController.IsRunning ? "Paused" : "Playing")}");
 
         ui.Q<Button>("ToggleFlow").clicked += OnToggleFlowClicked;
         simController.IsRewinding = false;
@@ -209,8 +216,30 @@ public class SimulatorHandler
         ui.Q<Label>("Title").text = title;
     }
 
-    // saves the simulation on click
-    private void OnSaveSimulationClicked()
+    // displays the simulation's options on click
+    public void OnOptionsClicked()
+    {
+        Debug.Log("[showing options]");
+    }
+
+    // on click - saves the simulation directly, or prompts for "Save As"
+    //   if the simulation is being saved for the first time
+    private void OnSaveClicked()
+    {
+        Simulation simulation = simController.simulation;
+
+        if (DataHandler.UpdateSimulationSave(simulation.id, simulation))
+        {
+            Debug.Log("[successful save notification process]");
+        }
+        else
+        {
+            CreateSavePopup();
+        }
+    }
+
+    // prompts to save the simulation as a new copy on click
+    private void OnSaveAsClicked()
     {
         CreateSavePopup();
     }
@@ -716,16 +745,31 @@ public class SimulatorHandler
     #endregion Properties
 
 
-    #region Creating Saves
+    #region Options Popup
 
+    public void CreateOptionsPopup()
+    {
+
+    }
+
+    #endregion Options Popup
+
+    
+
+    #region Save As Popup
+
+    // creates a prompt to save the simulation as a new copy
     public void CreateSavePopup()
     {
-        if (ui.Q<VisualElement>("CreateSave") != null) return;
+        if (ui.Q<VisualElement>("SavePopup") != null) return;
 
-        simController.FullDisable();
+        if (simController.IsRunning)
+        {
+            OnTogglePlayClicked();
+        }
 
-        VisualElement popup = UIController.CloneInterface(createSaveTemplate);
-        popup.name = "CreateSave";
+        VisualElement popup = UIController.CloneInterface(savePopupTemplate);
+        popup.name = "SavePopup";
         ui.Add(popup);
 
         Settings settings = simController.simulation.settings;
@@ -830,8 +874,8 @@ public class SimulatorHandler
 
     public void DestroySavePopup()
     {
-        ui.Q<VisualElement>("CreateSave").RemoveFromHierarchy();
+        ui.Q<VisualElement>("SavePopup").RemoveFromHierarchy();
     }
 
-    #endregion
+    #endregion Save As Popup
 }

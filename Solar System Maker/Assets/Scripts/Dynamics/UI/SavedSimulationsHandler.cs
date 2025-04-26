@@ -59,7 +59,6 @@ public class SavedSimulationsHandler
     private void OnDeleteClicked()
     {
         DeleteSave(selectedSave);
-        RemoveSaveEntry(selectedEntry);
     }
 
     // returns to the "Main Menu" interface on click
@@ -113,6 +112,7 @@ public class SavedSimulationsHandler
         {
             selectedEntry = entry;
             selectedEntry.Q<Button>().AddToClassList("selectedEntry");
+            Debug.Log("selected");
         }
         else
         {
@@ -140,7 +140,7 @@ public class SavedSimulationsHandler
         Label description = saveViewer.Q<Label>("Description");
         Label noSelectedSave = saveViewer.Q<Label>("NoSelectedSave");
 
-        if (selectedEntry != null) 
+        if (save != null) 
         {
             string simName = save.settings.Name;
             title.text = simName;
@@ -168,16 +168,11 @@ public class SavedSimulationsHandler
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(save);
         simController.FullEnable();
+        simController.IsRunning = false;
 
         uiController.ShowSimulator();
 
         CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
-    }
-
-    // deletes the given save entry
-    public void RemoveSaveEntry(VisualElement entry)
-    {
-        ui.Q<ScrollView>("List").Remove(entry);
     }
 
     // deletes the given save using its ID
