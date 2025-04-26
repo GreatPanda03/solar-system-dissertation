@@ -11,6 +11,31 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.10.1
+**Date:** 2025/04/26
+<br/>**Additions / Changes:**
+* **1)** "Label" body tool is now functional - individual body labels can toggled
+* **2)** Adjusted star brightness *(visually more luminous)*
+
+---
+
+### Version: 1.10.0
+**Date:** 2025/04/26
+<br/>**Bug Fixes:**
+* **1)** Fixed visual bug where play button change to paused state when opening options *(no visual change now)*
+
+**Additions / Changes:**
+* **1)** Added "Help" button to simulator toolbar *(currently visual only, will display controls, etc.)*
+* **2)** Added a toolbar for body tools to manage the current selected body:
+    * **a)** **Properties:** toggles the properties window containing the body's details
+    * **b)** **Trajectory:** toggle the path the body has taken through space *(currenlty visual only)*
+    * **c)** **Label:** toggle the body's label *(currently visual only)*
+    * **d)** **Anchor:** toggle whether the body is affected by gravity *(currently visual only)*
+    * **e)** **Delete:** remove the body from the system
+* **3)** Adjusted icons for label buttons
+
+---
+
 ### Version: 1.9.4
 **Date:** 2025/04/26
 <br/>**Bug Fixes:**
