@@ -3,11 +3,20 @@
 This changelog covers a list of features and fixes which have been made for the application.
 
 Versions are in the form **X.Y.Z**: 
-*X* represents a significant changes which covers a range of unique functionalities; 
-*Y* represents single / related feature changes;
-and *Z* represents fixes or build-ups to the same feature as a gradual release.
+*X* represents a significant version covering a range of unique functionalities; 
+*Y* represents single feature or set of related additions;
+and *Z* represents fixes, or build-ups to the same feature as a gradual release.
 
 All dates are in the form **YYYY/MM/DD**.
+
+---
+
+### Version: 1.10.3
+**Date:** 2025/04/26
+<br/>**Additions / Changes:**
+* **1)** New class to generalise and hold simulator controls *(for possible customisation in the future)*
+* **2)** "Help" button is now functional - displays how to use the simulator and its controls
+* **3)** "Save As" and "Options" popups can be toggled with the buttons themselves
 
 ---
 
