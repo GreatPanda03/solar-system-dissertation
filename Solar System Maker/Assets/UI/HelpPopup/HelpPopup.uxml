@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/OptionsPopup/OptionsPopupStyles.uss?fileID=7433441132597879392&amp;guid=2f3e8d53c4164944abcf95248b56c3fa&amp;type=3#OptionsPopupStyles" />
+    <Style src="project://database/Assets/UI/HelpPopup/HelpPopupStyles.uss?fileID=7433441132597879392&amp;guid=2f3e8d53c4164944abcf95248b56c3fa&amp;type=3#HelpPopupStyles" />
     <ui:VisualElement name="Outer" style="flex-grow: 1; height: 447px;">
         <ui:VisualElement name="Container" style="flex-grow: 1; height: 325px; max-height: 325px; min-height: 325px;">
             <ui:VisualElement name="Header" style="flex-grow: 1;">
@@ -8,7 +8,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="Content" style="flex-grow: 1;">
                 <ui:Label text="The simulator can be used to create a system with bodies, like stars and planets." name="Information" />
-                <ui:Label text="The simulator can be used to create a system with bodies, like stars and planets." name="Controls" />
+                <ui:Label text="[controls]" name="Controls" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Tooltip/TooltipStyles.uss?fileID=7433441132597879392&amp;guid=5f14cf4abaf132f4a972a230f5d8cad0&amp;type=3#TooltipStyles" />
+    <ui:VisualElement name="Tooltip">
+        <ui:Label text="Label" name="Text" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class UIController : MonoBehaviour
@@ -20,6 +19,7 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset optionsPopupTemplate;
     public VisualTreeAsset savePopupTemplate;
     public VisualTreeAsset helpPopupTemplate;
+    public VisualTreeAsset tooltipTemplate;
     public VisualElement root; // main screen holder
 
     private static bool mousePressedLast = false;
@@ -75,7 +75,8 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(mainMenuUI);
         root.Add(screen);
         new MainMenuHandler(screen, this);
-        PrepareFieldFocus(root);
+        
+        PrepareScreen(root);
     }
 
     // shows a new instance of the "New Simulations" interface
@@ -85,7 +86,8 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(newSimulationUI);
         root.Add(screen);
         new NewSimulationHandler(screen, this);
-        PrepareFieldFocus(root);
+        
+        PrepareScreen(root);
     }
 
     // shows a new instance of the "Saved Simulations" interface
@@ -95,7 +97,8 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(savedSimulationsUI);
         root.Add(screen);
         new SavedSimulationsHandler(screen, this, saveEntryTemplate);
-        PrepareFieldFocus(root);
+        
+        PrepareScreen(root);
     }
 
     // shows a new instance of the "Template Simulations" interface
@@ -105,7 +108,8 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(templateSimulationsUI);
         root.Add(screen);
         new TemplateSimulationsHandler(screen, this);
-        PrepareFieldFocus(root);
+        
+        PrepareScreen(root);
     }
 
     // shows a new instance of the "Tutorial" interface
@@ -115,7 +119,8 @@ public class UIController : MonoBehaviour
         VisualElement screen = CloneInterface(tutorialUI);
         root.Add(screen);
         new TutorialHandler(screen, this);
-        PrepareFieldFocus(root);
+        
+        PrepareScreen(root);
     }
 
     // shows a new instance of the "Simulator" interface
@@ -133,10 +138,22 @@ public class UIController : MonoBehaviour
             savePopupTemplate,
             helpPopupTemplate);
 
-        PrepareFieldFocus(root);
+        PrepareScreen(screen);
     }
 
     #endregion Screen Methods
+
+    
+    #region General Methods
+
+    // prepares general element functionality for the given screen
+    public void PrepareScreen(VisualElement screen)
+    {
+        PrepareFieldFocus(screen);
+        PrepareButtonTooltips(screen);
+    }
+
+    #endregion General Methods
 
 
     #region Field Focus
@@ -176,7 +193,48 @@ public class UIController : MonoBehaviour
     #endregion Field Focus
 
 
-    #region General Methods
+    #region Button Tooltips
+
+    // for all buttons in the given visual, when a button is hovered over,
+    //   any tooltip assigned to it is displayed over the button
+    public void PrepareButtonTooltips(VisualElement parent)
+    {
+        float offset = 0;
+
+        List<VisualElement> allElements = parent.Query<VisualElement>().ToList();
+
+        foreach (VisualElement element in allElements)
+        {
+            if (element is Button button)
+            {
+                if (button.tooltip != "")
+                {
+                    VisualElement tooltip = null;
+
+                    button.RegisterCallback<MouseEnterEvent>((e) => {
+                        if (tooltip == null)
+                        {
+                            tooltip = CloneInterface(tooltipTemplate);
+                            tooltip.Q<Label>("Text").text = button.tooltip;
+                            tooltip.style.left = Input.mousePosition.x - offset;
+                            tooltip.style.bottom = Input.mousePosition.y - offset;
+                            parent.Add(tooltip);
+                        }
+                    });
+
+                    button.RegisterCallback<MouseLeaveEvent>((e) => {
+                        tooltip?.RemoveFromHierarchy();
+                        tooltip = null;
+                    });
+                }
+            }
+        }
+    }
+
+    #endregion Button Tooltips
+
+
+    #region Mouse Checks
 
     // returns True if the mouse has any UI selected (for button clicks)
     public bool IsMouseOverUI()
@@ -241,5 +299,5 @@ public class UIController : MonoBehaviour
         */
     }
 
-    #endregion General Methods
+    #endregion Mouse Checks
 }

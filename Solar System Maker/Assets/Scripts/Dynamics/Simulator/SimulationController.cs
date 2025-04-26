@@ -234,6 +234,9 @@ public class SimulationController : MonoBehaviour
     {
         if (!isActive) return;
 
+        // keep track of whether to clear trails
+        float initialScale = renderer.Scale;
+
         // run keyboard / mouse controls
         if (IsInteractable)
         {
@@ -262,6 +265,17 @@ public class SimulationController : MonoBehaviour
                     renderer.RenderLabel(body);
             }
         }
+
+        // TEMPORARY: re-render trails if scale was changed
+        if (renderer.Scale != initialScale)
+        {
+            Debug.Log("changed!");
+            if (showTrails) // clear trails to remove streaks
+            {
+                foreach (Body body in simulation.bodies)
+                    body.Entity.GetComponent<TrailRenderer>().Clear();
+            }
+        }
     }
 
     // runs basic controls / keybinds
@@ -285,12 +299,6 @@ public class SimulationController : MonoBehaviour
             Camera.main.transform.position = spacePosition * (float) newScale;
 
             OnScaleChanged?.Invoke(newScale);
-
-            if (showTrails)
-            {
-                foreach (Body body in simulation.bodies)
-                    body.Entity.GetComponent<TrailRenderer>().Clear();
-            }
         }
 
         // when "WASD" pressed - switch back to simulator mode from follow mode
