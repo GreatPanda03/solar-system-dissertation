@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 
@@ -23,6 +24,7 @@ public class SimulatorHandler
     public VisualTreeAsset explorerEntryTemplate;
     public VisualTreeAsset optionsPopupTemplate;
     public VisualTreeAsset savePopupTemplate;
+    public VisualTreeAsset helpPopupTemplate;
     
     private string selectedBodyItem;
     private VisualElement focusedField;
@@ -40,7 +42,8 @@ public class SimulatorHandler
         SimulationController simController, 
         VisualTreeAsset explorerEntryTemplate,
         VisualTreeAsset optionsPopupTemplate,
-        VisualTreeAsset savePopupTemplate
+        VisualTreeAsset savePopupTemplate,
+        VisualTreeAsset helpPopupTemplate
     ) {
         this.ui = ui;
         this.uiController = uiController;
@@ -48,11 +51,13 @@ public class SimulatorHandler
         this.explorerEntryTemplate = explorerEntryTemplate;
         this.optionsPopupTemplate = optionsPopupTemplate;
         this.savePopupTemplate = savePopupTemplate;
+        this.helpPopupTemplate = helpPopupTemplate;
 
         ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = simController.simulation.settings.Name;
         ui.Q<Button>("Options").clicked += OnOptionsClicked;
         ui.Q<Button>("Save").clicked += OnSaveClicked;
         ui.Q<Button>("SaveAs").clicked += OnSaveAsClicked;
+        ui.Q<Button>("Help").clicked += OnHelpClicked;
         ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
 
         ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
@@ -136,20 +141,20 @@ public class SimulatorHandler
             if (UIController.FocusedField != null) return;
 
             // toggling explorer visibility on "Tab" pressed
-            if (e.keyCode == KeyCode.Tab)
+            if (e.keyCode == AppControls.keybinds["Explorer"])
             {
                 bool visible = ui.Q<VisualElement>("Explorer").style.display == DisplayStyle.Flex;
                 SetExplorerVisible(!visible);
             } 
 
             // deselecting the current body on "E" pressed
-            else if (e.keyCode == KeyCode.E)
+            else if (e.keyCode == AppControls.keybinds["Deselect Preview"])
             {
                 DeselectBodyItem();
             }
 
             // toggling properties visibility on "P" pressed
-            else if (e.keyCode == KeyCode.P)
+            else if (e.keyCode == AppControls.keybinds["Properties"])
             {
                 if (simController.SelectedBody != null)
                 {
@@ -230,7 +235,16 @@ public class SimulatorHandler
     // displays the simulation's options on click
     public void OnOptionsClicked()
     {
-        CreateOptionsPopup();
+        VisualElement optionsPopup = ui.Q<VisualElement>("OptionsPopup");
+
+        if (optionsPopup == null)
+        {
+            CreateOptionsPopup();
+        }
+        else
+        {
+            optionsPopup.RemoveFromHierarchy();
+        }
     }
 
     // on click - saves the simulation directly, or prompts for "Save As"
@@ -252,7 +266,16 @@ public class SimulatorHandler
     // prompts to save the simulation as a new copy on click
     private void OnSaveAsClicked()
     {
-        CreateSavePopup();
+        VisualElement savePopup = ui.Q<VisualElement>("SavePopup");
+
+        if (savePopup == null)
+        {
+            CreateSavePopup();
+        }
+        else
+        {
+            savePopup.RemoveFromHierarchy();
+        }
     }
 
     // returns to the "Main Menu" interface
@@ -467,6 +490,53 @@ public class SimulatorHandler
     // NB: a distance is ALWAYS selected - there can never be none
 
     #endregion Distance Selection
+
+
+    #region Help Popup
+    
+    // toggles the visibility of the help popup on click
+    public void OnHelpClicked()
+    {
+        if (ui.Q<VisualElement>("HelpPopup") == null)
+        {
+            DisplayHelpPopup();
+        }
+        else
+        {
+            CloseHelpPopup();
+        }
+    }
+
+    // shows a help popup with the current controls
+    public void DisplayHelpPopup()
+    {
+        VisualElement existingPopup = ui.Q<VisualElement>("HelpPopup");
+        if (existingPopup != null) return;
+        
+        VisualElement popup = UIController.CloneInterface(helpPopupTemplate);
+        popup.name = "HelpPopup";
+
+        // load text based on current controls
+        string finalText = "";
+
+        foreach(KeyValuePair<string, KeyCode> pair in AppControls.keybinds)
+            finalText += $"<b>{pair.Key}</b>   -   {pair.Value}<br>";
+
+        popup.Q<Label>("Controls").text = finalText;
+
+        ui.Add(popup);
+    }
+
+    // closes the existing help popup
+    public void CloseHelpPopup()
+    {
+        VisualElement existingPopup = ui.Q<VisualElement>("HelpPopup");
+        if (existingPopup == null) return;
+        
+        existingPopup.RemoveFromHierarchy();
+    }
+
+    #endregion Help Popup`
 
 
     #region Scaling Methods

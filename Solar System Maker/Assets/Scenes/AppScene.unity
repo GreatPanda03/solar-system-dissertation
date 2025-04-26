@@ -758,6 +758,7 @@ MonoBehaviour:
   explorerEntryTemplate: {fileID: 9197481963319205126, guid: 23251c35d6365954d8d7882e2ea2bc42, type: 3}
   optionsPopupTemplate: {fileID: 9197481963319205126, guid: a66a80150dc13994eb199ec4b659690a, type: 3}
   savePopupTemplate: {fileID: 9197481963319205126, guid: e32458bc23189494a8194d217742d05b, type: 3}
+  helpPopupTemplate: {fileID: 9197481963319205126, guid: 050c2e896f1d3d542aaaab314305e881, type: 3}
 --- !u!1 &1776561390
 GameObject:
   m_ObjectHideFlags: 0

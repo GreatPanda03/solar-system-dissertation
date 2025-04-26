@@ -19,6 +19,7 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset explorerEntryTemplate;
     public VisualTreeAsset optionsPopupTemplate;
     public VisualTreeAsset savePopupTemplate;
+    public VisualTreeAsset helpPopupTemplate;
     public VisualElement root; // main screen holder
 
     private static bool mousePressedLast = false;
@@ -129,7 +130,8 @@ public class UIController : MonoBehaviour
             GameObject.Find("Simulator").GetComponent<SimulationController>(), 
             explorerEntryTemplate,
             optionsPopupTemplate,
-            savePopupTemplate);
+            savePopupTemplate,
+            helpPopupTemplate);
 
         PrepareFieldFocus(root);
     }

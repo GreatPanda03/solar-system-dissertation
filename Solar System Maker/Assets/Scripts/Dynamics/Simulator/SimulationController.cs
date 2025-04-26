@@ -281,7 +281,7 @@ public class SimulationController : MonoBehaviour
         }
 
         // when "F" pressed - toggle following for the selected body (if any)
-        if (Input.GetKeyDown(KeyCode.F) && UIController.FocusedField == null)
+        if (Input.GetKeyDown(AppControls.keybinds["Follow"]) && UIController.FocusedField == null)
         {
             if (CameraController.GetCameraMode() == CameraController.CameraMode.Simulator)
             {
@@ -299,7 +299,7 @@ public class SimulationController : MonoBehaviour
         }
 
         // when "V" pressed - set an appropriate scale to view the subject (if in follow mode)
-        if (Input.GetKeyDown(KeyCode.V) && UIController.FocusedField == null)
+        if (Input.GetKeyDown(AppControls.keybinds["Adjust Scale"]) && UIController.FocusedField == null)
         {
             if (CameraController.GetCameraMode() == CameraController.CameraMode.Following)
             {
@@ -515,7 +515,7 @@ public class SimulationController : MonoBehaviour
     // places an instance of the selected body down (if any)
     private void RunPreviewPlacement()
     {
-        if (Input.GetKeyDown(KeyCode.Q) && UIController.FocusedField == null)
+        if (Input.GetKeyDown(AppControls.keybinds["Place Body"]) && UIController.FocusedField == null)
         {
             Body body = bodyPreview.GetCopy(); // incl. Position & Velocity
             body.CreateEntity();

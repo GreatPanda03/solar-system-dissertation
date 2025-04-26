@@ -134,11 +134,11 @@ public class CameraController : MonoBehaviour
 
         Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(AppControls.keybinds["Move Slower"]))
         {
             currentSpeed = slowRate;
         }
-        else if (Input.GetKey(KeyCode.LeftShift))
+        else if (Input.GetKey(AppControls.keybinds["Move Faster"]))
         {
             currentSpeed = fastRate;
         }
