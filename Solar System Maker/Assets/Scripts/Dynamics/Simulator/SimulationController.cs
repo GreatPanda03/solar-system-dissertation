@@ -167,6 +167,8 @@ public class SimulationController : MonoBehaviour
     // removes the given body from the simulation
     public void RemoveBody(Body body)
     {
+        if (body == null) return;
+
         if (selectedBody == body)
         {
             DeselectBody();

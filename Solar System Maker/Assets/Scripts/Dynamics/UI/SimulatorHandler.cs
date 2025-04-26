@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 
@@ -87,6 +88,9 @@ public class SimulatorHandler
         ui.Q<Button>("ToggleFlow").clicked += OnToggleFlowClicked;
         simController.IsRewinding = false;
 
+        InitialiseBodyTools();
+        SetBodyToolsVisible(false);
+
         InitialisePropertyFields();
         ui.Q<Button>("Close").clicked += OnPropertiesCloseClicked;
         SetPropertiesVisible(false);
@@ -148,8 +152,11 @@ public class SimulatorHandler
             // toggling properties visibility on "P" pressed
             else if (e.keyCode == KeyCode.P)
             {
-                bool visible = ui.Q<VisualElement>("Properties").style.display == DisplayStyle.Flex;
-                SetPropertiesVisible(!visible);
+                if (simController.SelectedBody != null)
+                {
+                    bool visible = ui.Q<VisualElement>("PropertiesPanel").style.display == DisplayStyle.Flex;
+                    SetPropertiesVisible(!visible);
+                }
             }
 
         }, TrickleDown.TrickleDown);
@@ -186,11 +193,14 @@ public class SimulatorHandler
 
     public void OnBodySelected(Body selectedBody)
     {
+        SetBodyToolsVisible(true);
         SetPropertiesVisible(true);
     }
 
     public void OnBodyDeselected(Body deselectedBody)
     {
+        SetBodyToolsVisible(false);
+        SetPropertiesVisible(false);
         UpdateProperties(null);
     }
 
@@ -201,7 +211,7 @@ public class SimulatorHandler
 
     public void OnPhysicsUpdate()
     {
-        if (ui.Q<VisualElement>("Properties").style.display == DisplayStyle.Flex)
+        if (ui.Q<VisualElement>("PropertiesPanel").style.display == DisplayStyle.Flex)
         {
             UpdateProperties(simController.SelectedBody);
         }
@@ -335,143 +345,6 @@ public class SimulatorHandler
     }
 
     #endregion Toolbox Functions
-
-
-    #region Explorer
-
-    // sets whether the explorer is visible or not
-    public void SetExplorerVisible(bool visible)
-    {
-        ui.Q<VisualElement>("Explorer").style.display
-            = visible ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    // enables bodies to be searched for by name
-    public void InitialiseExplorerSearchBar()
-    {
-        VisualElement search = ui.Q<VisualElement>("Explorer")
-            .Q<VisualElement>("Search");
-
-        TextField input = search.Q<TextField>("Input");
-
-        input.RegisterCallback<KeyDownEvent>((e) =>
-        {
-            if (e.keyCode == KeyCode.Return)
-            {
-                ApplyExplorerFilters();
-            }
-        }, TrickleDown.TrickleDown);
-
-        input.RegisterValueChangedCallback((e) => 
-        {
-            ApplyExplorerFilters();
-        });
-    }
-
-    // filters all explorer entries by the current explorer filters
-    public void ApplyExplorerFilters()
-    {
-        VisualElement list = ui.Q<VisualElement>("Explorer").Q<VisualElement>("List");
-        VisualElement container = list.Q<VisualElement>("unity-content-container");
-
-        string searchQuery = GetExplorerSearchQuery().ToLower();
-
-        foreach (VisualElement entry in container.Children())
-        {
-            string name = entry.Q<Label>("Name").text.ToLower();
-
-            if (searchQuery == "" || name.Contains(searchQuery))
-            {
-                entry.style.display = DisplayStyle.Flex;
-            }
-            else
-            {
-                entry.style.display = DisplayStyle.None;
-            }
-        }
-    }
-
-    // auxiliary: returns the current search query
-    public string GetExplorerSearchQuery()
-    {
-        VisualElement search = ui.Q<VisualElement>("Explorer").Q<VisualElement>("Search");
-        return search.Q<TextField>("Input").value;
-    }
-
-    // creates a new entry in the explorer for the given body
-    public void RefreshExplorer()
-    {
-        ClearExplorer();
-
-        List<Body> bodies = simController.GetBodies();
-
-        if (bodies.Count > 0)
-        {
-            ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
-
-            foreach (Body body in simController.GetBodies())
-            {
-                CreateExplorerEntry(body);
-            }
-
-            ApplyExplorerFilters();
-        }
-        else
-        {
-            ui.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
-        }
-    }
-
-    // clears the explorer
-    public void ClearExplorer()
-    {
-        VisualElement explorer = ui.Q<VisualElement>("Explorer");
-        explorer.Q<ScrollView>("List").Clear();
-        explorer.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
-    }
-
-    // creates an entry for the given body
-    public VisualElement CreateExplorerEntry(Body body)
-    {
-        VisualElement explorerEntry = explorerEntryTemplate.Instantiate();
-
-        explorerEntry.Q<Label>("Type").text = body.Type;
-        explorerEntry.Q<Label>("Name").text = body.Name;
-        explorerEntry.Q<Button>("Delete").visible = false;
-
-        ui.Q<ScrollView>("List").Add(explorerEntry);
-
-        explorerEntry.RegisterCallback<ClickEvent>(e =>
-        {
-            simController.SelectBody(body);
-            CameraController.SetSubject(body);
-            CameraController.SetCameraMode(CameraController.CameraMode.Following);
-        });
-
-        explorerEntry.RegisterCallback<MouseEnterEvent>(e =>
-        {
-            explorerEntry.Q<Button>("Delete").visible = true;
-        });
-
-        explorerEntry.RegisterCallback<MouseLeaveEvent>(e =>
-        {
-            explorerEntry.Q<Button>("Delete").visible = false;
-        });
-
-        explorerEntry.Q<Button>("Delete").clicked += () => 
-        {
-            simController.RemoveBody(body);
-        };
-
-        return explorerEntry;
-    }
-
-    public void OnExplorerCloseClicked()
-    {
-        SetExplorerVisible(false);
-    }
-
-    #endregion Explorer
 
 
     #region Preview Selection
@@ -612,12 +485,184 @@ public class SimulatorHandler
     #endregion Scaling Methods
 
 
+    
+    #region Explorer
+
+    // sets whether the explorer is visible or not
+    public void SetExplorerVisible(bool visible)
+    {
+        ui.Q<VisualElement>("Explorer").style.display
+            = visible ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    // enables bodies to be searched for by name
+    public void InitialiseExplorerSearchBar()
+    {
+        VisualElement search = ui.Q<VisualElement>("Explorer")
+            .Q<VisualElement>("Search");
+
+        TextField input = search.Q<TextField>("Input");
+
+        input.RegisterCallback<KeyDownEvent>((e) =>
+        {
+            if (e.keyCode == KeyCode.Return)
+            {
+                ApplyExplorerFilters();
+            }
+        }, TrickleDown.TrickleDown);
+
+        input.RegisterValueChangedCallback((e) => 
+        {
+            ApplyExplorerFilters();
+        });
+    }
+
+    // filters all explorer entries by the current explorer filters
+    public void ApplyExplorerFilters()
+    {
+        VisualElement list = ui.Q<VisualElement>("Explorer").Q<VisualElement>("List");
+        VisualElement container = list.Q<VisualElement>("unity-content-container");
+
+        string searchQuery = GetExplorerSearchQuery().ToLower();
+
+        foreach (VisualElement entry in container.Children())
+        {
+            string name = entry.Q<Label>("Name").text.ToLower();
+
+            if (searchQuery == "" || name.Contains(searchQuery))
+            {
+                entry.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                entry.style.display = DisplayStyle.None;
+            }
+        }
+    }
+
+    // auxiliary: returns the current search query
+    public string GetExplorerSearchQuery()
+    {
+        VisualElement search = ui.Q<VisualElement>("Explorer").Q<VisualElement>("Search");
+        return search.Q<TextField>("Input").value;
+    }
+
+    // creates a new entry in the explorer for the given body
+    public void RefreshExplorer()
+    {
+        ClearExplorer();
+
+        List<Body> bodies = simController.GetBodies();
+
+        if (bodies.Count > 0)
+        {
+            ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
+
+            foreach (Body body in simController.GetBodies())
+            {
+                CreateExplorerEntry(body);
+            }
+
+            ApplyExplorerFilters();
+        }
+        else
+        {
+            ui.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
+        }
+    }
+
+    // clears the explorer
+    public void ClearExplorer()
+    {
+        VisualElement explorer = ui.Q<VisualElement>("Explorer");
+        explorer.Q<ScrollView>("List").Clear();
+        explorer.Q<Label>("NoBodies").style.display = DisplayStyle.Flex;
+    }
+
+    // creates an entry for the given body
+    public VisualElement CreateExplorerEntry(Body body)
+    {
+        VisualElement explorerEntry = explorerEntryTemplate.Instantiate();
+
+        explorerEntry.Q<Label>("Type").text = body.Type;
+        explorerEntry.Q<Label>("Name").text = body.Name;
+        explorerEntry.Q<Button>("Delete").visible = false;
+
+        ui.Q<ScrollView>("List").Add(explorerEntry);
+
+        explorerEntry.RegisterCallback<ClickEvent>(e =>
+        {
+            simController.SelectBody(body);
+            CameraController.SetSubject(body);
+            CameraController.SetCameraMode(CameraController.CameraMode.Following);
+        });
+
+        explorerEntry.RegisterCallback<MouseEnterEvent>(e =>
+        {
+            explorerEntry.Q<Button>("Delete").visible = true;
+        });
+
+        explorerEntry.RegisterCallback<MouseLeaveEvent>(e =>
+        {
+            explorerEntry.Q<Button>("Delete").visible = false;
+        });
+
+        explorerEntry.Q<Button>("Delete").clicked += () => 
+        {
+            simController.RemoveBody(body);
+        };
+
+        return explorerEntry;
+    }
+
+    public void OnExplorerCloseClicked()
+    {
+        SetExplorerVisible(false);
+    }
+
+    #endregion Explorer
+
+
+    #region Body Tools
+
+    // shows / hides the body tools panel
+    public void SetBodyToolsVisible(bool visible)
+    {
+        ui.Q<VisualElement>("BodyTools").style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    // prepares each button in the body tools panel
+    public void InitialiseBodyTools()
+    {
+        VisualElement bodyTools = ui.Q<VisualElement>("BodyTools");
+
+        // toggle the body's properties on click
+        bodyTools.Q<Button>("Properties").clicked += () => {
+            bool visible = ui.Q<VisualElement>("PropertiesPanel").style.display == DisplayStyle.Flex;
+            SetPropertiesVisible(!visible);
+        };
+
+        // TODO: toggles the body's trajectory on click
+
+        // TODO: toggles the body's label on click
+
+        // TODO: toggles the body's anchor on click
+
+        // deletes the body on click
+        bodyTools.Q<Button>("Delete").clicked += () => {
+            simController.RemoveBody(simController.SelectedBody);
+        };
+    }
+
+    #endregion Body Tools
+
+
     #region Properties
     
     // changes the selected body's properties when any property field is changed
     private void InitialisePropertyFields()
     {
-        VisualElement properties = ui.Q<VisualElement>("Properties");
+        VisualElement properties = ui.Q<VisualElement>("PropertiesPanel");
         VisualElement groups = properties.Q<VisualElement>("Groups");
 
         foreach (VisualElement group in groups.Children())
@@ -679,14 +724,14 @@ public class SimulatorHandler
     // sets the visiblity of the properties window
     public void SetPropertiesVisible(bool visible)
     {
-        ui.Q<VisualElement>("Properties").style.display 
+        ui.Q<VisualElement>("PropertiesPanel").style.display 
             = visible ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     // shows the properties window with the given body's details
     public void UpdateProperties(Body body)
     {
-        VisualElement properties = ui.Q<VisualElement>("Properties");
+        VisualElement properties = ui.Q<VisualElement>("PropertiesPanel");
         VisualElement groups = properties.Q<VisualElement>("Groups");
 
         if (body == null)
@@ -796,9 +841,6 @@ public class SimulatorHandler
         popup.Q<Button>("Close").clicked += () => {
             popup.RemoveFromHierarchy();
         };
-
-        ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Playing");
     }
 
     // validates the option panel's details
