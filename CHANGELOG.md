@@ -11,6 +11,18 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.10.5
+**Date:** 2025/04/26
+<br/>**Bug Fixes:** No additional fixes
+* **1)** Fixed small trail streaks when adjusting scale
+* **Note:** large streaks are left when adjusting the scale - trails are a WIP
+
+**Additions / Changes:**
+* **1)** Icon buttons now show tooltips for what they are when hovered over
+* **Note:** some tooltips appear offscreen and cause popups to shift - tooltips are a WIP
+
+---
+
 ### Version: 1.10.4
 **Date:** 2025/04/26
 <br/>**Bug Fixes:**
