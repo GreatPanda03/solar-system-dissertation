@@ -3,11 +3,18 @@
 This changelog covers a list of features and fixes which have been made for the application.
 
 Versions are in the form **X.Y.Z**: 
-*X* represents a significant feature which covers a range of functionality; 
-*Y* represents single / small feature changes;
+*X* represents a significant changes which covers a range of unique functionalities; 
+*Y* represents single / related feature changes;
 and *Z* represents fixes or build-ups to the same feature as a gradual release.
 
 All dates are in the form **YYYY/MM/DD**.
+
+---
+
+### Version: 1.10.2
+**Date:** 2025/04/26
+<br/>**Additions / Changes:**
+* **1)** "Anchor" body tool is now functional - bodies can be made unaffected by gravity and locked in place
 
 ---
 
