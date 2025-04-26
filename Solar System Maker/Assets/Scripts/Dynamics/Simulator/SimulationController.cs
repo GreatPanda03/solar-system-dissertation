@@ -65,14 +65,21 @@ public class SimulationController : MonoBehaviour
         set {
             showLabels = value;
 
-            foreach (Body body in simulation.bodies)
+            if (showLabels)
             {
-                body.SetLabelVisibility(showLabels);
-            }
+                foreach (Body body in simulation.bodies)
+                    body.SetLabelVisibility(body.ShowLabel);
 
-            if (bodyPreview != null && bodyPreview.Label != null)
+                if (bodyPreview?.Label != null)
+                    bodyPreview.SetLabelVisibility(true);
+            }
+            else
             {
-                bodyPreview.SetLabelVisibility(showLabels);
+                foreach (Body body in simulation.bodies)
+                    body.SetLabelVisibility(false);
+
+                if (bodyPreview?.Label != null)
+                    bodyPreview.SetLabelVisibility(false);
             }
         }
     }
@@ -232,7 +239,8 @@ public class SimulationController : MonoBehaviour
         {
             foreach(Body body in simulation.bodies)
             {
-                renderer.RenderLabel(body);
+                if (body.ShowLabel)
+                    renderer.RenderLabel(body);
             }
         }
     }

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 
@@ -628,7 +627,25 @@ public class SimulatorHandler
     // shows / hides the body tools panel
     public void SetBodyToolsVisible(bool visible)
     {
-        ui.Q<VisualElement>("BodyTools").style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        VisualElement bodyTools = ui.Q<VisualElement>("BodyTools");
+        bodyTools.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+
+        // updating body tool button visuals accordingly
+        if (visible)
+        {
+            /*
+            bodyTools.Q<Button>("Path").Q<VisualElement>("Disabled")
+                .style.display = simController.SelectedBody.Path ? DisplayStyle.None : DisplayStyle.Flex;
+            */
+
+            bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled")
+                .style.display = simController.SelectedBody.ShowLabel ? DisplayStyle.None : DisplayStyle.Flex;
+
+            /*
+            bodyTools.Q<Button>("Anchored").Q<VisualElement>("Disabled")
+                .style.display = simController.SelectedBody.Anchored ? DisplayStyle.None : DisplayStyle.Flex;
+            */
+        }
     }
 
     // prepares each button in the body tools panel
@@ -644,7 +661,20 @@ public class SimulatorHandler
 
         // TODO: toggles the body's trajectory on click
 
-        // TODO: toggles the body's label on click
+        bodyTools.Q<Button>("Label").clicked += () => {
+            if (simController.SelectedBody != null)
+            {
+                bool visible = !simController.SelectedBody.ShowLabel;
+                simController.SelectedBody.ShowLabel = visible;
+
+                // keep the label hidden if all labels are hidden
+                if (!simController.ShowLabels)
+                    simController.SelectedBody.SetLabelVisibility(false);
+
+                bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled").style.display
+                    = visible ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+        };
 
         // TODO: toggles the body's anchor on click
 

@@ -57,6 +57,16 @@ public class Body
         }
     }
 
+    protected bool showLabel = true;
+    [JsonIgnore] // only for simulation
+    public bool ShowLabel {
+        get => showLabel;
+        set {
+            showLabel = value;
+            SetLabelVisibility(value);
+        }
+    }
+
     protected float mass;
     public float Mass {
         get => mass;
