@@ -67,6 +67,21 @@ public class Body
         }
     }
 
+    protected bool anchored = false;
+    [JsonIgnore] // only for simulation
+    public bool Anchored {
+        get => anchored;
+        set {
+            anchored = value;
+
+            if (anchored)
+            {
+                acceleration = Vector3.zero;
+                velocity = Vector3.zero;
+            }
+        }
+    }
+
     protected float mass;
     public float Mass {
         get => mass;

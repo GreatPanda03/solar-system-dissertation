@@ -641,10 +641,8 @@ public class SimulatorHandler
             bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled")
                 .style.display = simController.SelectedBody.ShowLabel ? DisplayStyle.None : DisplayStyle.Flex;
 
-            /*
             bodyTools.Q<Button>("Anchored").Q<VisualElement>("Disabled")
                 .style.display = simController.SelectedBody.Anchored ? DisplayStyle.None : DisplayStyle.Flex;
-            */
         }
     }
 
@@ -659,24 +657,31 @@ public class SimulatorHandler
             SetPropertiesVisible(!visible);
         };
 
-        // TODO: toggles the body's trajectory on click
-
+        // toggles the body's trajectory on click
         bodyTools.Q<Button>("Label").clicked += () => {
-            if (simController.SelectedBody != null)
-            {
-                bool visible = !simController.SelectedBody.ShowLabel;
-                simController.SelectedBody.ShowLabel = visible;
+            if (simController.SelectedBody == null) return;
+            
+            bool visible = !simController.SelectedBody.ShowLabel;
+            simController.SelectedBody.ShowLabel = visible;
 
-                // keep the label hidden if all labels are hidden
-                if (!simController.ShowLabels)
-                    simController.SelectedBody.SetLabelVisibility(false);
+            // keep the label hidden if all labels are hidden
+            if (!simController.ShowLabels)
+                simController.SelectedBody.SetLabelVisibility(false);
 
-                bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled").style.display
-                    = visible ? DisplayStyle.None : DisplayStyle.Flex;
-            }
+            bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled").style.display
+                = visible ? DisplayStyle.None : DisplayStyle.Flex;
         };
 
-        // TODO: toggles the body's anchor on click
+        // toggles the body's anchor on click (affected by gravity or not)
+        bodyTools.Q<Button>("Anchored").clicked += () => {
+            if (simController.SelectedBody == null) return;
+
+            bool anchored = !simController.SelectedBody.Anchored;
+            simController.SelectedBody.Anchored = anchored;
+
+            bodyTools.Q<Button>("Anchored").Q<VisualElement>("Disabled").style.display
+                = anchored ? DisplayStyle.None : DisplayStyle.Flex;
+        };
 
         // deletes the body on click
         bodyTools.Q<Button>("Delete").clicked += () => {

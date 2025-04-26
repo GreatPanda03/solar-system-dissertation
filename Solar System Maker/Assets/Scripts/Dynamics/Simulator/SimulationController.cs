@@ -389,11 +389,11 @@ public class SimulationController : MonoBehaviour
                 Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
                     simulation.settings.GravitationalConstant);
 
-                bodyA.ApplyForce(force);
+                if (!bodyA.Anchored) bodyA.ApplyForce(force);
                 bodyB.ApplyForce(-force);
             }
 
-            bodyA.Update();
+            if (!bodyA.Anchored) bodyA.Update();
 
             renderer.ApplyScale(bodyA);
         }
