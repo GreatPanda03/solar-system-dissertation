@@ -11,6 +11,21 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.10.4
+**Date:** 2025/04/26
+<br/>**Bug Fixes:**
+* **1)** Fixed "Options" popup styles *(used same stylesheet as "Help" popup)*
+
+**Additions / Changes:**
+* **1)** Added trails to bodies to show where they've passed in space
+* **2)** Renamed "Trajectory" to "Trail" *(makes more sense since it's the path behind)*
+* **3)** Swapped label and trail buttons in body tools to be consistent with toolbox order
+* **4)** "Trail" *("Trajectory")* body tool is now functional - all / individual body trails can be toggled
+* **5)** Added global trail button in toolbox to toggle all trails
+* **Note:** for now, trails are completely cleared when scaling or toggling trails *(trail texture "jumps" in both cases)* - this is a WIP
+
+---
+
 ### Version: 1.10.3
 **Date:** 2025/04/26
 <br/>**Additions / Changes:**
