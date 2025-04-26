@@ -67,6 +67,16 @@ public class Body
         }
     }
 
+    protected bool showTrail = true;
+    [JsonIgnore] // only for simulation
+    public bool ShowTrail {
+        get => showTrail;
+        set {
+            showTrail = value;
+            SetTrailVisibility(value);
+        }
+    }
+
     protected bool anchored = false;
     [JsonIgnore] // only for simulation
     public bool Anchored {
@@ -256,10 +266,17 @@ public class Body
         label.transform.SetParent(GameObject.Find("Overlay").transform, false);
     }
 
-    // toggles the visibility of the body's label
-    public void SetLabelVisibility(bool state)
+    // sets the visibility of the body's label
+    public void SetLabelVisibility(bool visible)
     {
-        label.GetComponent<TextMeshProUGUI>().enabled = state;
+        label.GetComponent<TextMeshProUGUI>().enabled = visible;
+    }
+
+    // sets the visibility of the body's trail
+    public void SetTrailVisibility(bool visible)
+    {
+        entity.GetComponent<TrailRenderer>().enabled = visible;
+        if (!visible) entity.GetComponent<TrailRenderer>().Clear();
     }
 
     // destroys the entity's physical components

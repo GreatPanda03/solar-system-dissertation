@@ -93,10 +93,10 @@ public class RenderingHandler
     #endregion Label Methods
 
 
-    #region Path Methods
+    #region Path Drawing
 
-    // supplies the given body's entity with a streak for rendering use
-    public void GiveStreak(Body body)
+    // supplies the given body's entity with a line renderer for use
+    public void GiveLineRenderer(Body body)
     {
         if (body.Entity == null) return;
 
@@ -104,15 +104,13 @@ public class RenderingHandler
         pathDrawer.material = new Material(Shader.Find("Sprites/Default"));
         pathDrawer.widthMultiplier = 0.2f;
 
-        // line that fades out
-        Gradient gradient = new Gradient();
-        gradient.SetKeys(
+        Gradient gradient = new();
+
+        gradient.SetKeys( // line that fades out
             new GradientColorKey[] {new(Color.white, 0), new(Color.white, 1)},
             new GradientAlphaKey[] {new(1, 0), new(0, 1)});
-        pathDrawer.colorGradient = gradient;
 
-        Material m = body.Entity.GetComponent<MeshRenderer>().material;
-        m.color = new Color(m.color.r, m.color.g, m.color.b, 0.25f);   
+        pathDrawer.colorGradient = gradient;
     }
 
     // draws a trajectory for the given body based on the given vector
@@ -162,5 +160,29 @@ public class RenderingHandler
         pathDrawer.SetPositions(points);
     }
 
-    #endregion Path Methods
+    #endregion Path Drawing
+
+
+    #region Trail Drawing
+
+    // supplies the given body with a trail renderer to show where it has passed
+    public void GiveTrailRenderer(Body body)
+    {
+        if (body.Entity == null) return;
+
+        TrailRenderer trailDrawer = body.Entity.AddComponent<TrailRenderer>();
+        trailDrawer.material = new Material(Shader.Find("Sprites/Default"));
+        trailDrawer.widthMultiplier = 0.2f;
+
+        Gradient gradient = new();
+        
+        gradient.SetKeys( // trail that fades out
+            new GradientColorKey[] {new(Color.white, 0), new(Color.white, 1)},
+            new GradientAlphaKey[] {new(1, 0), new(0, 1)});
+
+        trailDrawer.colorGradient = gradient;
+        trailDrawer.time = 60;
+    }
+
+    #endregion Trail Drawing
 }

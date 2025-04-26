@@ -22,12 +22,13 @@
         <ui:Button name="Properties" tooltip="Explorer" class="toolboxButton" style="width: 30px; height: 30px; margin-left: 0; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255);">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Properties&apos;);" />
         </ui:Button>
-        <ui:Button name="Trajectory" tooltip="Bodies" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Trajectory&apos;);" />
-        </ui:Button>
         <ui:Button name="Label" tooltip="Toggle Simulation Run" class="toolboxButton">
             <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Label&apos;);" />
+        </ui:Button>
+        <ui:Button name="Trail" tooltip="Bodies" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Trail&apos;);" />
+            <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
         </ui:Button>
         <ui:Button name="Anchored" tooltip="Placement Modes" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Anchored&apos;);" />
@@ -92,6 +93,10 @@
         <ui:Button name="ToggleLabels" tooltip="Toggle Simulation Run" class="toolboxButton">
             <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/Labels&apos;);" />
+        </ui:Button>
+        <ui:Button name="ToggleTrails" tooltip="Toggle Simulation Run" class="toolboxButton">
+            <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/Trails&apos;);" />
         </ui:Button>
         <ui:Button name="TogglePlay" tooltip="Toggle Simulation Run" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Paused&apos;);" />

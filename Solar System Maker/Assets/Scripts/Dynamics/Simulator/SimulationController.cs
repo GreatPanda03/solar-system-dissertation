@@ -84,6 +84,25 @@ public class SimulationController : MonoBehaviour
         }
     }
 
+    private bool showTrails = true;
+    public bool ShowTrails {
+        get => showTrails;
+        set {
+            showTrails = value;
+            
+            if (showTrails)
+            {
+                foreach (Body body in simulation.bodies)
+                    body.SetTrailVisibility(body.ShowTrail);
+            }
+            else
+            {
+                foreach (Body body in simulation.bodies)
+                    body.SetTrailVisibility(false);
+            }
+        }
+    }
+
     private bool isRunning = false;
     public bool IsRunning {
         get => isRunning;
@@ -266,6 +285,12 @@ public class SimulationController : MonoBehaviour
             Camera.main.transform.position = spacePosition * (float) newScale;
 
             OnScaleChanged?.Invoke(newScale);
+
+            if (showTrails)
+            {
+                foreach (Body body in simulation.bodies)
+                    body.Entity.GetComponent<TrailRenderer>().Clear();
+            }
         }
 
         // when "WASD" pressed - switch back to simulator mode from follow mode
@@ -423,7 +448,10 @@ public class SimulationController : MonoBehaviour
         bodyPreview.Name = "New " + type.ToString();
         bodyPreview.Entity.transform.parent = simulatorSpace.transform;
 
-        renderer.GiveStreak(bodyPreview);
+        renderer.GiveLineRenderer(bodyPreview);
+
+        Material m = bodyPreview.Entity.GetComponent<MeshRenderer>().material;
+        m.color = new Color(m.color.r, m.color.g, m.color.b, 0.25f);
     }
 
     // removes the current body preview
@@ -522,6 +550,8 @@ public class SimulationController : MonoBehaviour
             body.Name = body.Type;
             AddBody(body);
             renderer.ApplyScale(body);
+
+            renderer.GiveTrailRenderer(body);
 
             if (showLabels) renderer.RenderLabel(body);
         }

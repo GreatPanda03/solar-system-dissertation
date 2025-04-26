@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/OptionsPopup/OptionsPopupStyles.uss?fileID=7433441132597879392&amp;guid=2f3e8d53c4164944abcf95248b56c3fa&amp;type=3#OptionsPopupStyles" />
+    <Style src="project://database/Assets/UI/OptionsPopup/OptionsPopupStyles.uss?fileID=7433441132597879392&amp;guid=b17c8becfdc4d254089afa31f8a12ddf&amp;type=3#OptionsPopupStyles" />
     <ui:VisualElement name="Outer" style="flex-grow: 1; height: 447px;">
         <ui:VisualElement name="Container" style="flex-grow: 1; height: 325px; max-height: 325px; min-height: 325px;">
             <ui:VisualElement name="Header" style="flex-grow: 1;">

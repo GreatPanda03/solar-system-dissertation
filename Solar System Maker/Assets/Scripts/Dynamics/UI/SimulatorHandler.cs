@@ -84,6 +84,8 @@ public class SimulatorHandler
 
         ui.Q<Button>("ToggleLabels").clicked += OnToggleLabelsClicked;
 
+        ui.Q<Button>("ToggleTrails").clicked += OnToggleTrailsClicked;
+
         ui.Q<Button>("TogglePlay").clicked += OnTogglePlayClicked;
     
         ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
@@ -330,6 +332,14 @@ public class SimulatorHandler
         disabledIcon.style.display = simController.ShowLabels ? DisplayStyle.None : DisplayStyle.Flex;
 
         // TODO: render body labels individually
+    }
+
+    private void OnToggleTrailsClicked()
+    {
+        simController.ShowTrails = !simController.ShowTrails;
+
+        VisualElement disabledIcon = ui.Q<Button>("ToggleTrails").Q<VisualElement>("Disabled");
+        disabledIcon.style.display = simController.ShowTrails ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     public void OnTogglePlayClicked()
@@ -703,10 +713,8 @@ public class SimulatorHandler
         // updating body tool button visuals accordingly
         if (visible)
         {
-            /*
-            bodyTools.Q<Button>("Path").Q<VisualElement>("Disabled")
-                .style.display = simController.SelectedBody.Path ? DisplayStyle.None : DisplayStyle.Flex;
-            */
+            bodyTools.Q<Button>("Trail").Q<VisualElement>("Disabled")
+                .style.display = simController.SelectedBody.ShowTrail ? DisplayStyle.None : DisplayStyle.Flex;
 
             bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled")
                 .style.display = simController.SelectedBody.ShowLabel ? DisplayStyle.None : DisplayStyle.Flex;
@@ -727,7 +735,22 @@ public class SimulatorHandler
             SetPropertiesVisible(!visible);
         };
 
-        // toggles the body's trajectory on click
+        // toggles the body's trail path on click
+        bodyTools.Q<Button>("Trail").clicked += () => {
+            if (simController.SelectedBody == null) return;
+            
+            bool visible = !simController.SelectedBody.ShowTrail;
+            simController.SelectedBody.ShowTrail = visible;
+
+            // keep the trail hidden if all labels are hidden
+            if (!simController.ShowTrails)
+                simController.SelectedBody.SetTrailVisibility(false);
+
+            bodyTools.Q<Button>("Trail").Q<VisualElement>("Disabled").style.display
+                = visible ? DisplayStyle.None : DisplayStyle.Flex;
+        };
+
+        // toggles the body's label on click
         bodyTools.Q<Button>("Label").clicked += () => {
             if (simController.SelectedBody == null) return;
             
