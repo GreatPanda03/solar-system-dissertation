@@ -11,6 +11,18 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.9.4
+**Date:** 2025/04/26
+<br/>**Bug Fixes:**
+* **1)** Fixed movement controls not being disabled when typing in fields *(misassigned event)*
+* **2)** Fixed properties window briefly showing fields when opened for the first time with no selection
+
+**Additions / Changes:**
+* **1)** Restored speed field to properties window *(read only)*
+* **2)** Simulator keybind operations are no longer when typing in fields
+
+---
+
 ### Version: 1.9.3
 **Date:** 2025/04/26
 <br/>**Additions / Changes:**
