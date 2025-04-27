@@ -11,6 +11,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.11.3
+**Date:** 2025/04/27
+<br/>**Additions / Changes:**
+* **1)** "Template Simulations" is now functional - template systems can be viewed and opened
+* **2)** Corrected Template Simulations screen alignment *(centralised)*
+* **3)** Adjusted styling of saving-related UIs to be consistent *(styles were from former versions)*
+
+---
+
 ### Version: 1.11.2
 **Date:** 2025/04/27
 <br/>**Bug Fixes:**
