@@ -11,6 +11,26 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.11.2
+**Date:** 2025/04/27
+<br/>**Bug Fixes:**
+* **1)** Amended "Template" body item functionality *(was considered an actual body type)*
+
+**Additions / Changes:**
+* **1)** New body templates panel to view and select saved body templates in a simulation
+* **2)** "Template" body button is now functional - template bodies can be selected and managed
+* **3)** Renamed instances of "Body Templates Popup" to "Save Body Popup" (and similar occurrences) to distinguish from new "Body Templates" popup
+
+---
+
+### Version: 1.11.1
+**Date:** 2025/04/27
+<br/>**Additions / Changes:**
+* **1)** Reorganised popup code *(made popups independent of simulator UI)*
+* **2)** New "Template" button added to body list *(currently visual only)*
+
+---
+
 ### Version: 1.11.0
 **Date:** 2025/04/27
 <br/>**Bug Fixes:**
@@ -33,7 +53,7 @@ All dates are in the form **YYYY/MM/DD**.
 
 ### Version: 1.10.6
 **Date:** 2025/04/27
-<br/>**Bug Fixes:* no additional fixes
+<br/>**Bug Fixes:** no additional fixes
 * **Note:** small and large trail streaks are still left when scaling - bug NOT fixed
 
 **Additions / Changes:**
