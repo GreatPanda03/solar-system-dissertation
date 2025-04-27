@@ -243,7 +243,7 @@ public class SimulatorHandler
 
         if (optionsPopup == null)
         {
-            CreateOptionsPopup();
+            uiController.ShowOptionsPopup(ui, simController);
         }
         else
         {
@@ -263,7 +263,10 @@ public class SimulatorHandler
         }
         else
         {
-            CreateSavePopup();
+            if (simController.IsRunning)
+                OnTogglePlayClicked(); // pause
+
+            uiController.ShowSaveSimulationPopup(ui, simController.simulation);
         }
     }
 
@@ -274,7 +277,7 @@ public class SimulatorHandler
 
         if (savePopup == null)
         {
-            CreateSavePopup();
+            uiController.ShowSaveSimulationPopup(ui, simController.simulation);
         }
         else
         {
@@ -797,11 +800,18 @@ public class SimulatorHandler
 
         // opens a prompt to save the selected body as a template
         bodyTools.Q<Button>("Template").clicked += () => {
-            CreateBodyTemplatePopup();
+            if (simController.SelectedBody == null) return;
+
+            if (simController.IsRunning)
+                OnTogglePlayClicked(); // pause
+
+            uiController.ShowBodyTemplatePopup(ui, simController.SelectedBody);
         };
 
         // deletes the body on click
         bodyTools.Q<Button>("Delete").clicked += () => {
+            if (simController.SelectedBody == null) return;
+
             simController.RemoveBody(simController.SelectedBody);
         };
     }
@@ -947,282 +957,4 @@ public class SimulatorHandler
     }
 
     #endregion Properties
-
-
-    #region Options Popup
-
-    // creates a panel of simulation options which can be edited
-    public void CreateOptionsPopup()
-    {
-        if (ui.Q<VisualElement>("OptionsPopup") != null) return;
-
-        VisualElement popup = UIController.CloneInterface(optionsPopup);
-        popup.name = "OptionsPopup";
-        ui.Add(popup);
-
-        UIController.PrepareFieldFocus(popup);
-
-        Settings settings = simController.simulation.settings;
-        popup.Q<TextField>("Name").value = settings.Name;
-        popup.Q<TextField>("Description").value = settings.Description;
-        popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
-        popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
-
-        popup.Q<Button>("Reset").clicked += () => {
-            Settings settings = simController.simulation.settings;
-            popup.Q<TextField>("Name").value = settings.Name;
-            popup.Q<TextField>("Description").value = settings.Description;
-            popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
-            popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
-        };
-
-        popup.Q<Button>("Save").clicked += () => {
-            if (!ValidateOptionsDetails(popup)) return;
-
-            popup.RemoveFromHierarchy();
-
-            Settings settings = GetOptionsDetailsAsSettings(popup);
-            simController.simulation.settings = settings;
-
-            string quality = popup.Q<DropdownField>("CollisionQuality").value;
-            simController.physics.SetCollisionQuality(quality);
-
-            ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = settings.Name;
-        }; 
-
-        popup.Q<Button>("Close").clicked += () => {
-            popup.RemoveFromHierarchy();
-        };
-    }
-
-    // validates the option panel's details
-    public bool ValidateOptionsDetails(VisualElement popup)
-    {
-        var name = popup.Q<TextField>("Name");
-
-        if (name.value == "")
-        {
-            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
-            return false;
-        }
-
-        // description can be blank
-        
-        var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
-
-        if (gravitationalConstant.value == float.NaN || gravitationalConstant.value == 0)
-        {
-            DisplayValidation(popup, "<b>'G'</b> must be greater than 0!");
-            return false;
-        }
-
-        var collisionQuality = popup.Q<DropdownField>("CollisionQuality");
-
-        if (collisionQuality.value == "")
-        {
-            DisplayValidation(popup, "<b>'Collisions'</b> cannot be blank!");
-        }
-
-        return true;
-    }
-        
-    // gathers the settings-related options data
-    public Settings GetOptionsDetailsAsSettings(VisualElement popup)
-    {
-        var name = popup.Q<TextField>("Name");
-        var description = popup.Q<TextField>("Description");
-        var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
-
-        return new()
-        {
-            Name = name.value,
-            Description = description.value,
-            GravitationalConstant = gravitationalConstant.value
-        };
-    }
-
-    #endregion Options Popup
-
-
-    #region Save As Popup
-
-    // creates a prompt to save the simulation as a new copy
-    public void CreateSavePopup()
-    {
-        if (ui.Q<VisualElement>("SavePopup") != null) return;
-
-        if (simController.IsRunning)
-        {
-            OnTogglePlayClicked();
-        }
-
-        VisualElement popup = UIController.CloneInterface(savePopup);
-        popup.name = "SavePopup";
-        ui.Add(popup);
-
-        UIController.PrepareFieldFocus(popup);
-
-        Settings settings = simController.simulation.settings;
-        popup.Q<TextField>("Name").value = settings.Name;
-        popup.Q<TextField>("Description").value = settings.Description;
-        popup.Q<TextField>("GravitationalConstant").value = settings.GravitationalConstant.ToString();
-
-        popup.Q<Button>("SaveSimulation").clicked += () => {
-            if (!ValidateSaveDetails(popup)) return;
-
-            popup.RemoveFromHierarchy();
-
-            Settings settings = GetSaveDetailsAsSettings(popup);
-
-            List<Body> bodyCopies = new();
-            foreach (Body body in simController.simulation.bodies)
-                bodyCopies.Add(body.GetCopy());
-
-            Simulation newSave = DataHandler.GetNextSimulationSaveSlot();
-            newSave.settings = settings;
-            newSave.bodies = bodyCopies;
-
-            DataHandler.SimulationSaves.Add(newSave);
-            simController.simulation.id = newSave.id;
-
-            ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = newSave.settings.Name;
-        }; 
-
-        popup.Q<Button>("SaveTemplate").clicked += () => {
-            if (!ValidateSaveDetails(popup)) return;
-
-            popup.RemoveFromHierarchy();
-
-            Settings settings = GetSaveDetailsAsSettings(popup);
-
-            List<Body> bodyCopies = new();
-            foreach (Body body in simController.simulation.bodies)
-                bodyCopies.Add(body.GetCopy());
-
-            Simulation newSave = DataHandler.GetNextSimulationTemplateSlot();
-            newSave.settings = settings;
-            newSave.bodies = bodyCopies;
-
-            DataHandler.SimulationTemplates.Add(newSave);
-        };
-
-        popup.Q<Button>("Close").clicked += () => {
-            popup.RemoveFromHierarchy();
-        };
-
-        // pause simulation
-        simController.IsRunning = false;
-
-        ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Playing");
-    }
-
-    // validates the save's details
-    public bool ValidateSaveDetails(VisualElement popup)
-    {
-        var name = popup.Q<TextField>("Name");
-
-        if (name.value == "")
-        {
-            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
-            return false;
-        }
-
-        // description can be blank
-        
-        var gravitationalConstant = popup.Q<TextField>("GravitationalConstant");
-
-        if (gravitationalConstant.value == "")
-        {
-            DisplayValidation(popup, "<b>'G'</b> must be greater than 0!");
-            return false;
-        }
-
-        return true;
-    }
-        
-    // gathers the save's details
-    public Settings GetSaveDetailsAsSettings(VisualElement popup)
-    {
-        var name = popup.Q<TextField>("Name");
-        var description = popup.Q<TextField>("Description");
-        // var gravitationalConstant = popup.Q<TextField>("GravitationalConstant");
-
-        return new()
-        {
-            Name = name.value,
-            Description = description.value,
-            GravitationalConstant = simController.simulation.settings.GravitationalConstant
-        };
-    }
-
-    #endregion Save As Popup
-
-
-    #region Body Template Popup
-
-    // creates a prompt to save the selected body as a template
-    public void CreateBodyTemplatePopup()
-    {
-        if (ui.Q<VisualElement>("BodyTemplatePopup") != null) return;
-
-        if (simController.IsRunning)
-        {
-            OnTogglePlayClicked();
-        }
-
-        VisualElement popup = UIController.CloneInterface(bodyTemplatePopup);
-        popup.name = "BodyTemplatePopup";
-        ui.Add(popup);
-
-        popup.Q<TextField>("Name").value = simController.SelectedBody.Name;
-
-        UIController.PrepareFieldFocus(popup);
-
-        popup.Q<Button>("Save").clicked += () => {
-            if (!ValidateBodyTemplateDetails(popup)) return;
-
-            popup.RemoveFromHierarchy();
-
-            BodyTemplate newSave = DataHandler.GetNextBodyTemplateSlot();
-            newSave.Name = popup.Q<TextField>("Name").value;
-            newSave.Description = popup.Q<TextField>("Description").value;
-            newSave.Body = simController.SelectedBody;
-
-            DataHandler.BodyTemplates.Add(newSave);
-        }; 
-
-        popup.Q<Button>("Close").clicked += () => {
-            popup.RemoveFromHierarchy();
-        };
-    }
-
-    // validates the body template's details
-    public bool ValidateBodyTemplateDetails(VisualElement popup)
-    {
-        var name = popup.Q<TextField>("Name");
-
-        if (name.value == "")
-        {
-            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
-            return false;
-        }
-
-        // description can be blank
-
-        return true;
-    }
-
-    #endregion Body Template Popup
-
-
-    #region General Popup
-
-    // displays the given message as the given popup's validation message
-    public void DisplayValidation(VisualElement popup, string message)
-    {
-        popup.Q<Label>("Validation").text = message;
-    }
-
-    #endregion General Popup
 }

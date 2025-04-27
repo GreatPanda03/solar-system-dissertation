@@ -123,6 +123,7 @@
             <ui:Button text="Star" name="Star" tooltip="Star" class="bodyButton toolboxButton" style="width: 45px;" />
             <ui:Button text="Planet" name="Planet" tooltip="Planet" class="bodyButton toolboxButton" style="width: 55px;" />
             <ui:Button text="Moon" name="Moon" enable-rich-text="true" tooltip="Moon" class="bodyButton toolboxButton" style="width: 50px;" />
+            <ui:Button text="Templates&#10;" name="Templates" enable-rich-text="true" tooltip="Templates" class="bodyButton toolboxButton" style="width: 80px;" />
         </ui:VisualElement>
         <ui:VisualElement name="ModeList" class="toolboxList">
             <ui:Label text="Mode" name="ModeLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />

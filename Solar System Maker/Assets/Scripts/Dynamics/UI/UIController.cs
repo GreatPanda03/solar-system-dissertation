@@ -18,7 +18,7 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset explorerEntry;
     public VisualTreeAsset bodyTemplatePopup;
     public VisualTreeAsset optionsPopup;
-    public VisualTreeAsset savePopup;
+    public VisualTreeAsset saveSimulationPopup;
     public VisualTreeAsset helpPopup;
     public VisualTreeAsset tooltip;
     public VisualElement root; // main screen holder
@@ -136,7 +136,7 @@ public class UIController : MonoBehaviour
             GameObject.Find("Simulator").GetComponent<SimulationController>(), 
             explorerEntry,
             optionsPopup,
-            savePopup,
+            saveSimulationPopup,
             bodyTemplatePopup,
             helpPopup);
 
@@ -144,6 +144,32 @@ public class UIController : MonoBehaviour
     }
 
     #endregion Screen Methods
+
+
+    #region Popup Methods
+
+    // shows a new instance of an "Options" popup for the given screen and simulation instance
+    public void ShowOptionsPopup(VisualElement screen, SimulationController simController)
+    {
+        VisualElement popup = CloneInterface(optionsPopup);
+        new OptionsPopupHandler(popup, this, screen, simController);
+    }
+
+    // shows a new instance of a "Save Simulation" popup for the given screen and simulation
+    public void ShowSaveSimulationPopup(VisualElement screen, Simulation simulation)
+    {
+        VisualElement popup = CloneInterface(saveSimulationPopup);
+        new SaveSimulationPopupHandler(popup, this, screen, simulation);
+    }
+
+    // shows a new instance of a "Body Template" popup for the given screen and body instance
+    public void ShowBodyTemplatePopup(VisualElement screen, Body body)
+    {
+        VisualElement popup = CloneInterface(bodyTemplatePopup);
+        new BodyTemplatePopupHandler(popup, this, screen, body);
+    }
+
+    #endregion Popup Methods
 
     
     #region General Methods
