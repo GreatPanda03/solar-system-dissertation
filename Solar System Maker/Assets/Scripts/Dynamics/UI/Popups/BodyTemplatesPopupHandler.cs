@@ -44,8 +44,6 @@ public class BodyTemplatesPopupHandler
         popup.name = "BodyTemplates";
         parent.Add(popup);
 
-        Debug.Log("Body Templates popup showing");
-
         ScrollView list = popup.Q<ScrollView>("List");
         list.contentContainer.style.flexDirection = FlexDirection.Row;
         list.contentContainer.style.flexWrap = Wrap.Wrap;

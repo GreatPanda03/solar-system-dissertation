@@ -53,7 +53,7 @@ public class MainMenuHandler
         // clear simulation when main menu is left
         foreach (VisualElement element in ui.Q<VisualElement>("Container").Children())
         {
-            if (element is Button button)
+            if (element is Button button && element.name != "Tutorial") // tutorial button is a WIP
             {
                 button.clicked += () => {
                     simController.DisableSimulator();

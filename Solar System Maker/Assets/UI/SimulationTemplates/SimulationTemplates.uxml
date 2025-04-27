@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/SimulationTemplates/SimulationTemplatesStyles.uss?fileID=7433441132597879392&amp;guid=f9649f2b36510a74bbf6f5431ba84ab5&amp;type=3#SimulationTemplatesStyles" />
+    <ui:VisualElement name="Outer" style="flex-grow: 1; height: 447px;">
+        <ui:VisualElement name="Container" style="flex-grow: 1; align-self: center;">
+            <ui:VisualElement name="Header" style="flex-grow: 1;">
+                <ui:Label text="Template Simulations" name="Title" />
+                <ui:Button text="Close" name="Close" />
+            </ui:VisualElement>
+            <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1;" />
+            <ui:VisualElement name="Content" style="align-content: center; align-items: stretch; justify-content: center; flex-basis: 85%;">
+                <ui:ScrollView name="List" />
+                <ui:VisualElement name="Divider" class="divider" style="flex-grow: 1; height: auto; max-height: none; min-height: auto; width: 1px; max-width: 1px; min-width: 1px; background-color: rgba(255, 255, 255, 0.39); margin-right: 5px; margin-left: 5px;" />
+                <ui:VisualElement name="Viewer" style="flex-grow: 1;">
+                    <ui:Label text="Select a template from the template list to view its details." name="NoSelection" class="viewerDescription" style="-unity-text-align: upper-center; -unity-font-style: italic;" />
+                    <ui:VisualElement name="Details" style="flex-grow: 1; display: none;">
+                        <ui:Label text="Template TItle" name="Title" class="viewerTitle" style="display: flex; white-space: normal; width: 100%;" />
+                        <ui:Label text="This is some sample text about our solar system!" name="Description" class="viewerDescription" style="height: auto; display: flex;" />
+                        <ui:VisualElement name="Footer" style="flex-grow: 1; flex-basis: 5%; display: flex; max-height: 30px; margin-top: 5px; flex-direction: row; min-height: 30px; height: 30px; align-content: center; justify-content: center;">
+                            <ui:Button text="Load" name="Load" class="loadButton" />
+                            <ui:Button text="Delete" name="Delete" class="deleteButton" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

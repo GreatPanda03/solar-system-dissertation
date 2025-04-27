@@ -109,7 +109,7 @@ public class UIController : MonoBehaviour
         root.Clear();
         VisualElement screen = CloneInterface(templateSimulationsUI);
         root.Add(screen);
-        new TemplateSimulationsHandler(screen, this);
+        new TemplateSimulationsHandler(screen, this, saveEntry);
         
         PrepareScreen(root);
     }

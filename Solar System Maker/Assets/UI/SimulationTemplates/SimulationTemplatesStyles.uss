@@ -1,4 +1,14 @@
-.container {
+#Outer {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    justify-content: center;
+}
+
+#Container {
     background-color: rgba(0, 0, 0, 0.78);
     padding-right: 5px;
     padding-left: 5px;
@@ -12,12 +22,12 @@
     border-bottom-left-radius: 15px;
 }
 
-.header {
-    flex-basis: 10%;
+#Header {
+    flex-basis: 5%;
     justify-content: center;
 }
 
-.closeButton {
+#Close {
     background-color: rgb(255, 88, 88);
     width: 50px;
     min-width: 50px;
@@ -38,16 +48,18 @@
     margin-bottom: 5px;
 }
 
-.title {
+#Title {
     -unity-text-align: middle-center;
     color: rgb(255, 255, 255);
     -unity-font-style: bold;
     align-items: stretch;
     position: relative;
     font-size: 16px;
+    width: 50%;
+    align-self: center;
 }
 
-.content {
+#Content {
     flex-basis: 80%;
     flex-direction: row;
     flex-wrap: wrap;
@@ -59,11 +71,11 @@
     -unity-text-align: middle-left;
 }
 
-.templateList {
-    flex-basis: 70%;
+#List {
+    flex-basis: 65%;
 }
 
-.templateViewer {
+#Viewer {
     flex-basis: 30%;
 }
 
@@ -72,6 +84,7 @@
     font-size: 16px;
     -unity-text-align: middle-center;
     color: rgb(255, 255, 255);
+    width: 50%;
 }
 
 .viewerDescription {
@@ -82,11 +95,11 @@
     -unity-text-align: upper-center;
 }
 
-.loadButton {
-    max-width: 50px;
-    background-color: rgb(56, 173, 73);
+#Load {
+    max-width: none;
+    color: rgb(0, 0, 0);
 }
 
-.footer {
-    align-items: center;
+#Delete {
+    max-width: none;
 }
