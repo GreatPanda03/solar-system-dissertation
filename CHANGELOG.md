@@ -11,6 +11,26 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.11.0
+**Date:** 2025/04/27
+<br/>**Bug Fixes:**
+* **1)** Fixed trails missing for bodies loaded from saved simulations
+* **2)** Fixed trails persisting to main menu sample when leaving a simulation *(included in simulation disable)*
+* **3)** Replaced default save entry description with the save's real description
+* **4)** Fixed issue where using "Save As" wouldn't switch to the new copy of the simulation *(continued to use the old ID)*
+* **5)** Fixed "Help" close button not closing the popup when clicked *(missing functionality)*
+* **6)** Fixed tool bar button tooltips shifting simulator popup windows *(adjusted layout)*
+
+**Additions / Changes:**
+* **1)** Data handling code cleanup *(generalised methods)*
+* **2)** Reorganisation of UI names / styles *(backend)*
+* **3)** Bodies can now be saved as templates
+* **4)** "Save As Template" body tool is now functional - bodies can be saved as templates with a name and description
+* **5)** Clicking a button with a tooltip removes its tooltip *(mainly to stop popup shifting)*
+* **Note:** body templates can be saved but not yet used
+
+---
+
 ### Version: 1.10.6
 **Date:** 2025/04/27
 <br/>**Bug Fixes:* no additional fixes
@@ -18,6 +38,7 @@ All dates are in the form **YYYY/MM/DD**.
 
 **Additions / Changes:**
 * **1)** Added "Focus" and "Scale" as body tool buttons *(same as "F" and "V" respectively)
+* **2)** Added "Save As Template" to body tools *(currently visual only)*
 
 ---
 
