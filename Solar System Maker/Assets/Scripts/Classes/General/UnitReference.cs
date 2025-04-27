@@ -33,6 +33,7 @@ public class UnitReference
         ["Minute"]          = 60,
         ["Hour"]            = 3.6e+3,
         ["Day"]             = 8.64e+4,
+        ["Week"]            = 6.048e+5,
         ["Month"]           = 2.628e+6, // 30.5 days (average)
         ["Year"]            = 3.154e+7
     };

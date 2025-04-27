@@ -374,9 +374,6 @@ public class SimulationController : MonoBehaviour
     public void ApplyPhysics()
     {
         List<Body> bodies = simulation.bodies;
-        
-        float secondsPerSecond = (float) UnitReference.TIME_UNITS[physics.TimePerSecond];
-        float timeCoefficient = secondsPerSecond * Time.deltaTime;
 
         for (int a = 0; a < bodies.Count; a++)
         {
@@ -393,7 +390,7 @@ public class SimulationController : MonoBehaviour
                 bodyB.ApplyForce(-force);
             }
 
-            if (!bodyA.Anchored) bodyA.Update(timeCoefficient);
+            if (!bodyA.Anchored) bodyA.Update(physics.TimeCoefficient);
 
             renderer.ApplyScale(bodyA);
         }

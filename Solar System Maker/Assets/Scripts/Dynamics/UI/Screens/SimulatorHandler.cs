@@ -28,6 +28,7 @@ public class SimulatorHandler
     
     private string selectedBodyItem;
     private VisualElement focusedField;
+    private Vector3 lastVelocity = Vector3.zero; // temporary - only for acceleration field
 
     #endregion Attributes
 
@@ -964,6 +965,8 @@ public class SimulatorHandler
         {
             groups.style.display = DisplayStyle.None;
             properties.Q<Label>("NoSelection").style.display = DisplayStyle.Flex;
+            
+            lastVelocity = Vector3.zero;
         }
         else 
         {
@@ -1004,8 +1007,14 @@ public class SimulatorHandler
             }
 
             // special case fields
-            properties.Q<FloatField>("Speed").value = body.Velocity.magnitude
-                * simController.renderer.Scale;
+            float distanceScale = simController.renderer.Scale;
+            float timeScale = simController.physics.TimeCoefficient / Time.deltaTime;
+            float DTScale = distanceScale * timeScale;
+
+            properties.Q<FloatField>("Speed_custom").value = body.Velocity.magnitude * DTScale;
+            properties.Q<FloatField>("Acceleration_custom").value = (lastVelocity - body.Velocity).magnitude * DTScale;
+
+            lastVelocity = body.Velocity;
 
             properties.Q<Label>("NoSelection").style.display = DisplayStyle.None;
             groups.Q<VisualElement>("Star").style.display = body is Star ? DisplayStyle.Flex : DisplayStyle.None;

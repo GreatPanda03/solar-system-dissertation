@@ -16,7 +16,17 @@ public class PhysicsHandler
     private string timePerSecond;
     public string TimePerSecond {
         get => timePerSecond;
-        set => timePerSecond = value;
+        set {
+            timePerSecond = value;
+            timeCoefficient = Time.deltaTime
+                * (float) UnitReference.TIME_UNITS[timePerSecond];
+        }
+    }
+
+    private float timeCoefficient;
+    public float TimeCoefficient {
+        get => timeCoefficient;
+        set => timeCoefficient = value;
     }
 
     #endregion Attributes
