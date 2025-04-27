@@ -11,6 +11,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.12.1
+**Date:** 2025/04/07
+<br/>**Additions / Changes:**
+* **1)** Added ready-to-use "time coefficient" value to physics renderer
+* **2)** Added acceleration magnitude to properties window
+* **3)** Time-sensitive / scale-sensitive properties now scale with the current time / scale in the properties window
+
+---
+
 ### Version: 1.12.0
 **Date:** 2025/04/27
 <br/>**Additions / Changes:**
