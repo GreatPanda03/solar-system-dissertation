@@ -48,6 +48,7 @@ public class MainMenuHandler
         simController.IsActive = true;
         simController.IsRunning = true;
         simController.ShowLabels = true;
+        simController.ShowTrails = false;
 
         // clear simulation when main menu is left
         foreach (VisualElement element in ui.Q<VisualElement>("Container").Children())

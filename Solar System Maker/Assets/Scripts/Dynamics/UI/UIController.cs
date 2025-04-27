@@ -11,15 +11,16 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset mainMenuUI;
     public VisualTreeAsset newSimulationUI;
     public VisualTreeAsset savedSimulationsUI;
-    public VisualTreeAsset saveEntryTemplate;
+    public VisualTreeAsset saveEntry;
     public VisualTreeAsset templateSimulationsUI;
     public VisualTreeAsset tutorialUI;
     public VisualTreeAsset simulatorUI;
-    public VisualTreeAsset explorerEntryTemplate;
-    public VisualTreeAsset optionsPopupTemplate;
-    public VisualTreeAsset savePopupTemplate;
-    public VisualTreeAsset helpPopupTemplate;
-    public VisualTreeAsset tooltipTemplate;
+    public VisualTreeAsset explorerEntry;
+    public VisualTreeAsset bodyTemplatePopup;
+    public VisualTreeAsset optionsPopup;
+    public VisualTreeAsset savePopup;
+    public VisualTreeAsset helpPopup;
+    public VisualTreeAsset tooltip;
     public VisualElement root; // main screen holder
 
     private static bool mousePressedLast = false;
@@ -96,7 +97,7 @@ public class UIController : MonoBehaviour
         root.Clear();
         VisualElement screen = CloneInterface(savedSimulationsUI);
         root.Add(screen);
-        new SavedSimulationsHandler(screen, this, saveEntryTemplate);
+        new SavedSimulationsHandler(screen, this, saveEntry);
         
         PrepareScreen(root);
     }
@@ -133,10 +134,11 @@ public class UIController : MonoBehaviour
         new SimulatorHandler(screen, 
             this, 
             GameObject.Find("Simulator").GetComponent<SimulationController>(), 
-            explorerEntryTemplate,
-            optionsPopupTemplate,
-            savePopupTemplate,
-            helpPopupTemplate);
+            explorerEntry,
+            optionsPopup,
+            savePopup,
+            bodyTemplatePopup,
+            helpPopup);
 
         PrepareScreen(screen);
     }
@@ -209,23 +211,28 @@ public class UIController : MonoBehaviour
             {
                 if (button.tooltip != "")
                 {
-                    VisualElement tooltip = null;
+                    VisualElement tip = null;
 
                     button.RegisterCallback<MouseEnterEvent>((e) => {
-                        if (tooltip == null)
+                        if (tip == null)
                         {
-                            tooltip = CloneInterface(tooltipTemplate);
-                            tooltip.Q<Label>("Text").text = button.tooltip;
-                            tooltip.style.left = Input.mousePosition.x - offset;
-                            tooltip.style.bottom = Input.mousePosition.y - offset;
-                            parent.Add(tooltip);
+                            tip = CloneInterface(tooltip);
+                            tip.Q<Label>("Text").text = button.tooltip;
+                            tip.style.left = Input.mousePosition.x - offset;
+                            tip.style.bottom = Input.mousePosition.y - offset;
+                            parent.Add(tip);
                         }
                     });
 
                     button.RegisterCallback<MouseLeaveEvent>((e) => {
-                        tooltip?.RemoveFromHierarchy();
-                        tooltip = null;
+                        tip?.RemoveFromHierarchy();
+                        tip = null;
                     });
+
+                    button.clicked += () => {
+                        tip?.RemoveFromHierarchy();
+                        tip = null;
+                    };
                 }
             }
         }

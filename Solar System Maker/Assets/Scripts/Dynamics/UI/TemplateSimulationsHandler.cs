@@ -46,7 +46,7 @@ public class TemplateSimulationsHandler
     // load all template simulations
     public static void LoadTemplateEntries()
     {
-        List<Simulation> templates = DataHandler.TemplateSaves;
+        List<Simulation> templates = DataHandler.SimulationTemplates;
 
         foreach (Simulation template in templates)
         {

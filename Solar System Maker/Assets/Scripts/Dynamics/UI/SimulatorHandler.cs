@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 
@@ -21,10 +20,11 @@ public class SimulatorHandler
     public VisualElement ui;
     public UIController uiController;
     private SimulationController simController;
-    public VisualTreeAsset explorerEntryTemplate;
-    public VisualTreeAsset optionsPopupTemplate;
-    public VisualTreeAsset savePopupTemplate;
-    public VisualTreeAsset helpPopupTemplate;
+    public VisualTreeAsset explorerEntry;
+    public VisualTreeAsset optionsPopup;
+    public VisualTreeAsset savePopup;
+    public VisualTreeAsset bodyTemplatePopup;
+    public VisualTreeAsset helpPopup;
     
     private string selectedBodyItem;
     private VisualElement focusedField;
@@ -40,18 +40,20 @@ public class SimulatorHandler
         VisualElement ui, 
         UIController uiController,
         SimulationController simController, 
-        VisualTreeAsset explorerEntryTemplate,
-        VisualTreeAsset optionsPopupTemplate,
-        VisualTreeAsset savePopupTemplate,
-        VisualTreeAsset helpPopupTemplate
+        VisualTreeAsset explorerEntry,
+        VisualTreeAsset optionsPopup,
+        VisualTreeAsset savePopup,
+        VisualTreeAsset bodyTemplatePopup,
+        VisualTreeAsset helpPopup
     ) {
         this.ui = ui;
         this.uiController = uiController;
         this.simController = simController;
-        this.explorerEntryTemplate = explorerEntryTemplate;
-        this.optionsPopupTemplate = optionsPopupTemplate;
-        this.savePopupTemplate = savePopupTemplate;
-        this.helpPopupTemplate = helpPopupTemplate;
+        this.explorerEntry = explorerEntry;
+        this.optionsPopup = optionsPopup;
+        this.savePopup = savePopup;
+        this.bodyTemplatePopup = bodyTemplatePopup;
+        this.helpPopup = helpPopup;
 
         ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = simController.simulation.settings.Name;
         ui.Q<Button>("Options").clicked += OnOptionsClicked;
@@ -523,7 +525,7 @@ public class SimulatorHandler
         VisualElement existingPopup = ui.Q<VisualElement>("HelpPopup");
         if (existingPopup != null) return;
         
-        VisualElement popup = UIController.CloneInterface(helpPopupTemplate);
+        VisualElement popup = UIController.CloneInterface(helpPopup);
         popup.name = "HelpPopup";
 
         // load text based on current controls
@@ -533,6 +535,10 @@ public class SimulatorHandler
             finalText += $"<b>{pair.Key}</b>   -   {pair.Value}<br>";
 
         popup.Q<Label>("Controls").text = finalText;
+
+        popup.Q<Button>("Close").clicked += () => {
+            popup.RemoveFromHierarchy();
+        };
 
         ui.Add(popup);
     }
@@ -661,37 +667,37 @@ public class SimulatorHandler
     // creates an entry for the given body
     public VisualElement CreateExplorerEntry(Body body)
     {
-        VisualElement explorerEntry = explorerEntryTemplate.Instantiate();
+        VisualElement entry = explorerEntry.Instantiate();
 
-        explorerEntry.Q<Label>("Type").text = body.Type;
-        explorerEntry.Q<Label>("Name").text = body.Name;
-        explorerEntry.Q<Button>("Delete").visible = false;
+        entry.Q<Label>("Type").text = body.Type;
+        entry.Q<Label>("Name").text = body.Name;
+        entry.Q<Button>("Delete").visible = false;
 
-        ui.Q<ScrollView>("List").Add(explorerEntry);
+        ui.Q<ScrollView>("List").Add(entry);
 
-        explorerEntry.RegisterCallback<ClickEvent>(e =>
+        entry.RegisterCallback<ClickEvent>(e =>
         {
             simController.SelectBody(body);
             CameraController.SetSubject(body);
             CameraController.SetCameraMode(CameraController.CameraMode.Following);
         });
 
-        explorerEntry.RegisterCallback<MouseEnterEvent>(e =>
+        entry.RegisterCallback<MouseEnterEvent>(e =>
         {
-            explorerEntry.Q<Button>("Delete").visible = true;
+            entry.Q<Button>("Delete").visible = true;
         });
 
-        explorerEntry.RegisterCallback<MouseLeaveEvent>(e =>
+        entry.RegisterCallback<MouseLeaveEvent>(e =>
         {
-            explorerEntry.Q<Button>("Delete").visible = false;
+            entry.Q<Button>("Delete").visible = false;
         });
 
-        explorerEntry.Q<Button>("Delete").clicked += () => 
+        entry.Q<Button>("Delete").clicked += () => 
         {
             simController.RemoveBody(body);
         };
 
-        return explorerEntry;
+        return entry;
     }
 
     public void OnExplorerCloseClicked()
@@ -787,6 +793,11 @@ public class SimulatorHandler
 
             bodyTools.Q<Button>("Anchored").Q<VisualElement>("Disabled").style.display
                 = anchored ? DisplayStyle.None : DisplayStyle.Flex;
+        };
+
+        // opens a prompt to save the selected body as a template
+        bodyTools.Q<Button>("Template").clicked += () => {
+            CreateBodyTemplatePopup();
         };
 
         // deletes the body on click
@@ -945,7 +956,7 @@ public class SimulatorHandler
     {
         if (ui.Q<VisualElement>("OptionsPopup") != null) return;
 
-        VisualElement popup = UIController.CloneInterface(optionsPopupTemplate);
+        VisualElement popup = UIController.CloneInterface(optionsPopup);
         popup.name = "OptionsPopup";
         ui.Add(popup);
 
@@ -991,7 +1002,7 @@ public class SimulatorHandler
 
         if (name.value == "")
         {
-            DisplayOptionsValidation(popup, "<b>'Name'</b> cannot be blank!");
+            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
             return false;
         }
 
@@ -1001,7 +1012,7 @@ public class SimulatorHandler
 
         if (gravitationalConstant.value == float.NaN || gravitationalConstant.value == 0)
         {
-            DisplayOptionsValidation(popup, "<b>'G'</b> must be greater than 0!");
+            DisplayValidation(popup, "<b>'G'</b> must be greater than 0!");
             return false;
         }
 
@@ -1009,7 +1020,7 @@ public class SimulatorHandler
 
         if (collisionQuality.value == "")
         {
-            DisplayOptionsValidation(popup, "<b>'Collisions'</b> cannot be blank!");
+            DisplayValidation(popup, "<b>'Collisions'</b> cannot be blank!");
         }
 
         return true;
@@ -1030,17 +1041,6 @@ public class SimulatorHandler
         };
     }
 
-    // displays the given message as a validation notification
-    public void DisplayOptionsValidation(VisualElement popup, string message)
-    {
-        popup.Q<Label>("Validation").text = message;
-    }
-
-    public void DestroyOptionsPopup()
-    {
-        ui.Q<VisualElement>("OptionsPopup").RemoveFromHierarchy();
-    }
-
     #endregion Options Popup
 
 
@@ -1056,7 +1056,7 @@ public class SimulatorHandler
             OnTogglePlayClicked();
         }
 
-        VisualElement popup = UIController.CloneInterface(savePopupTemplate);
+        VisualElement popup = UIController.CloneInterface(savePopup);
         popup.name = "SavePopup";
         ui.Add(popup);
 
@@ -1078,11 +1078,12 @@ public class SimulatorHandler
             foreach (Body body in simController.simulation.bodies)
                 bodyCopies.Add(body.GetCopy());
 
-            Simulation newSave = DataHandler.CreateSimulationSave();
+            Simulation newSave = DataHandler.GetNextSimulationSaveSlot();
             newSave.settings = settings;
             newSave.bodies = bodyCopies;
 
-            DataHandler.AddSimulationSave(newSave);
+            DataHandler.SimulationSaves.Add(newSave);
+            simController.simulation.id = newSave.id;
 
             ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = newSave.settings.Name;
         }; 
@@ -1098,11 +1099,11 @@ public class SimulatorHandler
             foreach (Body body in simController.simulation.bodies)
                 bodyCopies.Add(body.GetCopy());
 
-            Simulation newSave = DataHandler.CreateSimulationSave();
+            Simulation newSave = DataHandler.GetNextSimulationTemplateSlot();
             newSave.settings = settings;
             newSave.bodies = bodyCopies;
 
-            Debug.Log("[run template saving process]");
+            DataHandler.SimulationTemplates.Add(newSave);
         };
 
         popup.Q<Button>("Close").clicked += () => {
@@ -1123,7 +1124,7 @@ public class SimulatorHandler
 
         if (name.value == "")
         {
-            DisplaySaveValidation(popup, "<b>'Name'</b> cannot be blank!");
+            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
             return false;
         }
 
@@ -1133,7 +1134,7 @@ public class SimulatorHandler
 
         if (gravitationalConstant.value == "")
         {
-            DisplaySaveValidation(popup, "<b>'G'</b> must be greater than 0!");
+            DisplayValidation(popup, "<b>'G'</b> must be greater than 0!");
             return false;
         }
 
@@ -1155,16 +1156,73 @@ public class SimulatorHandler
         };
     }
 
-    // displays the given message as a validation notification
-    public void DisplaySaveValidation(VisualElement popup, string message)
+    #endregion Save As Popup
+
+
+    #region Body Template Popup
+
+    // creates a prompt to save the selected body as a template
+    public void CreateBodyTemplatePopup()
+    {
+        if (ui.Q<VisualElement>("BodyTemplatePopup") != null) return;
+
+        if (simController.IsRunning)
+        {
+            OnTogglePlayClicked();
+        }
+
+        VisualElement popup = UIController.CloneInterface(bodyTemplatePopup);
+        popup.name = "BodyTemplatePopup";
+        ui.Add(popup);
+
+        popup.Q<TextField>("Name").value = simController.SelectedBody.Name;
+
+        UIController.PrepareFieldFocus(popup);
+
+        popup.Q<Button>("Save").clicked += () => {
+            if (!ValidateBodyTemplateDetails(popup)) return;
+
+            popup.RemoveFromHierarchy();
+
+            BodyTemplate newSave = DataHandler.GetNextBodyTemplateSlot();
+            newSave.Name = popup.Q<TextField>("Name").value;
+            newSave.Description = popup.Q<TextField>("Description").value;
+            newSave.Body = simController.SelectedBody;
+
+            DataHandler.BodyTemplates.Add(newSave);
+        }; 
+
+        popup.Q<Button>("Close").clicked += () => {
+            popup.RemoveFromHierarchy();
+        };
+    }
+
+    // validates the body template's details
+    public bool ValidateBodyTemplateDetails(VisualElement popup)
+    {
+        var name = popup.Q<TextField>("Name");
+
+        if (name.value == "")
+        {
+            DisplayValidation(popup, "<b>'Name'</b> cannot be blank!");
+            return false;
+        }
+
+        // description can be blank
+
+        return true;
+    }
+
+    #endregion Body Template Popup
+
+
+    #region General Popup
+
+    // displays the given message as the given popup's validation message
+    public void DisplayValidation(VisualElement popup, string message)
     {
         popup.Q<Label>("Validation").text = message;
     }
 
-    public void DestroySavePopup()
-    {
-        ui.Q<VisualElement>("SavePopup").RemoveFromHierarchy();
-    }
-
-    #endregion Save As Popup
+    #endregion General Popup
 }

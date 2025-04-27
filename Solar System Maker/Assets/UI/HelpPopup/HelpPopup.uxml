@@ -7,7 +7,7 @@
                 <ui:Label text="Simulator Help" name="Title" class="title" />
             </ui:VisualElement>
             <ui:VisualElement name="Content" style="flex-grow: 1;">
-                <ui:Label text="The simulator can be used to create a system with bodies, like stars and planets." name="Information" />
+                <ui:Label text="The simulator can be used to create a system with bodies, like stars and planets. Below are the list of controls for the simulation." name="Information" />
                 <ui:Label text="[controls]" name="Controls" />
             </ui:VisualElement>
         </ui:VisualElement>

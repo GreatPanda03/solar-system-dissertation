@@ -1,0 +1,163 @@
+#Outer {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    justify-content: center;
+}
+
+#Container {
+    width: 400px;
+    height: 275px;
+    max-height: 275px;
+    max-width: 400px;
+    min-width: 400px;
+    min-height: 275px;
+    background-color: rgba(0, 0, 0, 0.78);
+    align-self: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#Header {
+    width: 100%;
+    flex-direction: row;
+    flex-grow: 1;
+    height: 10%;
+    max-height: 10%;
+    min-height: 10%;
+    margin-bottom: 2.5%;
+    justify-content: center;
+}
+
+#Close {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0);
+    color: rgb(255, 6, 6);
+    -unity-font-style: bold;
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    justify-content: flex-start;
+    -unity-text-align: middle-center;
+    position: absolute;
+    max-width: 10px;
+    max-height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    left: 5px;
+    top: 5px;
+}
+
+#Title {
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+    align-self: center;
+    width: 50%;
+}
+
+#Content {
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+    align-self: center;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+#Information {
+    color: rgb(255, 255, 255);
+    -unity-font-style: normal;
+    -unity-text-align: upper-center;
+    align-self: center;
+    width: 100%;
+    white-space: normal;
+    margin-bottom: 2.5%;
+}
+
+#Fields {
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+    align-self: center;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 100%;
+    min-width: 100%;
+    margin-left: 5%;
+}
+
+#Fields .unity-base-field {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+}
+
+#Fields .unity-base-field__label {
+    -unity-text-align: upper-right;
+    -unity-font-style: normal;
+    flex-grow: 1;
+    width: 30%;
+    max-width: 30%;
+    min-width: 70%;
+    padding-right: 5px;
+}
+
+#Fields .unity-base-field__input {
+    -unity-font-style: normal;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 100%;
+    min-width: 70%;
+    align-self: stretch;
+    color: rgb(111, 111, 111);
+}
+
+#Validation {
+    -unity-font-style: normal;
+    color: rgb(255, 117, 0);
+    -unity-text-align: upper-center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 15px;
+    padding-left: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+}
+
+#Footer {
+    width: 100%;
+    flex-direction: row;
+    flex-grow: 1;
+    height: 10%;
+    max-height: 10%;
+    min-height: 10%;
+    margin-bottom: 2.5%;
+    justify-content: center;
+}

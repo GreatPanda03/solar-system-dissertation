@@ -751,15 +751,16 @@ MonoBehaviour:
   mainMenuUI: {fileID: 9197481963319205126, guid: 6f947e4c83b822b4c82457e1e49909ef, type: 3}
   newSimulationUI: {fileID: 9197481963319205126, guid: d1c6ba380eb0c5b4f95d91b091da2225, type: 3}
   savedSimulationsUI: {fileID: 9197481963319205126, guid: 3241247828bfe744d95325bbf0938151, type: 3}
-  saveEntryTemplate: {fileID: 9197481963319205126, guid: 12edb7d03f1914d4faa7e58958c62bfb, type: 3}
+  saveEntry: {fileID: 9197481963319205126, guid: 12edb7d03f1914d4faa7e58958c62bfb, type: 3}
   templateSimulationsUI: {fileID: 9197481963319205126, guid: 349fd20e6bbf7a54087e4d95687659f4, type: 3}
   tutorialUI: {fileID: 0}
   simulatorUI: {fileID: 9197481963319205126, guid: 1efa3a77ecb7ed74cb23eaec8f736c86, type: 3}
-  explorerEntryTemplate: {fileID: 9197481963319205126, guid: 23251c35d6365954d8d7882e2ea2bc42, type: 3}
-  optionsPopupTemplate: {fileID: 9197481963319205126, guid: a66a80150dc13994eb199ec4b659690a, type: 3}
-  savePopupTemplate: {fileID: 9197481963319205126, guid: e32458bc23189494a8194d217742d05b, type: 3}
-  helpPopupTemplate: {fileID: 9197481963319205126, guid: 050c2e896f1d3d542aaaab314305e881, type: 3}
-  tooltipTemplate: {fileID: 9197481963319205126, guid: d8ceca96012d07c43a9444e2ed46aec9, type: 3}
+  explorerEntry: {fileID: 9197481963319205126, guid: 23251c35d6365954d8d7882e2ea2bc42, type: 3}
+  bodyTemplatePopup: {fileID: 9197481963319205126, guid: 3d9646489e9912043ba25ee621cc4fbe, type: 3}
+  optionsPopup: {fileID: 9197481963319205126, guid: a66a80150dc13994eb199ec4b659690a, type: 3}
+  savePopup: {fileID: 9197481963319205126, guid: e32458bc23189494a8194d217742d05b, type: 3}
+  helpPopup: {fileID: 9197481963319205126, guid: 050c2e896f1d3d542aaaab314305e881, type: 3}
+  tooltip: {fileID: 9197481963319205126, guid: d8ceca96012d07c43a9444e2ed46aec9, type: 3}
 --- !u!1 &1776561390
 GameObject:
   m_ObjectHideFlags: 0

@@ -136,6 +136,7 @@ public class SimulationController : MonoBehaviour
         foreach (Body body in simulation.bodies)
         {
             body.CreateEntity();
+            renderer.GiveTrailRenderer(body);
             OnBodyAdded?.Invoke(body);
         }
 
@@ -159,6 +160,7 @@ public class SimulationController : MonoBehaviour
         IsInteractable = true;
         IsRunning = true;
         ShowLabels = true;
+        ShowTrails = true;
     }
 
     public void FullDisable()
@@ -167,6 +169,7 @@ public class SimulationController : MonoBehaviour
         IsInteractable = false;
         IsRunning = false;
         ShowLabels = false;
+        ShowTrails = false;
     }
 
     #endregion Simulator Setup

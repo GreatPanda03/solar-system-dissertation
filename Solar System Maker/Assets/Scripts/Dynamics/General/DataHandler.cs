@@ -1,10 +1,14 @@
 // handles all data-related processes
+// * all data is saved in JSON format - see the file paths below
 
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 using System;
+using Unity.VisualScripting;
+using Mono.Cecil;
+using System.Linq;
 
 public class DataHandler
 {
@@ -17,130 +21,133 @@ public class DataHandler
         private set => simulationSaves = value;
     }
 
-    private static List<Simulation> templateSaves;
-    public static List<Simulation> TemplateSaves {
-        get => templateSaves; 
-        private set => templateSaves = value;
+    private static List<Simulation> simulationTemplates;
+    public static List<Simulation> SimulationTemplates {
+        get => simulationTemplates; 
+        private set => simulationTemplates = value;
+    }
+
+    private static List<BodyTemplate> bodyTemplates;
+    public static List<BodyTemplate> BodyTemplates {
+        get => bodyTemplates;
+        private set => bodyTemplates = value;
     }
 
     private static readonly string simulationSavesPath
         = Application.persistentDataPath + "/SimulationSaves.txt";
-    public static readonly string templateSavesPath
-        = Application.persistentDataPath + "/TemplateSaves.txt";
+    public static readonly string simulationTemplatesPath
+        = Application.persistentDataPath + "/SimulationTemplates.txt";
+
+    public static readonly string bodyTemplatesPath
+        = Application.persistentDataPath + "/BodyTemplates.txt";
 
     #endregion Attributes
 
 
-    #region Loading Data
+    #region General Loading
 
     // retrieves all data stored in json files
     public static void LoadAllData()
     {
-        LoadSimulationsData();
-        LoadTemplatesData();
+        Debug.Log("Loading data...");
+
+        LoadSimulationSaves();
+        LoadSimulationTemplates();
+        LoadBodyTemplates();
+
+        Debug.Log("Data loaded");
     }
+
+    // returns any JSON data from the given file
+    private static string ReadJsonFromFilePath(string filePath)
+    {
+        string data;
+
+        try
+        {
+            data = File.ReadAllText(filePath);
+            Debug.Log($"[DATA] SUCCESS: Data read from {filePath}");
+        }
+        catch(FileNotFoundException)
+        {
+            data = "[]";
+            File.WriteAllText(filePath, "[]");
+            Debug.Log($"[DATA] WARNING: No existing {filePath} file - creating a new one");
+        }
+        catch (Exception e)
+        {
+            data = "[]";
+            Debug.Log($"[DATA] ERROR: Couldn't load {filePath} data: " + e.Message);
+        }
+
+        return data;
+    }
+
+    // loads all data from the file at the given file path 
+    //   into a list of the given data type
+    // * assumes the target data is a list of the target body in JSON format
+    public static List<T> LoadJsonListDataFromFilePath<T>(string filePath)
+    {
+        List<T> list;
+        string data = ReadJsonFromFilePath(filePath);
+
+        // Debug.Log("[DATA] Simulations Saves to load: " + GetPrettyJson(data));
+
+        list = JsonConvert.DeserializeObject<List<T>>(
+            data,
+            new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
+            }
+        );
+
+        if (list == null) 
+        {
+            list = new();
+            Debug.Log($"[DATA] WARNING: No saves to load from {filePath} - prepared blank list");
+        }
+
+        return list;
+    }
+
+    #endregion General Loading
+
+
+    #region Specific Loading
 
     // loads all of the user's simulations data
-    public static void LoadSimulationsData()
+    public static void LoadSimulationSaves()
     {
-        simulationSaves = new List<Simulation>();
-
-        string simulationsData;
-
-        // TO DO: add some kind of system to disable saving if
-        //   the file can't be read from
-        // * "There was a problem loading your data"
-        // * "Saving will be disabled for this session to avoid overwriting potentially existing data"
-        // * "Please restart the application to re-enable saving"
-        try
-        {
-            simulationsData = File.ReadAllText(simulationSavesPath);
-            Debug.Log("[DATA] SUCCESS: Data Loaded");
-        }
-        catch(FileNotFoundException)
-        {
-            simulationsData = "[]";
-            File.WriteAllText(simulationSavesPath, "[]");
-            Debug.Log("[DATA] No existing 'SaveSimulations.txt' file, creating a new one");
-        }
-        catch (Exception e)
-        {
-            simulationsData = "[]";
-            Debug.Log("[DATA] ERROR: " + e.Message);
-        }
-
-        Debug.Log("Simulations Data to Load: "
-            + GetPrettyJson(simulationsData));
-
-        simulationSaves = JsonConvert.DeserializeObject<List<Simulation>>(
-            simulationsData,
-            new JsonSerializerSettings()
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Auto
-            }
-        );
-
-        if (simulationSaves == null) 
-        {
-            simulationSaves = new();
-            Debug.Log("No simulations data to load - prepared blank list");
-        }
+        simulationSaves = LoadJsonListDataFromFilePath<Simulation>(
+            simulationSavesPath);
     }
 
-    // loads all of the user's template simulations data
-    public static void LoadTemplatesData()
+    // loads all of the user's simulation templates
+    public static void LoadSimulationTemplates()
     {
-                templateSaves = new List<Simulation>();
-
-        string templatesData;
-
-        try
-        {
-            templatesData = File.ReadAllText(simulationSavesPath);
-            Debug.Log("[DATA] SUCCESS: Data Loaded");
-        }
-        catch(FileNotFoundException)
-        {
-            templatesData = "[]";
-            File.WriteAllText(simulationSavesPath, "[]");
-            Debug.Log("[DATA] No existing 'SaveSimulations.txt' file, creating a new one");
-        }
-        catch (Exception e)
-        {
-            templatesData = "[]";
-            Debug.Log("[DATA] ERROR: " + e.Message);
-        }
-
-        Debug.Log("Simulations Data to Load: "
-            + GetPrettyJson(templatesData));
-
-        templateSaves = JsonConvert.DeserializeObject<List<Simulation>>(
-            templatesData,
-            new JsonSerializerSettings()
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Auto
-            }
-        );
-
-        if (templateSaves == null) 
-        {
-            templateSaves = new();
-            Debug.Log("No templates data to load - prepared blank list");
-        }
+        simulationTemplates = LoadJsonListDataFromFilePath<Simulation>(
+            simulationTemplatesPath);
     }
 
-    #endregion Loading Data
+    // loads all of the user's body templates
+    public static void LoadBodyTemplates()
+    {
+        bodyTemplates = LoadJsonListDataFromFilePath<BodyTemplate>(
+            bodyTemplatesPath);
+    }
+
+    #endregion Specific Loading
 
 
     #region Saving Data
 
-    // writes all the current data to their respective json files
-    public static void SaveAllData()
+    // saves the given data to the given file in JSON format
+    // * COMPLETELY overwrites the file
+    public static void SaveDataToFileAsJson<T>(string filePath, T dataToSave)
     {
-        string simulationsData = JsonConvert.SerializeObject(
-            simulationSaves, 
+        string data = JsonConvert.SerializeObject(
+            dataToSave, 
             new JsonSerializerSettings()
             { 
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -148,18 +155,27 @@ public class DataHandler
             }
         ); 
         
-        Debug.Log("Simulations Data To Save: "
-            + GetPrettyJson(simulationSaves));
+        Debug.Log($"[DATA] Data to save to {filePath}: "
+            + GetPrettyJson(data));
         
         try 
         {
-            File.WriteAllText(simulationSavesPath, simulationsData);
-            Debug.Log("[DATA] SUCCESS: Data Saved");
+            File.WriteAllText(filePath, data);
+            Debug.Log($"[DATA] SUCCESS: Data saved to {filePath}");
         }
         catch (Exception e)
         {
-            Debug.Log("[DATA] ERROR: The simulation data could not be saved, " + e.Message);
+            Debug.Log($"[DATA] ERROR: Data couldn't be saved to {filePath}: "
+                + e.Message);
         }
+    }
+
+    // writes all the current data to their respective json files
+    public static void SaveAllData()
+    {
+        SaveDataToFileAsJson(simulationSavesPath, simulationSaves);
+        SaveDataToFileAsJson(simulationTemplatesPath, simulationTemplates);
+        SaveDataToFileAsJson(bodyTemplatesPath, bodyTemplates);
     }
 
     #endregion Saving Data
@@ -169,50 +185,75 @@ public class DataHandler
 
     // CREATE
 
-    // returns an empty simulation with the next available ID
-    public static Simulation CreateSimulationSave()
+    // returns the next available ID from the list of items
+    // * assumes the "item" has an ID attribute
+    public static int GetNextId<T>(List<T> items)
     {
-        Simulation simulation = new();
+        int nextId = 1;
         List<int> usedIds = new();
 
-        foreach (Simulation save in simulationSaves)
-            usedIds.Add(save.id);
+        foreach (T item in items)
+        {
+            var idField = item.GetType().GetField("id");
+            int id = (int) idField.GetValue(item);
+            usedIds.Add(id);
+        }
 
-        int nextId = 0;
-        do nextId += 1; while (usedIds.Contains(nextId));
+        while (usedIds.Contains(nextId)) nextId += 1;
 
-        simulation.id = nextId;
-
-        return simulation;
+        return nextId;
     }
 
-    public static void AddSimulationSave(Simulation simulation)
+    // returns the next available simulation save, save slot
+    public static Simulation GetNextSimulationSaveSlot()
     {
-        simulationSaves.Add(simulation);
+        Simulation slot = new() { id = GetNextId(simulationSaves) };
+        return slot;
     }
 
-    public static void AddTemplateSave(Simulation simulation)
+    // returns the next available simulation template save slot
+    public static Simulation GetNextSimulationTemplateSlot()
     {
-        templateSaves.Add(simulation);
+        Simulation slot = new() { id = GetNextId(simulationTemplates) };
+        return slot;
+    }
+
+    // returns the next available body template save slot
+    public static BodyTemplate GetNextBodyTemplateSlot()
+    {
+        BodyTemplate slot = new() { id = GetNextId(bodyTemplates) };
+        return slot;
     }
 
     // READ
-    public static Simulation GetSimulationSave(int id)
+
+    // returns the item from the given list associated with the given id
+    // * assumes all items have an ID attribute
+    public static T GetSaveById<T>(List<T> items, int targetId)
     {
-        foreach (Simulation simulation in simulationSaves)
+        foreach (T item in items)
         {
-            if (simulation.id == id) return simulation;
+            var idField = item.GetType().GetField("id");
+            int id = (int) idField.GetValue(item);
+            if (id == targetId) return item;
         }
-        return null;
+
+        return default;
     }
 
-    public static Simulation GetTemplateSave(int id)
+    public static Simulation GetSimulationSave(int id)
     {
-        foreach (Simulation template in templateSaves)
-        {
-            if (template.id == id) return template;
-        }
-        return null;
+        return GetSaveById(simulationSaves, id);
+    }
+
+    public static Simulation GetSimulationTemplateSave(int id)
+    {
+        return GetSaveById(simulationTemplates, id);
+    }
+
+    public static BodyTemplate GetBodyTemplateSave(int id)
+    {
+        return GetSaveById(bodyTemplates, id);
     }
 
     // UPDATE
@@ -230,7 +271,7 @@ public class DataHandler
 
     public static bool UpdateSavedTemplate(int id, Simulation newData)
     {
-        Simulation target = GetTemplateSave(id);
+        Simulation target = GetSimulationTemplateSave(id);
         
         if (target == null) return false;
 
@@ -240,25 +281,42 @@ public class DataHandler
         return true;
     }
 
-    // DELETE
-    public static Simulation DeleteSimulationSave(int id)
+    public static bool UpdateBodyTemplate(int id, Body body)
     {
-        Simulation target = GetSimulationSave(id);
+        BodyTemplate target = GetBodyTemplateSave(id);
+
+        if (target == null) return false;
+
+        target.Body = body;
+
+        return true;
+    }
+
+    // DELETE
+    public static T DeleteSaveSlot<T>(List<T> items, int id)
+    {
+        T target = GetSaveById(items, id);
         
-        if (target == null) return null;
-        simulationSaves.Remove(target);
+        if (target == null) return default;
+
+        items.Remove(target);
 
         return target;
     }
 
-    public static Simulation DeleteTemplateSave(int id)
+    public static Simulation DeleteSimulationSave(int id)
     {
-        Simulation target = GetTemplateSave(id);
-        
-        if (target == null) return null;
-        templateSaves.Remove(target);
+        return DeleteSaveSlot(simulationSaves, id);
+    }
 
-        return target;
+    public static Simulation DeleteSimulationTemplateSave(int id)
+    {
+        return DeleteSaveSlot(simulationTemplates, id);
+    }
+
+    public static BodyTemplate DeleteBodyTemplateSave(int id)
+    {
+        return DeleteSaveSlot(bodyTemplates, id);
     }
 
     #endregion CRUD Methods

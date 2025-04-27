@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Simulator/SimulatorStyles.uss?fileID=7433441132597879392&amp;guid=f640695c10d59ba4199d931b7b100157&amp;type=3#SimulatorStyles" />
-    <ui:VisualElement name="ToolBar" class="toolbar" style="flex-grow: 1; height: 30px; width: 100%; flex-direction: row; max-height: 30px; min-height: 30px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 0;">
+    <ui:VisualElement name="ToolBar" class="toolbar">
         <ui:Button name="ExitSimulator" tooltip="Exit" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbar/ExitSimulator&apos;);" />
         </ui:Button>
@@ -42,8 +42,8 @@
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Anchored&apos;);" />
             <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
         </ui:Button>
-        <ui:Button name="SaveAs" tooltip="Save As" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/SaveAs&apos;);" />
+        <ui:Button name="Template" tooltip="Save As" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Template&apos;);" />
             <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
         </ui:Button>
         <ui:Button name="Delete" tooltip="Delete" class="toolboxButton">

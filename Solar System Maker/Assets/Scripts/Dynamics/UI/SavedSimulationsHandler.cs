@@ -141,9 +141,8 @@ public class SavedSimulationsHandler
 
         if (save != null) 
         {
-            string simName = save.settings.Name;
-            title.text = simName;
-            description.text = $"This is the save file for the simulation called '{simName}'";
+            title.text = save.settings.Name;
+            description.text = save.settings.Description;
 
             noSelectedSave.style.display = DisplayStyle.None;
             saveDetails.style.display = DisplayStyle.Flex;

@@ -40,7 +40,7 @@ public class NewSimulationHandler
 
         Settings settings = GetDetailsAsSettings();
 
-        Simulation newSimulation = DataHandler.CreateSimulationSave();
+        Simulation newSimulation = DataHandler.GetNextSimulationSaveSlot();
         newSimulation.settings = settings;
 
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
