@@ -11,6 +11,13 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.11.1
+**Date:** 2025/04/27
+<br/>**Additions / Changes:**
+* **1)** Reorganised popup code *(made popups independent of simulator UI)*
+
+---
+
 ### Version: 1.11.0
 **Date:** 2025/04/27
 <br/>**Bug Fixes:**
@@ -33,7 +40,7 @@ All dates are in the form **YYYY/MM/DD**.
 
 ### Version: 1.10.6
 **Date:** 2025/04/27
-<br/>**Bug Fixes:* no additional fixes
+<br/>**Bug Fixes:** no additional fixes
 * **Note:** small and large trail streaks are still left when scaling - bug NOT fixed
 
 **Additions / Changes:**
