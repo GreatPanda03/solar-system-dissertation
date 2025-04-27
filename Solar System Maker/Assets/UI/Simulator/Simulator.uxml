@@ -22,6 +22,14 @@
         <ui:Button name="Properties" tooltip="Properties" class="toolboxButton" style="width: 30px; height: 30px; margin-left: 0; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255);">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Properties&apos;);" />
         </ui:Button>
+        <ui:Button name="Follow" tooltip="Follow" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Follow&apos;);" />
+            <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
+        </ui:Button>
+        <ui:Button name="Scale" tooltip="Scale" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Scale&apos;);" />
+            <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
+        </ui:Button>
         <ui:Button name="Label" tooltip="Toggle Label" class="toolboxButton">
             <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Label&apos;);" />
@@ -32,6 +40,10 @@
         </ui:Button>
         <ui:Button name="Anchored" tooltip="Anchor" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Anchored&apos;);" />
+            <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
+        </ui:Button>
+        <ui:Button name="SaveAs" tooltip="Save As" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/SaveAs&apos;);" />
             <ui:VisualElement name="Disabled" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/General/Disabled&apos;); position: absolute; width: 22px; height: 22px; display: none;" />
         </ui:Button>
         <ui:Button name="Delete" tooltip="Delete" class="toolboxButton">

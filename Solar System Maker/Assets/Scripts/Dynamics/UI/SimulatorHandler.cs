@@ -735,6 +735,19 @@ public class SimulatorHandler
             SetPropertiesVisible(!visible);
         };
 
+        // follows the body on click
+        bodyTools.Q<Button>("Follow").clicked += () => {
+            CameraController.SetSubject(simController.SelectedBody);
+            CameraController.SetCameraMode(CameraController.CameraMode.Following);
+        };
+
+        // adjusts the scale to the selected body on click
+        bodyTools.Q<Button>("Scale").clicked += () => {
+            CameraController.SetSubject(simController.SelectedBody);
+            CameraController.SetCameraMode(CameraController.CameraMode.Following);
+            simController.ScaleToFit(simController.SelectedBody);
+        };
+
         // toggles the body's trail path on click
         bodyTools.Q<Button>("Trail").clicked += () => {
             if (simController.SelectedBody == null) return;

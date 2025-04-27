@@ -269,7 +269,6 @@ public class SimulationController : MonoBehaviour
         // TEMPORARY: re-render trails if scale was changed
         if (renderer.Scale != initialScale)
         {
-            Debug.Log("changed!");
             if (showTrails) // clear trails to remove streaks
             {
                 foreach (Body body in simulation.bodies)
@@ -336,44 +335,7 @@ public class SimulationController : MonoBehaviour
         {
             if (CameraController.GetCameraMode() == CameraController.CameraMode.Following)
             {
-                float targetDiameter = 5;
-
-                double value = targetDiameter * UnitReference.DISTANCE_UNITS[renderer.Distance] 
-                    / (2 * selectedBody.Radius * renderer.UNITS_PER_WORLDSPACE);
-
-                renderer.ZoomFactor = (float) Math.Log10(value);
-
-                OnScaleChanged?.Invoke(renderer.ZoomFactor);
-
-                // NB: the mathemagics behind this so i don't forget
-
-                // * adjusts the zoom factor so that the diameter of the body meets the
-                //     target diameter in world space based on the current scale metrics
-
-                // 1. from the renderer, to scale bodies, we have:
-
-                //    > float scaledRadius = body.Radius * scale
-                //    > body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
-
-                // so the target diameter would be:
-
-                //      ~ D = 2 * body.Radius * scale
-                //  ~ scale = D / (2 * body.Radius)                                   (1) 
-
-                // 2. from the renderer, we also have the following to determine scale:
-
-                //    > float scale = 1 / UnitReference.DISTANCE_UNITS[distance]      (2)
-                //         * Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;                
-
-                // 3. substituting (2) into (1), we have:
-
-                //    ~ 1 / U * Math.Pow(10, zoomFactor) * Uws = D / (2 * body.Radius)
-                
-                // -- where "U" is the unit of distance and "Uws" is UNITS_PER_WORLDSPACE (for shorthand)
-
-                // 4. rearranging the equation to make "zoomFactor" the subject, we get:
-
-                //    ~ zoomFactor = log10(D * U / (2 * body.Radius * Uws))
+                ScaleToFit(selectedBody);
             }
         }
     }
@@ -433,6 +395,56 @@ public class SimulationController : MonoBehaviour
     }
     
     #endregion Simulation Loop
+
+
+    #region Scale Management
+
+    // scales the simulation to fit the given body
+    public void ScaleToFit(Body body)
+    {
+        if (body == null) return;
+
+        float targetDiameter = 5;
+
+        double value = targetDiameter * UnitReference.DISTANCE_UNITS[renderer.Distance] 
+            / (2 * body.Radius * renderer.UNITS_PER_WORLDSPACE);
+
+        renderer.ZoomFactor = (float) Math.Log10(value);
+
+        OnScaleChanged?.Invoke(renderer.ZoomFactor);
+
+        // NB: the mathemagics behind this so i don't forget
+
+        // * adjusts the zoom factor so that the diameter of the body meets the
+        //     target diameter in world space based on the current scale metrics
+
+        // 1. from the renderer, to scale bodies, we have:
+
+        //    > float scaledRadius = body.Radius * scale
+        //    > body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
+
+        // so the target diameter would be:
+
+        //      ~ D = 2 * body.Radius * scale
+        //  ~ scale = D / (2 * body.Radius)                                   (1) 
+
+        // 2. from the renderer, we also have the following to determine scale:
+
+        //    > float scale = 1 / UnitReference.DISTANCE_UNITS[distance]      (2)
+        //         * Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;                
+
+        // 3. substituting (2) into (1), we have:
+
+        //    ~ 1 / U * Math.Pow(10, zoomFactor) * Uws = D / (2 * body.Radius)
+        
+        // -- where "U" is the unit of distance and "Uws" is UNITS_PER_WORLDSPACE (for shorthand)
+
+        // 4. rearranging the equation to make "zoomFactor" the subject, we get:
+
+        //    ~ zoomFactor = log10(D * U / (2 * body.Radius * Uws))
+    }
+
+    #endregion Scale Management
 
 
     #region Preview Management
