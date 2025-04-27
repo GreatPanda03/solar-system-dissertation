@@ -44,6 +44,7 @@ public class MainMenuHandler
         simController.LoadSimulation(simulation);
         simController.renderer.Distance = "Metre";
         simController.renderer.ZoomFactor = -0.5f;
+        simController.physics.TimePerSecond = "Minute";
 
         simController.IsActive = true;
         simController.IsRunning = true;

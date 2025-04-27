@@ -11,7 +11,13 @@ public class PhysicsHandler
     public SimulationController simController;
 
     public enum CollisionQuality { None, Low, High }
-    public CollisionQuality collisionQuality;
+    public CollisionQuality collisionQuality = CollisionQuality.Low;
+    
+    private string timePerSecond;
+    public string TimePerSecond {
+        get => timePerSecond;
+        set => timePerSecond = value;
+    }
 
     #endregion Attributes
 
@@ -23,6 +29,7 @@ public class PhysicsHandler
     public PhysicsHandler(SimulationController simController)
     {
         this.simController = simController;
+        timePerSecond = "Second";
     }
 
     #endregion Constructor

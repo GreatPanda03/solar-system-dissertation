@@ -90,11 +90,18 @@ public class SimulatorHandler
 
         ui.Q<Button>("TogglePlay").clicked += OnTogglePlayClicked;
     
+        // could be either playing or paused (depending on where this sim was loaded from)
         ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
             = Resources.Load<Texture2D>($"Icons/Toolbox/Options/{(simController.IsRunning ? "Paused" : "Playing")}");
 
+        // will always start with time going forward & 1s/s
         ui.Q<Button>("ToggleFlow").clicked += OnToggleFlowClicked;
+        simController.physics.TimePerSecond = "Second";
         simController.IsRewinding = false;
+
+        ui.Q<Button>("SlowTime").clicked += OnSlowTimeClicked;
+
+        ui.Q<Button>("SpeedTime").clicked += OnSpeedTimeClicked;
 
         InitialiseBodyTools();
         SetBodyToolsVisible(false);
@@ -305,30 +312,35 @@ public class SimulatorHandler
 
     #region Toolbox Methods
 
+    // toggles the visibility of the explorer on click
     public void OnExplorerClicked()
     {
         bool state = ui.Q<VisualElement>("Explorer").style.display == DisplayStyle.Flex;
         SetExplorerVisible(!state);        
     }
 
+    // toggles the visibility of the bodies list on click
     public void OnBodiesClicked()
     {
         VisualElement bodyList = ui.Q<VisualElement>("BodyList");
         bodyList.style.display = bodyList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
+    // toggles the visibility of the placement modes list on click
     public void OnModesClicked()
     {
         VisualElement modeList = ui.Q<VisualElement>("ModeList");
         modeList.style.display = modeList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
+    // toggles the visibility of the distances units list on click
     public void OnDistanceClicked()
     {
         VisualElement distanceList = ui.Q<VisualElement>("DistanceList");
         distanceList.style.display = distanceList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
     
+    // toggles the visibility of all labels on click (where individual labels aren't disabled)
     private void OnToggleLabelsClicked()
     {
         simController.ShowLabels = !simController.ShowLabels;
@@ -339,6 +351,7 @@ public class SimulatorHandler
         // TODO: render body labels individually
     }
 
+    // toggles the visibility of all trails on click (where individual trail aren't disabled)
     private void OnToggleTrailsClicked()
     {
         simController.ShowTrails = !simController.ShowTrails;
@@ -347,6 +360,7 @@ public class SimulatorHandler
         disabledIcon.style.display = simController.ShowTrails ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
+    // plays or pauses the simulation
     public void OnTogglePlayClicked()
     {
         if (simController.IsRunning)
@@ -365,6 +379,7 @@ public class SimulatorHandler
         }
     }
 
+    // toggles whether time is moving forward or backwards 
     public void OnToggleFlowClicked()
     {
         simController.IsRewinding = !simController.IsRewinding;
@@ -372,14 +387,41 @@ public class SimulatorHandler
         if (simController.IsRewinding)
         {
             ui.Q<Button>("ToggleFlow").Q<VisualElement>("Icon").style.backgroundImage
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Rewind");
+                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Reverse");
         }
         else
         {
             ui.Q<Button>("ToggleFlow").Q<VisualElement>("Icon").style.backgroundImage
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/FastForward");
+                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Forward");
         }
     }
+
+    // slows down time by "one metric" on click (e.g., hour -> minute -> second)
+    public void OnSlowTimeClicked()
+    {
+        List<string> keys = new(UnitReference.TIME_UNITS.Keys);
+        int keyIndex = keys.IndexOf(simController.physics.TimePerSecond);
+        keyIndex -= 1;
+
+        if (keyIndex >= 0)
+            simController.physics.TimePerSecond = keys[keyIndex];
+
+        UpdateTimeLabel();
+    }
+
+    // speeds up time by "one metric" on click (e.g., second -> minute -> hour)
+    public void OnSpeedTimeClicked()
+    {
+        List<string> keys = new(UnitReference.TIME_UNITS.Keys);
+        int keyIndex = keys.IndexOf(simController.physics.TimePerSecond);
+        keyIndex += 1;
+
+        if (keyIndex < keys.Count)
+            simController.physics.TimePerSecond = keys[keyIndex];
+
+        UpdateTimeLabel();
+    }
+
 
     #endregion Toolbox Functions
 
@@ -572,7 +614,7 @@ public class SimulatorHandler
     #endregion Help Popup`
 
 
-    #region Scaling Methods
+    #region Unit Methods
 
     // updates the zoom label with the current scale and distance
     private void UpdateScaleLabel()
@@ -584,8 +626,16 @@ public class SimulatorHandler
         ui.Q<Label>("Scale").text = zoomText;
     }
 
-    #endregion Scaling Methods
+    // updates the time label with the current time per second
+    private void UpdateTimeLabel()
+    {
+        string timeText = string.Format("<b>Time:</b> 1 {0} / s", 
+            simController.physics.TimePerSecond.ToLower()); // stylistic
 
+        ui.Q<Label>("Time").text = timeText;
+    }
+
+    #endregion Unit Methods
 
     
     #region Explorer

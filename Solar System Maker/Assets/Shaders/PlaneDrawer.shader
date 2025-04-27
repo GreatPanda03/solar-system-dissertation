@@ -48,6 +48,7 @@ Shader "Unlit/GridPlaneShader"
                 float3 worldPosition : TEXCOORD0;
             };
 
+            // defining vertex
             v2f vert(appdata v)
             {
                 v2f o;
@@ -66,43 +67,32 @@ Shader "Unlit/GridPlaneShader"
                 return saturate(lineX + lineY);
             }
 
-            // fragments the grid lines so they're recursive
-            // * also fades inner grid lines out the further you go (and conversely)
+            // fragmentation method:
+            // 1. a "subgrid" covers the "decimal" component of the zoom factor
+            // 2. a "supergrid" covers the "integer" component of the zoom factor
             float4 frag(v2f i) : SV_Target
             {
 
-                // METHOD 1 - layered textures
-                /*
+                // fade out subgrid with height
+                float height = length(_WorldSpaceCameraPos.y);
+                float visibility = saturate(1.0 - height / 25.0);
+
                 float2 worldXZ = i.worldPosition.xz / _GridScale;
-                float logZoom = log10(abs(_WorldSpaceCameraPos.y));
+                float scale, thickness, grid;
 
-                float grid = 0.0;
-                const int layers = 10;
-
-                for (int layer = -2; layer < layers; layer++)
-                {
-                    float scale = _GridScale * pow(10.0, layer);
-                    float fade = smoothstep(0.0f, _FadeWidth, 1.0f - abs(logZoom - float(layer)));
-                    float thickness = _GridLineThickness / pow(10.0, layer - 1);
-
-                    grid += DrawGrid(worldXZ, scale, thickness) * fade;
-                }
+                // super grid
+                scale = _GridScale * 10;
+                thickness = _GridLineThickness * 0.5;
+                grid = DrawGrid(worldXZ, scale, thickness);
+                
+                // subgrid
+                scale = _GridScale * 1;
+                thickness = _GridLineThickness;
+                grid += DrawGrid(worldXZ, scale, thickness) * visibility;
 
                 grid = saturate(grid);
+
                 return float4(_GridLineColour.rgb, grid * _GridLineColour.a);
-                */
-
-                // METHOD 2 - fixed grid
-                float2 worldXZ = i.worldPosition.xz / _GridScale;
-                float logZoom = log10(abs(_WorldSpaceCameraPos.y));
-
-                float scale = _GridScale * 10;
-                float thickness = _GridLineThickness;
-
-                float grid = DrawGrid(worldXZ, scale, thickness);
-                grid = saturate(grid);
-
-                return grid;
             }
             ENDCG
         }

@@ -241,14 +241,10 @@ public class Body
     }
 
     // updates the body's physics
-    public void Update()
+    public void Update(float dt)
     {
-        float dt = Time.deltaTime;
-
-        // TODO: use dt
-
-        velocity += acceleration; // * dt;
-        position += velocity; // * dt;
+        velocity += acceleration * dt;
+        position += velocity * dt;
         acceleration = new Vector3(0,0,0);
     }
 

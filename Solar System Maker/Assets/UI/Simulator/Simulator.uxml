@@ -114,7 +114,13 @@
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Paused&apos;);" />
         </ui:Button>
         <ui:Button name="ToggleFlow" tooltip="Toggle Time Flow" class="toolboxButton">
-            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/FastForward&apos;);" />
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/Forward&apos;);" />
+        </ui:Button>
+        <ui:Button name="SlowTime" tooltip="Slow Down Time" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/SlowTime&apos;);" />
+        </ui:Button>
+        <ui:Button name="SpeedTime" tooltip="Speed Up Time" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/SpeedTime&apos;);" />
         </ui:Button>
     </ui:VisualElement>
     <ui:VisualElement name="SubToolBox" class="toolboxBar" style="bottom: 40px; flex-direction: column; margin-left: 0;">
@@ -148,5 +154,5 @@
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:Label text="&lt;b&gt;Scale:&lt;/b&gt; 1 Kilometre x 1.000" name="Scale" style="position: absolute; -unity-text-align: upper-right; color: rgb(255, 255, 255); bottom: 0; right: 0;" />
-    <ui:Label text="&lt;b&gt;Time:&lt;/b&gt; 1s / s" name="Time" enable-rich-text="true" style="position: absolute; -unity-text-align: upper-right; color: rgb(255, 255, 255); bottom: 25px; right: 0;" />
+    <ui:Label text="&lt;b&gt;Time:&lt;/b&gt; 1 second / s" name="Time" enable-rich-text="true" style="position: absolute; -unity-text-align: upper-right; color: rgb(255, 255, 255); bottom: 25px; right: 0;" />
 </ui:UXML>
