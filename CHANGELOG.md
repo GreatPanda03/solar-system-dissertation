@@ -11,6 +11,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.10.6
+**Date:** 2025/04/27
+<br/>**Bug Fixes:* no additional fixes
+* **Note:** small and large trail streaks are still left when scaling - bug NOT fixed
+
+**Additions / Changes:**
+* **1)** Added "Focus" and "Scale" as body tool buttons *(same as "F" and "V" respectively)
+
+---
+
 ### Version: 1.10.5
 **Date:** 2025/04/26
 <br/>**Bug Fixes:** No additional fixes
