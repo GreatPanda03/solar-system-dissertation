@@ -11,6 +11,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.12.0
+**Date:** 2025/04/27
+<br/>**Additions / Changes:**
+* **1)** Added speed & slow time tool box buttons
+* **2)** Time can be sped or slowed *(only a basic timestep multiplier!)* 
+* **3)** "Time" is now relative to real seconds rather than frames *(using delta time)*
+* **4)** Restored subgrid to the plane visual *(1/10th of the larger grid)*
+
+---
+
 ### Version: 1.11.3
 **Date:** 2025/04/27
 <br/>**Additions / Changes:**
