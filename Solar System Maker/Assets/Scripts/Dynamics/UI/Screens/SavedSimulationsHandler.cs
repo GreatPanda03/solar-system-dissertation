@@ -14,7 +14,7 @@ public class SavedSimulationsHandler
 
     public VisualElement ui;
     public UIController uiController;
-    public VisualTreeAsset saveEntryTemplate;
+    public VisualTreeAsset saveEntry;
 
     public VisualElement selectedEntry;
     public Simulation selectedSave;
@@ -25,16 +25,18 @@ public class SavedSimulationsHandler
     #region Constructor
 
     // prepares the given UI as a "Saved Simulations" interface
-    public SavedSimulationsHandler(VisualElement ui, UIController uiController, 
-        VisualTreeAsset saveEntryTemplate)
+    public SavedSimulationsHandler(
+        VisualElement ui,
+        UIController uiController, 
+        VisualTreeAsset saveEntry)
     {
         this.ui = ui;
         this.uiController = uiController;
-        this.saveEntryTemplate = saveEntryTemplate;
+        this.saveEntry = saveEntry;
 
-        ScrollView saveList = ui.Q<ScrollView>("List");
-        saveList.contentContainer.style.flexDirection = FlexDirection.Row;
-        saveList.contentContainer.style.flexWrap = Wrap.Wrap;
+        ScrollView list = ui.Q<ScrollView>("List");
+        list.contentContainer.style.flexDirection = FlexDirection.Row;
+        list.contentContainer.style.flexWrap = Wrap.Wrap;
 
         ui.Q<Button>("Load").clicked += OnLoadClicked;
         ui.Q<Button>("Delete").clicked += OnDeleteClicked;
@@ -70,7 +72,7 @@ public class SavedSimulationsHandler
     #endregion UI Methods
 
 
-    #region Save Management
+    #region Entry Management
 
     // load all saves of the user as entries
     public void LoadSaves()
@@ -79,34 +81,34 @@ public class SavedSimulationsHandler
 
         foreach (Simulation save in saves)
         {
-            VisualElement entry = CreateSaveEntry(save);
-            EnableSaveEntry(entry, save);
+            VisualElement entry = CreateEntry(save);
+            EnableEntry(entry, save);
             ui.Q<ScrollView>("List").Add(entry);
         }
     }
 
     // creates an entry for the given save
-    public VisualElement CreateSaveEntry(Simulation save)
+    public VisualElement CreateEntry(Simulation save)
     {
-        VisualElement newEntry = saveEntryTemplate.Instantiate();
-        newEntry.Q<Label>("Title").text = save.settings.Name;
+        VisualElement entry = saveEntry.Instantiate();
+        entry.Q<Label>("Title").text = save.settings.Name;
 
-        return newEntry;
+        return entry;
     }
 
     // allows the save associated with the given entry to be interacted with
-    public void EnableSaveEntry(VisualElement entry, Simulation save)
+    public void EnableEntry(VisualElement entry, Simulation save)
     {
         Button button = entry.Q<Button>(); // the entry button itself
 
         button.clicked += () => {
-            SelectSaveEntry(entry);
+            SelectEntry(entry);
             UpdateViewer(save);
         };
     }
 
     // selects the given Save Entry
-    public void SelectSaveEntry(VisualElement entry)
+    public void SelectEntry(VisualElement entry)
     {
         if (selectedEntry == null)
         {
@@ -189,7 +191,7 @@ public class SavedSimulationsHandler
         ui.Q<ScrollView>("List").Clear();
     }
 
-    #endregion Save Management
+    #endregion Entry Management
 }
 
 

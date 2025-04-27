@@ -3,7 +3,7 @@
     <ui:VisualElement name="Outer" style="flex-grow: 1; height: 447px;">
         <ui:VisualElement name="Container" style="flex-grow: 1; height: 325px; max-height: 325px; min-height: 325px;">
             <ui:VisualElement name="Header" style="flex-grow: 1;">
-                <ui:Button text="X" name="Close" class="close" />
+                <ui:Button text="X" name="Close" />
                 <ui:Label text="Simulator Help" name="Title" class="title" />
             </ui:VisualElement>
             <ui:VisualElement name="Content" style="flex-grow: 1;">

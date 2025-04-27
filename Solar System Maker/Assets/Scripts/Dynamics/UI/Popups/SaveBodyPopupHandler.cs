@@ -3,7 +3,7 @@
 
 using UnityEngine.UIElements;
 
-public class BodyTemplatePopupHandler
+public class SaveBodyPopupHandler
 {
     
     #region Attributes
@@ -19,7 +19,7 @@ public class BodyTemplatePopupHandler
     #region Constructor
 
     // prepares the given popup as an "Body Template Popup" bound to the given parent interface
-    public BodyTemplatePopupHandler(
+    public SaveBodyPopupHandler(
         VisualElement popup, 
         UIController uiController,
         VisualElement parent,

@@ -389,9 +389,11 @@ public class SimulatorHandler
     // selects the respective body as a preview on click
     public void InitialiseBodyItemButtons()
     {
-        foreach (var element in ui.Q<VisualElement>("BodyList").Children())
+        VisualElement list = ui.Q<VisualElement>("BodyList");
+
+        foreach (var element in list.Children())
         {
-            if (element is Button item)
+            if (element is Button item && element.name != "Templates")
             {
                 item.clicked += () => {
                     if (item.name != selectedBodyItem)
@@ -405,6 +407,17 @@ public class SimulatorHandler
                 };
             }
         }
+
+        // show body templates on click
+        list.Q<Button>("Templates").clicked += () => {
+            BodyTemplatesPopupHandler popup = uiController.ShowBodyTemplatesPopup(ui);
+            
+            popup.OnTemplateSelected += body =>
+            {
+                DeselectBodyItem();
+                simController.SetEntityPreview(body);
+            };
+        };
     }
 
     // selects the given item for body previews
@@ -422,13 +435,14 @@ public class SimulatorHandler
     // deselects the current item as a body preview
     public void DeselectBodyItem()
     {
-        if (selectedBodyItem == null) return;
+        if (selectedBodyItem != null)
+        {
+            Button button = ui.Q<Button>(selectedBodyItem);
+            button.RemoveFromClassList("selectedButton");
 
-        Button button = ui.Q<Button>(selectedBodyItem);
-        button.RemoveFromClassList("selectedButton");
+            selectedBodyItem = null;
+        }
 
-        selectedBodyItem = null;
-        
         simController.RemoveEntityPreview();
     }
 
@@ -805,7 +819,7 @@ public class SimulatorHandler
             if (simController.IsRunning)
                 OnTogglePlayClicked(); // pause
 
-            uiController.ShowBodyTemplatePopup(ui, simController.SelectedBody);
+            uiController.ShowSaveBodyPopup(ui, simController.SelectedBody);
         };
 
         // deletes the body on click

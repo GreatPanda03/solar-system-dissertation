@@ -16,7 +16,8 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset tutorialUI;
     public VisualTreeAsset simulatorUI;
     public VisualTreeAsset explorerEntry;
-    public VisualTreeAsset bodyTemplatePopup;
+    public VisualTreeAsset saveBodyPopup;
+    public VisualTreeAsset bodyTemplatesPopup;
     public VisualTreeAsset optionsPopup;
     public VisualTreeAsset saveSimulationPopup;
     public VisualTreeAsset helpPopup;
@@ -137,7 +138,7 @@ public class UIController : MonoBehaviour
             explorerEntry,
             optionsPopup,
             saveSimulationPopup,
-            bodyTemplatePopup,
+            saveBodyPopup,
             helpPopup);
 
         PrepareScreen(screen);
@@ -162,11 +163,18 @@ public class UIController : MonoBehaviour
         new SaveSimulationPopupHandler(popup, this, screen, simulation);
     }
 
-    // shows a new instance of a "Body Template" popup for the given screen and body instance
-    public void ShowBodyTemplatePopup(VisualElement screen, Body body)
+    // shows a new instance of a "Save Body" popup for the given screen and body instance
+    public void ShowSaveBodyPopup(VisualElement screen, Body body)
     {
-        VisualElement popup = CloneInterface(bodyTemplatePopup);
-        new BodyTemplatePopupHandler(popup, this, screen, body);
+        VisualElement popup = CloneInterface(saveBodyPopup);
+        new SaveBodyPopupHandler(popup, this, screen, body);
+    }
+
+    // shows a new instance of a "Body Templates" popup for the given screen
+    public BodyTemplatesPopupHandler ShowBodyTemplatesPopup(VisualElement screen)
+    {
+        VisualElement popup = CloneInterface(bodyTemplatesPopup);
+        return new BodyTemplatesPopupHandler(popup, this, saveEntry, screen);
     }
 
     #endregion Popup Methods

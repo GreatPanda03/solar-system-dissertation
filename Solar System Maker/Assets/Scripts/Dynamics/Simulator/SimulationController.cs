@@ -464,11 +464,30 @@ public class SimulationController : MonoBehaviour
         } 
         else 
         {
-            Debug.LogWarning($"ERROR: '{bodyType}' is not a valid Body type!");
+            Debug.LogWarning($"ERROR: '{bodyType}' is not a valid Body type - defaulting to Body");
+            bodyPreview = new Body();
         }
 
-        bodyPreview.CreateEntity();
         bodyPreview.Name = "New " + type.ToString();
+
+        PreparePreviewVisuals();
+    }
+
+    // creates a new preview instance from the given body
+    public void SetEntityPreview(Body body)
+    {
+        bodyPreview = body;
+        bodyPreview.Name = body.Name;
+
+        PreparePreviewVisuals();
+    }
+
+    // auxiliary: prepares the visuals for the body preview
+    public void PreparePreviewVisuals()
+    {
+        if (bodyPreview == null) return;
+
+        bodyPreview.CreateEntity();
         bodyPreview.Entity.transform.parent = simulatorSpace.transform;
 
         renderer.GiveLineRenderer(bodyPreview);

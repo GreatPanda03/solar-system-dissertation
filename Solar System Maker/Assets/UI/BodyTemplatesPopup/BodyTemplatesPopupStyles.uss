@@ -1,0 +1,143 @@
+.container {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.78);
+    padding-right: 5px;
+    padding-left: 5px;
+    width: 600px;
+    height: 500px;
+    max-height: 500px;
+    max-width: 600px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    align-self: center;
+}
+
+#Header {
+    flex-basis: 10%;
+    justify-content: center;
+}
+
+#Close {
+    width: 15px;
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0);
+    color: rgb(255, 6, 6);
+    -unity-font-style: bold;
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    justify-content: flex-start;
+    -unity-text-align: middle-center;
+    position: absolute;
+    max-width: 15px;
+    max-height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    left: 5px;
+    top: 15px;
+    font-size: 18px;
+}
+
+.divider {
+    height: 3px;
+    max-height: 3px;
+    min-height: 3px;
+    background-color: rgba(255, 255, 255, 0.59);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#Title {
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    align-items: stretch;
+    position: relative;
+    font-size: 16px;
+    width: 50%;
+    align-self: center;
+}
+
+.content {
+    flex-basis: 90%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    white-space: nowrap;
+    -unity-text-align: middle-left;
+}
+
+.saveList {
+    flex-basis: 65%;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.selectedEntry {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    margin-right: 0;
+    background-color: rgb(162, 217, 255);
+    transition-duration: 0.25s;
+}
+
+.selectedEntry:hover {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    margin-right: 0;
+    background-color: rgb(107, 198, 255);
+    transition-duration: 0.25s;
+}
+
+.saveViewer {
+    flex-basis: 30%;
+}
+
+.viewerTitle {
+    -unity-font-style: bold;
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+}
+
+.viewerDescription {
+    height: auto;
+    color: rgb(255, 255, 255);
+    white-space: normal;
+    word-spacing: 0;
+    -unity-text-align: upper-center;
+}
+
+.footer {
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#Select {
+    max-width: none;
+    color: rgb(0, 0, 0);
+}
+
+#Delete {
+    max-width: none;
+    color: rgb(0, 0, 0);
+}

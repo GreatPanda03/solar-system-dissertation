@@ -756,7 +756,8 @@ MonoBehaviour:
   tutorialUI: {fileID: 0}
   simulatorUI: {fileID: 9197481963319205126, guid: 1efa3a77ecb7ed74cb23eaec8f736c86, type: 3}
   explorerEntry: {fileID: 9197481963319205126, guid: 23251c35d6365954d8d7882e2ea2bc42, type: 3}
-  bodyTemplatePopup: {fileID: 9197481963319205126, guid: 3d9646489e9912043ba25ee621cc4fbe, type: 3}
+  saveBodyPopup: {fileID: 9197481963319205126, guid: 3d9646489e9912043ba25ee621cc4fbe, type: 3}
+  bodyTemplatesPopup: {fileID: 9197481963319205126, guid: d40a83be8257f8142ac0b61a5949b83c, type: 3}
   optionsPopup: {fileID: 9197481963319205126, guid: a66a80150dc13994eb199ec4b659690a, type: 3}
   saveSimulationPopup: {fileID: 9197481963319205126, guid: e32458bc23189494a8194d217742d05b, type: 3}
   helpPopup: {fileID: 9197481963319205126, guid: 050c2e896f1d3d542aaaab314305e881, type: 3}

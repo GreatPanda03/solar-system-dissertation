@@ -1,4 +1,4 @@
-.saveEntry {
+#SaveEntry {
     width: 100px;
     height: 100px;
     max-width: 100px;
@@ -24,7 +24,7 @@
     transition-property: background-color;
 }
 
-.saveEntry:hover {
+#SaveEntry:hover {
     width: 100px;
     height: 100px;
     max-width: 100px;
@@ -50,7 +50,7 @@
     transition-property: background-color;
 }
 
-.title {
+#Title {
     padding-top: 0;
     padding-right: 0;
     padding-bottom: 0;
