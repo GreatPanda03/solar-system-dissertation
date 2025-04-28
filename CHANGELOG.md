@@ -9,6 +9,32 @@ and *Z* represents fixes, or build-ups to the same feature as a gradual release.
 
 All dates are in the form **YYYY/MM/DD**.
 
+---
+
+### Version: 1.14.0
+**Date:** 2025/04/28
+<br/>**Bug Fixes:**
+* **1)** Verified orbit path rendering for different inclinations *(not sure if it was even broken for this version...)*
+
+**Additions / Changes:**
+* **1)** General code cleanup for Simulator Controller / Handler
+* **2)** Restructured toolbox buttons
+    * **a)** Made "Plane Mode" a standalone mode *(can be used in conjunction with other modes)*
+    * **b)** Added a new set of plane tools to manipulate the plane *(raise, lower, rotate)* - use the magnet tool to toggle grid stickiness
+    * **c)** Created a separate list for time-related buttons
+    * **d)** Removed "Mode" list and moved its icons to the main tool box
+* **3)** Reworked placement modes
+    * **a)** Removed "Free Placement" as an explicit mode - placement will be free by default, but can be placed on the plane with the new stick button
+    * **b)** Separated modes into separate variables to allow multiple modes to be used at once *(e.g., plane and orbit mode)*
+* **4)** Added a "Fixate Plane" button to body tools to align the plane with the selected body *(currently visual only)*
+* **5)** Used "Help Popup" to the "Tutorial" section instead
+* **6)** Replaced icon "Disabled" slash with selection highlighting instead
+* **7)** Added a "Toggle Background" button to switch between a space and blank black background
+
+- **Note:** for the Main Menu, the tutorial popup doesn't render properly yet!
+
+---
+
 ### Version: 1.13.1
 **Date:** 2025/04/28
 <br/>**Bug Fixes:**
