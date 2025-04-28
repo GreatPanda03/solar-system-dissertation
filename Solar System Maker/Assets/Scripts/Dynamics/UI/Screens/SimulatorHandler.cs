@@ -97,7 +97,7 @@ public class SimulatorHandler
 
         // will always start with time going forward & 1s/s
         ui.Q<Button>("ToggleFlow").clicked += OnToggleFlowClicked;
-        simController.physics.TimePerSecond = "Second";
+        simController.physics.TimePerSecond = "1 Second";
         simController.IsRewinding = false;
 
         ui.Q<Button>("SlowTime").clicked += OnSlowTimeClicked;
@@ -630,8 +630,8 @@ public class SimulatorHandler
     // updates the time label with the current time per second
     private void UpdateTimeLabel()
     {
-        string timeText = string.Format("<b>Time:</b> 1 {0} / s", 
-            simController.physics.TimePerSecond.ToLower()); // stylistic
+        string timeText = string.Format("<b>Time:</b> {0} / s", // "unit" already included in key
+            simController.physics.TimePerSecond.ToLower());  // stylistic
 
         ui.Q<Label>("Time").text = timeText;
     }

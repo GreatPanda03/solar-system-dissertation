@@ -9,7 +9,7 @@ public class UnitReference
     public static float G = 1;
 
     public static Dictionary<string, double> DISTANCE_UNITS = new() {
-        ["Centimetre"]      = 1e-2,
+        ["Centimetre"]      = 0.01,
         ["Metre"]           = 1,
         ["Kilometre"]       = 1e+3,
         ["Mile"]            = 1.609_344e+3,
@@ -28,13 +28,28 @@ public class UnitReference
     };
 
     public static Dictionary<string, double> TIME_UNITS = new() {
-        ["Millisecond"]     = 1e-3,
-        ["Second"]          = 1,
-        ["Minute"]          = 60,
-        ["Hour"]            = 3.6e+3,
-        ["Day"]             = 8.64e+4,
-        ["Week"]            = 6.048e+5,
-        ["Month"]           = 2.628e+6, // 30.5 days (average)
-        ["Year"]            = 3.154e+7
+        ["1 Millisecond"]     = 1e-3,
+        ["10 Milliseconds"]   = 0.01,
+        ["100 Milliseconds"]  = 0.1,
+        ["1 Second"]          = 1,
+        ["2 Seconds"]         = 2,
+        ["5 Seconds"]         = 5,
+        ["15 Seconds"]        = 15,
+        ["30 Seconds"]        = 30,
+        ["1 Minute"]          = 60,
+        ["2 Minutes"]         = 120,
+        ["5 Minutes"]         = 300,
+        ["15 Minutes"]        = 900,
+        ["30 Minutes"]        = 1.8e+3,
+        ["1 Hour"]            = 3.6e+3,
+        ["2 Hours"]           = 7.2e+3,
+        ["6 Hours"]           = 2.16e+4,
+        ["12 Hours"]          = 4.32e+4,
+        ["1 Day"]             = 8.64e+4,
+        ["1 Week"]            = 6.048e+5,
+        ["2 Weeks"]           = 1.21e+6,
+        ["1 Month"]           = 2.628e+6,   // 30.5 days (average)
+        ["6 Months"]          = 1.5768e+7,  // ^ ditto
+        ["1 Year"]            = 3.154e+7
     };
 }

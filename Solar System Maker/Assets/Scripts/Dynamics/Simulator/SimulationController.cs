@@ -34,8 +34,10 @@ public class SimulationController : MonoBehaviour
         private set => bodyPreview = value;
     }
     
-    private Vector3? startVelocityPoint;
-    private Plane placementPlane = new(Vector3.up, Vector3.zero);
+    private Vector3? startVelocityPoint; // firing by dragging
+    private Plane placementPlane = new(Vector3.up, Vector3.zero); // plane placement
+    private float eccentricity = 0; // orbit placement
+    private float orbitDirection = -1;
     
     public event Action<Body> OnBodyAdded;
     public event Action<Body> OnBodyRemoved;
@@ -224,6 +226,7 @@ public class SimulationController : MonoBehaviour
         }
         
         startVelocityPoint = null;
+
         CameraController.SetSubject(null);
     }
 
@@ -302,9 +305,10 @@ public class SimulationController : MonoBehaviour
             OnScaleChanged?.Invoke(newScale);
         }
 
-        // when "WASD" pressed - switch back to simulator mode from follow mode
+        // key-sensitive controls (to not interfere with actual typing)
         if (UIController.FocusedField == null)
         {
+            // when "WASD" pressed - switch back to simulator mode from follow mode
             Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
             if (input.x != 0 || input.z != 0)
@@ -312,32 +316,48 @@ public class SimulationController : MonoBehaviour
                 CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
                 CameraController.SetSubject(null);
             }
-        }
 
-        // when "F" pressed - toggle following for the selected body (if any)
-        if (Input.GetKeyDown(AppControls.keybinds["Follow"]) && UIController.FocusedField == null)
-        {
-            if (CameraController.GetCameraMode() == CameraController.CameraMode.Simulator)
+            // when "F" pressed - toggle following for the selected body (if any)
+            if (Input.GetKeyDown(AppControls.keybinds["Follow"]))
             {
-                if (selectedBody != null)
+                if (CameraController.GetCameraMode() == CameraController.CameraMode.Simulator)
                 {
-                    CameraController.SetSubject(selectedBody);
-                    CameraController.SetCameraMode(CameraController.CameraMode.Following);
-                }   
+                    if (selectedBody != null)
+                    {
+                        CameraController.SetSubject(selectedBody);
+                        CameraController.SetCameraMode(CameraController.CameraMode.Following);
+                    }   
+                }
+                else
+                {
+                    CameraController.SetSubject(null);
+                    CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+                }
             }
-            else
-            {
-                CameraController.SetSubject(null);
-                CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
-            }
-        }
 
-        // when "V" pressed - set an appropriate scale to view the subject (if in follow mode)
-        if (Input.GetKeyDown(AppControls.keybinds["Adjust Scale"]) && UIController.FocusedField == null)
-        {
-            if (CameraController.GetCameraMode() == CameraController.CameraMode.Following)
+            // when "V" pressed - set an appropriate scale to view the subject (if in follow mode)
+            if (Input.GetKeyDown(AppControls.keybinds["Adjust Scale"]))
             {
-                ScaleToFit(selectedBody);
+                if (CameraController.GetCameraMode() == CameraController.CameraMode.Following)
+                {
+                    ScaleToFit(selectedBody);
+                }
+            }
+
+            // orbit-mode specific keybinds
+            if (placementMode == PlacementMode.OrbitPlacement)
+            {
+                // when "Z" pressed - decrease eccentricity (only to 0)
+                if (Input.GetKey(AppControls.keybinds["Decrease Eccentricity"]))
+                    eccentricity = Mathf.Max(eccentricity - 0.001f, 0);
+
+                // when "X" pressed - increase eccentricity (only to 0.999)
+                if (Input.GetKey(AppControls.keybinds["Increase Eccentricity"]))
+                    eccentricity = Mathf.Min(eccentricity + 0.001f, 0.99f); // to avoid zero-division
+            
+                // when "C" pressed - swap orbit direction
+                if (Input.GetKey(AppControls.keybinds["Flip Orbit"]))
+                    orbitDirection *= -1;
             }
         }
     }
@@ -570,8 +590,8 @@ public class SimulationController : MonoBehaviour
             {
                 float G = simulation.settings.GravitationalConstant * UnitReference.G;
                 bodyPreview.Position = RunOrbitPlacement(attractor) / scale;
-                bodyPreview.Velocity = physics.GetStableOrbitVelocity(attractor, bodyPreview, G);
-                renderer.DrawOrbitBetweenBodies(attractor, bodyPreview, bodyPreview.Velocity);
+                bodyPreview.Velocity = physics.GetStableOrbitVelocity(attractor, bodyPreview, G, eccentricity);
+                renderer.DrawOrbitBetweenBodies(attractor, bodyPreview, eccentricity);
             }
             else // standard plane placement
             {

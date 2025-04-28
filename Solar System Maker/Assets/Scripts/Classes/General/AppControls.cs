@@ -12,7 +12,10 @@ public class AppControls
         ["Properties"]          = KeyCode.P,
         ["Follow"]              = KeyCode.F,
         ["Adjust Scale"]        = KeyCode.V,
+        ["Move Slower"]         = KeyCode.LeftShift,
         ["Move Faster"]         = KeyCode.LeftControl,
-        ["Move Slower"]         = KeyCode.LeftShift
+        ["Decrease Eccentricity"] = KeyCode.Z,
+        ["Increase Eccentricity"] = KeyCode.X,
+        ["Flip Orbit"]          = KeyCode.C
     };
 }

@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 
 public class PhysicsHandler
@@ -39,7 +40,7 @@ public class PhysicsHandler
     public PhysicsHandler(SimulationController simController)
     {
         this.simController = simController;
-        timePerSecond = "Second";
+        timePerSecond = "1 Second";
     }
 
     #endregion Constructor
@@ -78,18 +79,35 @@ public class PhysicsHandler
 
     // returns the velocity required for the given child body to have a stable orbit around the given parent body
     // * velocity is based on the true positions of each body, which is then scaled accordingly later
-    public Vector3 GetStableOrbitVelocity(Body parent, Body child, float G)
+
+    // source: 
+    public Vector3 GetStableOrbitVelocity(
+        Body parent, 
+        Body child, 
+        float G, 
+        float eccentricity = 0)
     {
         Vector3 centre = parent.Position;
         Vector3 edge = child.Position;
-
         float r = Vector3.Distance(centre, edge);
+
         Vector3 gravityDirection = (edge - centre).normalized;
         Vector3 velocityDirection = Vector3.Cross(gravityDirection, Vector3.up);
 
-        float M = parent.Mass;
+        // * METHOD 1: fixed radius (constant velocity)
+        // * formula: v = root(G * M * r)
+        // float M = parent.Mass;
+        // Vector3 velocity = parent.Velocity + (velocityDirection * Mathf.Sqrt(G * M / r));
 
-        Vector3 velocity = parent.Velocity + (velocityDirection * Mathf.Sqrt(G * M / r));
+
+        // * METHOD 2: eccentric orbit (changing velocity)
+        // * calculates the velocity at the periapsis - same idea as in RenderingHandler
+        // * formula: v_per = root( (1 + e) x mu / (1 - e) / a )
+        float a = r / (1 - eccentricity);
+        float numerator = (1 + eccentricity) * G * (parent.Mass + child.Mass);
+        float denominator = (1 - eccentricity) * a;
+
+        Vector3 velocity = velocityDirection * Mathf.Sqrt(numerator / denominator);
 
         return velocity;
     }
