@@ -108,7 +108,7 @@ public class RenderingHandler
 
         gradient.SetKeys( // line that fades out
             new GradientColorKey[] {new(Color.white, 0), new(Color.white, 1)},
-            new GradientAlphaKey[] {new(1, 0), new(0.1f, 1f)});
+            new GradientAlphaKey[] {new(1, 0), new(0, 1)});
 
         pathDrawer.colorGradient = gradient;
     }
@@ -134,7 +134,7 @@ public class RenderingHandler
         Body parent, 
         Body child, 
         float eccentricity = 0,
-        float orbitDirection = -1)
+        float orbitDirection = 1)
     {
 
         // measurements
@@ -150,7 +150,7 @@ public class RenderingHandler
         // * "abs" so the path doesn't "flip", "offset" to account for inclination
         float degreesDiff = Mathf.Abs(Vector3.SignedAngle(scaledVector, Vector3.up, Vector3.forward));
         float scaledXZ = Mathf.Sqrt(Mathf.Pow(scaledVector.x, 2) + Mathf.Pow(scaledVector.z, 2));
-        float radiansOffset = Mathf.Atan2(scaledVector.y, scaledXZ); // accounts for 0 too!
+        float radiansOffset = 180 * Mathf.Atan2(scaledVector.y, scaledXZ); // accounts for 0 too!
         float startingRadians = (degreesDiff * Mathf.Deg2Rad) - radiansOffset;
 
         // full distance of "a", with its scale restored (since the above is ratio-based)

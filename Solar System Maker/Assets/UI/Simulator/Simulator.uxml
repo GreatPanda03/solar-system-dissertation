@@ -143,6 +143,7 @@
             <ui:Button name="OrbitPlacement" tooltip="Orbit Placement" class="toolboxButton">
                 <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: url(&quot;project://database/Assets/Resources/Icons/ToolBox/Modes/OrbitPlacement.png?fileID=2800000&amp;guid=1777bcebfa279584fa908aedbbee61ce&amp;type=3#OrbitPlacement&quot;);" />
             </ui:Button>
+            <ui:Label text="(e = 0)" name="Eccentricity" style="-unity-font-style: normal; color: rgb(255, 255, 255); -unity-text-align: middle-left; display: none;" />
         </ui:VisualElement>
         <ui:VisualElement name="DistanceList" class="toolboxList">
             <ui:Label text="Distance" name="DistanceLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />

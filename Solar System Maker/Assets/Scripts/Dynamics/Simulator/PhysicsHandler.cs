@@ -85,14 +85,15 @@ public class PhysicsHandler
         Body parent, 
         Body child, 
         float G, 
-        float eccentricity = 0)
+        float eccentricity = 0,
+        float orbitDirection = 1)
     {
         Vector3 centre = parent.Position;
         Vector3 edge = child.Position;
         float r = Vector3.Distance(centre, edge);
 
         Vector3 gravityDirection = (edge - centre).normalized;
-        Vector3 velocityDirection = Vector3.Cross(gravityDirection, Vector3.up);
+        Vector3 velocityDirection = Vector3.Cross(gravityDirection, Vector3.up * -orbitDirection);
 
         // * METHOD 1: fixed radius (constant velocity)
         // * formula: v = root(G * M * r)
@@ -107,7 +108,8 @@ public class PhysicsHandler
         float numerator = (1 + eccentricity) * G * (parent.Mass + child.Mass);
         float denominator = (1 - eccentricity) * a;
 
-        Vector3 velocity = velocityDirection * Mathf.Sqrt(numerator / denominator);
+        Vector3 velocity = parent.Velocity 
+            + (velocityDirection * Mathf.Sqrt(numerator / denominator));
 
         return velocity;
     }

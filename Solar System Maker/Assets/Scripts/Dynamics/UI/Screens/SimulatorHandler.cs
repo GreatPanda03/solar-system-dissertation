@@ -129,6 +129,7 @@ public class SimulatorHandler
         simController.OnBodyDeselected += OnBodyDeselected;
         simController.OnScaleChanged += OnScaleChanged;
         simController.OnPhysicsUpdate += OnPhysicsUpdate;
+        simController.OnOrbitChanged += OnOrbitChanged;
     }
 
     public void UnsubscribeEvents()
@@ -139,6 +140,7 @@ public class SimulatorHandler
         simController.OnBodyDeselected -= OnBodyDeselected;
         simController.OnScaleChanged -= OnScaleChanged;
         simController.OnPhysicsUpdate -= OnPhysicsUpdate;
+        simController.OnOrbitChanged += OnOrbitChanged;
     }
 
     #endregion Event Methods
@@ -233,6 +235,11 @@ public class SimulatorHandler
         }
     }
 
+    public void OnOrbitChanged(float eccentricity)
+    {
+        ui.Q<Label>("Eccentricity").text = $"(e = {eccentricity:0.000})";
+    }
+
     #endregion Simulator Events
 
 
@@ -285,6 +292,9 @@ public class SimulatorHandler
 
         if (savePopup == null)
         {
+            if (simController.IsRunning)
+                OnTogglePlayClicked(); // pause
+
             uiController.ShowSaveSimulationPopup(ui, simController.simulation);
         }
         else
@@ -518,6 +528,9 @@ public class SimulatorHandler
 
         Button newButton = ui.Q<Button>(newMode);
         newButton.AddToClassList("selectedButton");
+
+        ui.Q<Label>("Eccentricity").style.display 
+            = (newMode == "OrbitPlacement") ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     // NB: a placement mode is ALWAYS selected - there can never be none
@@ -621,7 +634,7 @@ public class SimulatorHandler
     private void UpdateScaleLabel()
     {
         string zoomText = string.Format("<b>Scale:</b> 1 {0} x {1:0.000}", 
-            simController.renderer.Distance, 
+            simController.renderer.Distance.ToLower(), 
             1 / Math.Pow(10, simController.renderer.ZoomFactor));
 
         ui.Q<Label>("Scale").text = zoomText;

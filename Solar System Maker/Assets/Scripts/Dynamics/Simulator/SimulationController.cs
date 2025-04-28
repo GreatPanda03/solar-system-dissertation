@@ -45,6 +45,7 @@ public class SimulationController : MonoBehaviour
     public event Action<Body> OnBodyDeselected;
     public event Action<float> OnScaleChanged;
     public event Action OnPhysicsUpdate;
+    public event Action<float> OnOrbitChanged;
 
     public List<SpaceSnapshot> snapshots;
 
@@ -350,13 +351,15 @@ public class SimulationController : MonoBehaviour
                 // when "Z" pressed - decrease eccentricity (only to 0)
                 if (Input.GetKey(AppControls.keybinds["Decrease Eccentricity"]))
                     eccentricity = Mathf.Max(eccentricity - 0.001f, 0);
+                    OnOrbitChanged?.Invoke(eccentricity);
 
                 // when "X" pressed - increase eccentricity (only to 0.999)
                 if (Input.GetKey(AppControls.keybinds["Increase Eccentricity"]))
                     eccentricity = Mathf.Min(eccentricity + 0.001f, 0.99f); // to avoid zero-division
+                    OnOrbitChanged?.Invoke(eccentricity);
             
                 // when "C" pressed - swap orbit direction
-                if (Input.GetKey(AppControls.keybinds["Flip Orbit"]))
+                if (Input.GetKeyDown(AppControls.keybinds["Flip Orbit"]))
                     orbitDirection *= -1;
             }
         }
@@ -590,8 +593,12 @@ public class SimulationController : MonoBehaviour
             {
                 float G = simulation.settings.GravitationalConstant * UnitReference.G;
                 bodyPreview.Position = RunOrbitPlacement(attractor) / scale;
-                bodyPreview.Velocity = physics.GetStableOrbitVelocity(attractor, bodyPreview, G, eccentricity);
-                renderer.DrawOrbitBetweenBodies(attractor, bodyPreview, eccentricity);
+                
+                bodyPreview.Velocity = physics.GetStableOrbitVelocity(
+                    attractor, bodyPreview, G, eccentricity, orbitDirection);
+                
+                renderer.DrawOrbitBetweenBodies(
+                    attractor, bodyPreview, eccentricity, orbitDirection);
             }
             else // standard plane placement
             {
