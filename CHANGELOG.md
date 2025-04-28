@@ -11,8 +11,20 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.13.0
+**Date:** 2025/04/28
+<br/>**Additions / Changes:**
+* **1)** Orbit paths now also render relative to orientation
+* **2)** Orbits can now be made elliptical by adjusting their eccentricity
+* **3)** Added keybinds to adjust orbit eccentricity *("Z" to decrease, "X" to increase)*
+* **4)** Added keybind to swap the direction of orbit *("C" to swap)*
+* **5)** Made orbit paths slightly less transparent to make tail end more visible
+* **6)** Added finer time intervals *(15s, 30s, 45s, etc.)*
+
+---
+
 ### Version: 1.12.1
-**Date:** 2025/04/07
+**Date:** 2025/04/27
 <br/>**Additions / Changes:**
 * **1)** Added ready-to-use "time coefficient" value to physics renderer
 * **2)** Added acceleration magnitude to properties window
