@@ -9,6 +9,19 @@ and *Z* represents fixes, or build-ups to the same feature as a gradual release.
 
 All dates are in the form **YYYY/MM/DD**.
 
+### Version: 1.13.1
+**Date:** 2025/04/28
+<br/>**Bug Fixes:**
+* **1)** Reverted orbit path tail transparency *(wrong values changed, decided to leave it)*
+* **2)** Fixed orbit direction not being used in calculations at all *(and amended how they affect velocity)*
+* **3)** Fixed orbit direction keybind being a "hold down" control *(now only single press)*
+* **4)** Amended orbit calculation to accounting for parent body's velocity
+* **5)** Fixed simulation not pausing when using "Save As"
+
+**Additions / Changes:**
+* **1)** Added an eccentricity label in the placement mode's list *(visible when in orbit mode)*
+* **2)** Made scale label unit lowercase *(for style)*
+
 ---
 
 ### Version: 1.13.0
