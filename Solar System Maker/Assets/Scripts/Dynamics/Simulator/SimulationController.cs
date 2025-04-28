@@ -14,30 +14,17 @@ public class SimulationController : MonoBehaviour
     public Simulation simulation;
     public new RenderingHandler renderer; // reserved library? hence new
     public PhysicsHandler physics;
-
-    public enum PlacementMode { FreePlacement, PlanePlacement, OrbitPlacement }
-    public PlacementMode placementMode;
-    public GameObject simulatorSpace;
+    
+    public GameObject simulatorSpace;       // general placement
     public GameObject simulatorPlane;
-    
-    private Body selectedBody;
-    public Body SelectedBody { 
-        get => selectedBody; 
-        private set => selectedBody = value; 
-    }
-    // ^ NB: "Body" is serialisable, SO KEEP THIS PRIVATE
-    //   (otherwise Unity defaults it to new Body())
-
-    private Body bodyPreview;
-    public Body BodyPreview { 
-        get => bodyPreview; 
-        private set => bodyPreview = value;
-    }
-    
-    private Vector3? startVelocityPoint; // firing by dragging
-    private Plane placementPlane = new(Vector3.up, Vector3.zero); // plane placement
-    private float eccentricity = 0; // orbit placement
-    private float orbitDirection = -1;
+    private Vector3? startVelocityPoint;    // fire by dragging
+    private Plane placementPlane 
+        = new(Vector3.up, Vector3.zero);    // plane placement
+    public bool planeEnabled = false;
+    public bool stickToPlane = false;
+    public bool orbitEnabled = false;      // orbit placement
+    public float eccentricity = 0;
+    public float orbitDirection = -1;
     
     public event Action<Body> OnBodyAdded;
     public event Action<Body> OnBodyRemoved;
@@ -48,6 +35,20 @@ public class SimulationController : MonoBehaviour
     public event Action<float> OnOrbitChanged;
 
     public List<SpaceSnapshot> snapshots;
+
+    private Body selectedBody;
+    public Body SelectedBody { 
+        get => selectedBody; 
+        private set => selectedBody = value; 
+    }
+    // ^ NB: "Body" is serialisable, SO KEEP THIS PRIVATE
+    //   (otherwise Unity defaults it to new Body() - bad if there isn't actually a body)
+
+    private Body bodyPreview;
+    public Body BodyPreview { 
+        get => bodyPreview; 
+        private set => bodyPreview = value;
+    }
 
     private bool isActive = false;
     public bool IsActive {
@@ -70,18 +71,26 @@ public class SimulationController : MonoBehaviour
             if (showLabels)
             {
                 foreach (Body body in simulation.bodies)
+                {
                     body.SetLabelVisibility(body.ShowLabel);
+                }
 
                 if (bodyPreview?.Label != null)
+                {
                     bodyPreview.SetLabelVisibility(true);
+                }
             }
             else
             {
                 foreach (Body body in simulation.bodies)
+                {
                     body.SetLabelVisibility(false);
+                }
 
                 if (bodyPreview?.Label != null)
+                {
                     bodyPreview.SetLabelVisibility(false);
+                }
             }
         }
     }
@@ -95,12 +104,16 @@ public class SimulationController : MonoBehaviour
             if (showTrails)
             {
                 foreach (Body body in simulation.bodies)
+                {
                     body.SetTrailVisibility(body.ShowTrail);
+                }
             }
             else
             {
                 foreach (Body body in simulation.bodies)
+                {
                     body.SetTrailVisibility(false);
+                }
             }
         }
     }
@@ -148,7 +161,7 @@ public class SimulationController : MonoBehaviour
     // clears all bodies in the Simulator
     public void ClearSimulator()
     {
-        foreach (Body body in GetBodies())
+        foreach (Body body in simulation.bodies)
         {
             body.DestroyEntity();
         }
@@ -178,12 +191,6 @@ public class SimulationController : MonoBehaviour
 
 
     #region Simulator Methods
-
-    // returns all bodies in the simulation
-    public List<Body> GetBodies()
-    {
-        return simulation.bodies;
-    }
 
     // adds the given body to the simulation
     public void AddBody(Body body)
@@ -216,7 +223,7 @@ public class SimulationController : MonoBehaviour
 
     public void DisableSimulator()
     {
-        SetPlaneVisibility(false);
+        DisablePlane();
 
         FullDisable();
         
@@ -255,7 +262,10 @@ public class SimulationController : MonoBehaviour
                 renderer.ApplyScale(bodyPreview);
                 RunPreviewPlacement();
 
-                if (showLabels) renderer.RenderLabel(bodyPreview);
+                if (showLabels)
+                {
+                    renderer.RenderLabel(bodyPreview);
+                }
             }
 
             // body selection
@@ -268,7 +278,9 @@ public class SimulationController : MonoBehaviour
             foreach(Body body in simulation.bodies)
             {
                 if (body.ShowLabel)
+                {
                     renderer.RenderLabel(body);
+                }
             }
         }
 
@@ -278,7 +290,9 @@ public class SimulationController : MonoBehaviour
             if (showTrails) // clear trails to remove streaks
             {
                 foreach (Body body in simulation.bodies)
+                {
                     body.Entity.GetComponent<TrailRenderer>().Clear();
+                }
             }
         }
     }
@@ -345,22 +359,74 @@ public class SimulationController : MonoBehaviour
                 }
             }
 
-            // orbit-mode specific keybinds
-            if (placementMode == PlacementMode.OrbitPlacement)
+            // plane mode specific keybinds
+            if (planeEnabled)
+            {
+                // when "U" pressed - move plane down
+                if (Input.GetKey(AppControls.keybinds["Lower Plane"]))
+                {
+                    TranslatePlane(new Vector3(0, -1, 0));
+                }
+
+                // when "I" pressed - raise the plane
+                if (Input.GetKey(AppControls.keybinds["Raise Plane"]))
+                {
+                    TranslatePlane(new Vector3(0, 1, 0));
+                }
+
+                // when "J" pressed - rotate the plane left
+                if (Input.GetKey(AppControls.keybinds["Turn Plane Left"]))
+                {
+                    TurnPlane(new Vector3(-1, 0, 0));
+                }
+
+                // when "K" pressed - rotate the plane right
+                if (Input.GetKey(AppControls.keybinds["Turn Plane Right"]))
+                {
+                    TurnPlane(new Vector3(1, 0, 0));
+                }
+
+                // when "N" pressed - rotate the plane backwards
+                if (Input.GetKey(AppControls.keybinds["Turn Plane Backwards"]))
+                {
+                    TurnPlane(new Vector3(0, 0, -1));
+                }
+
+                // when "M" pressed - rotate the plane forward
+                if (Input.GetKey(AppControls.keybinds["Turn Plane Forwards"]))
+                {
+                    TurnPlane(new Vector3(0, 0, 1));
+                }
+
+                // when "O" pressed - reset plane to origin
+                if (Input.GetKey(AppControls.keybinds["Reset Plane"]))
+                {
+                    SetPlanePositionAndRotation(Vector3.zero, Quaternion.Euler(90, 0, 0));
+                }
+            }
+
+            // orbit mode specific keybinds
+            if (planeEnabled)
             {
                 // when "Z" pressed - decrease eccentricity (only to 0)
                 if (Input.GetKey(AppControls.keybinds["Decrease Eccentricity"]))
+                {
                     eccentricity = Mathf.Max(eccentricity - 0.001f, 0);
                     OnOrbitChanged?.Invoke(eccentricity);
+                }
 
                 // when "X" pressed - increase eccentricity (only to 0.999)
                 if (Input.GetKey(AppControls.keybinds["Increase Eccentricity"]))
+                {
                     eccentricity = Mathf.Min(eccentricity + 0.001f, 0.99f); // to avoid zero-division
                     OnOrbitChanged?.Invoke(eccentricity);
-            
+                }
+
                 // when "C" pressed - swap orbit direction
                 if (Input.GetKeyDown(AppControls.keybinds["Flip Orbit"]))
+                {
                     orbitDirection *= -1;
+                }
             }
         }
     }
@@ -381,8 +447,10 @@ public class SimulationController : MonoBehaviour
         }
         else
         {
-            foreach (Body body in GetBodies())
+            foreach (Body body in simulation.bodies)
+            {
                 renderer.ApplyScale(body);
+            }
         }
 
         OnPhysicsUpdate?.Invoke();
@@ -409,11 +477,18 @@ public class SimulationController : MonoBehaviour
                 Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
                     simulation.settings.GravitationalConstant);
 
-                if (!bodyA.Anchored) bodyA.ApplyForce(force);
+                if (!bodyA.Anchored) 
+                {
+                    bodyA.ApplyForce(force);
+                }
+
                 bodyB.ApplyForce(-force);
             }
 
-            if (!bodyA.Anchored) bodyA.Update(physics.TimeCoefficient);
+            if (!bodyA.Anchored)
+            {
+                bodyA.Update(physics.TimeCoefficient);
+            }
 
             renderer.ApplyScale(bodyA);
         }
@@ -528,6 +603,7 @@ public class SimulationController : MonoBehaviour
                 bodyPreview.Entity.GetComponent<LineRenderer>().enabled = false;
                 bodyPreview.DestroyEntity();
             }
+
             bodyPreview = null;
         }
     }
@@ -537,42 +613,23 @@ public class SimulationController : MonoBehaviour
 
     #region Preview Placement
 
-    // sets the method to use when placing a body preview
-    public void SetPlacementMode(string modeName)
-    {
-        if (Enum.TryParse(modeName, out PlacementMode newMode))
-        {   
-            placementMode = newMode;
-            SetPlaneVisibility(newMode == PlacementMode.PlanePlacement);
-        }
-        else
-        {
-            Debug.Log($"[ERROR] '{modeName}' is an invalid mode!");
-        }
-    }
-
     // gathers the REAL position and velocity to set the preview body at
     // * "REAL" is relative to space, not the scene
     public void RunPreviewBearings()
     {
-        float scale = renderer.Scale;
-
-        if (placementMode == PlacementMode.FreePlacement)         // visual position & visual velocity
+        // determine position
+        if (stickToPlane)
         {
-            bodyPreview.Position = RunFreePlacement() / scale;      
-            bodyPreview.Velocity = GetFreeVelocityDrag() / scale;
-            renderer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
+            bodyPreview.Position = RunPlanePlacement();
         }
-        else if (placementMode == PlacementMode.PlanePlacement)   // visual position & velocity
+        else
         {
-            bodyPreview.Position = RunPlanePlacement() / scale;     
-            bodyPreview.Velocity = GetPlaneVelocityDrag() / scale;
-            renderer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
+            bodyPreview.Position = RunFreePlacement();
         }
-        else if (placementMode == PlacementMode.OrbitPlacement)   // visual position, but TRUE velocity
-        {
-            startVelocityPoint = null; // no dragging for fixed orbits!
 
+        // determine velocity
+        if (orbitEnabled)
+        {
             Body attractor = null;
 
             if (selectedBody != null)
@@ -589,10 +646,11 @@ public class SimulationController : MonoBehaviour
                 }
             }
 
-            if (attractor != null) // placement around the body ("capped" at attractor's radius)
+            if (attractor != null) // also restricts to beyond attractor's radius
             {
                 float G = simulation.settings.GravitationalConstant * UnitReference.G;
-                bodyPreview.Position = RunOrbitPlacement(attractor) / scale;
+
+                bodyPreview.Position = RestrictToRadiusOfTarget(bodyPreview, attractor);
                 
                 bodyPreview.Velocity = physics.GetStableOrbitVelocity(
                     attractor, bodyPreview, G, eccentricity, orbitDirection);
@@ -600,11 +658,19 @@ public class SimulationController : MonoBehaviour
                 renderer.DrawOrbitBetweenBodies(
                     attractor, bodyPreview, eccentricity, orbitDirection);
             }
-            else // standard plane placement
+        }
+        else
+        {
+            if (stickToPlane)
             {
-                bodyPreview.Position = RunPlanePlacement() / scale;
-                bodyPreview.Velocity = Vector3.zero;
+                bodyPreview.Velocity = GetPlaneVelocityDrag();    
             }
+            else
+            {
+                bodyPreview.Velocity = GetFreeVelocityDrag();
+            }
+            
+            renderer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
         }
     }
 
@@ -630,8 +696,7 @@ public class SimulationController : MonoBehaviour
 
     #region Free Placement
 
-    // allows the user to freely place bodies relative to the camera
-    // * position is based on the mouse's position on the screen
+    // returns a space position relative to a distance from the user's camera
     private Vector3 RunFreePlacement()
     {
         if (startVelocityPoint == null)
@@ -640,16 +705,15 @@ public class SimulationController : MonoBehaviour
             screenPosition.z = Camera.main.nearClipPlane + 30;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
 
-            return worldPosition;
+            return worldPosition / renderer.Scale;
         }
         else
         {
-            return bodyPreview.Entity.transform.position;
+            return bodyPreview.Position;
         }
     }
     
-    // returns a velocity based on the distance the mouse has moved after right click (if any)
-    // * velocity is based on the mouse's position on the screen
+    // returns a space velocity relative to the user's "drag and release"
     private Vector3 GetFreeVelocityDrag()
     {
         // starting the trajectory
@@ -673,7 +737,7 @@ public class SimulationController : MonoBehaviour
             screenPosition.z = Camera.main.nearClipPlane + 30;
             Vector3 endVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
 
-            return (Vector3) (startVelocityPoint - endVelocityPoint) / 10f;
+            return (Vector3) (startVelocityPoint - endVelocityPoint) / renderer.Scale;
         }
 
         return Vector3.zero;
@@ -684,27 +748,64 @@ public class SimulationController : MonoBehaviour
 
     #region Plane Placement
 
-    // sets the visibility of the plane
-    public void SetPlaneVisibility(bool visible)
+    // enables the plane
+    public void EnablePlane()
     {
-        simulatorPlane.GetComponent<Renderer>().enabled = visible;
+        planeEnabled = true;
+        simulatorPlane.GetComponent<Renderer>().enabled = true;
     }
 
-    // allows the user to place bodies on a fixed plane
-    // * position is based on the mouse's position on the screen
+    // disables the plane
+    public void DisablePlane()
+    {
+        simulatorPlane.GetComponent<Renderer>().enabled = false;
+        planeEnabled = false;
+    }
+
+    // enables sticking to the plane
+    public void EnableStickToPlane()
+    {
+        stickToPlane = true;
+    }
+
+    // disables sticking to the plane
+    public void DisableStickToPlane()
+    {
+        stickToPlane = false;
+    }
+
+    // returns the world point where the user's mouse meets the plane
+    private Vector3? GetMouseOnPlane()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (placementPlane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+
+        return null;
+    }
+
+    // returns the space position of the mouse's position along the plane (intersection)
     private Vector3 RunPlanePlacement()
     {
+        Debug.Log("running plane placement");
+
         if (startVelocityPoint == null)
         {
             Vector3? position = GetMouseOnPlane();
-            if (position != null) return (Vector3) position;
+            
+            if (position != null) 
+            {
+                return (Vector3) position / renderer.Scale;
+            }
         }
         
-        return bodyPreview.Entity.transform.position;
+        return bodyPreview.Position;
     }
 
-    // returns a velocity trajectory for plane mode from the mouse positions
-    // * velocity is based on the mouse's position on the screen
+    // returns the space velocity relative to the user's "drag and release" along the plane
     private Vector3 GetPlaneVelocityDrag()
     {
         // starting the trajectory
@@ -723,24 +824,42 @@ public class SimulationController : MonoBehaviour
         else if (startVelocityPoint != null)
         {
             Vector3? endVelocityPoint = GetMouseOnPlane();
-            return endVelocityPoint != null ? (Vector3) (startVelocityPoint - endVelocityPoint) / 10f : Vector3.zero;
+
+            return endVelocityPoint != null 
+                ? (Vector3) (startVelocityPoint - endVelocityPoint) / renderer.Scale
+                : Vector3.zero;
         }
 
         return Vector3.zero;
     }
 
-    // returns the point where the user's mouse intersects the plane Y = 0 (if any)
-    // * position is based on the mouse's position on the screen
-    private Vector3? GetMouseOnPlane()
+    // updates the placement plane to the given position and rotation
+    public void SetPlanePositionAndRotation(
+        Vector3 position, Quaternion rotation)
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        simulatorPlane.transform.position = position;
+        simulatorPlane.transform.rotation = rotation;
 
-        if (placementPlane.Raycast(ray, out float distance))
-        {
-            return ray.GetPoint(distance);
-        }
+        placementPlane.SetNormalAndPosition(
+            simulatorPlane.transform.up, simulatorPlane.transform.position);
+    }
 
-        return null;
+    // adjusts the plane by the given vector
+    public void TranslatePlane(Vector3 shift)
+    {
+        SetPlanePositionAndRotation(
+            simulatorPlane.transform.position + shift,
+            simulatorPlane.transform.rotation);
+    }
+
+    // turns the plane by the given rotation
+    public void TurnPlane(Vector3 rotation)
+    {
+        simulatorPlane.transform.Rotate(rotation);
+
+        SetPlanePositionAndRotation(
+            simulatorPlane.transform.position,
+            simulatorPlane.transform.rotation);
     }
 
     #endregion Plane Placement
@@ -748,28 +867,34 @@ public class SimulationController : MonoBehaviour
 
     #region Orbit Placement
 
-    // allows the user to place bodies in an orbit relative to other bodies (plane as a reference)
-    // * position is based on the mouse's position on the screen
-    // * position is also "capped" at the parent's and bodyPreview's combined radii
-    private Vector3 RunOrbitPlacement(Body parent)
+    // enables orbit mode
+    public void EnableOrbit()
     {
-        Vector3? planePosition = GetMouseOnPlane();
-        Vector3 position = (Vector3) (planePosition != null ? planePosition : bodyPreview.Entity.transform.position);
+        orbitEnabled = true;
+        startVelocityPoint = null; // no dragging for orbits
+        // * ^ MUST do this, otherwise locked out of positioning
+    }
 
-        // scaled to world position
-        double scale = renderer.Scale;
-        float radiiSum = (parent.Radius * (float) scale) + (bodyPreview.Radius * (float) scale);
-        Vector3 parentPos = parent.Position * (float) scale;
-        Vector3 vector = position - parentPos; // parent -> bodyPreview
+    // disables orbit mode
+    public void DisableOrbit()
+    {
+        orbitEnabled = false;
+    }
+
+    // returns a space position where the subject lies at least at the edge of the target
+    private Vector3 RestrictToRadiusOfTarget(Body subject, Body target)
+    {
+        float radiiSum = target.Radius + bodyPreview.Radius;
+        Vector3 vector = subject.Position - target.Position; // parent -> bodyPreview
 
         if (vector.magnitude > radiiSum)
         {
-            return position;
+            return subject.Position;
         }
         else
         {
             Vector3 direction = vector.normalized;
-            return parentPos + (radiiSum * direction);
+            return target.Position + (radiiSum * direction);
         }
     }
 

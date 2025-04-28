@@ -3,11 +3,12 @@
 
 using UnityEngine.UIElements;
 
-public class SaveBodyPopupHandler
+public class SaveBodyPopupHandler : IPopup
 {
     
     #region Attributes
 
+    public static string identifier = "SaveBodyPopup";
     public VisualElement popup;
     public UIController uiController;
     public VisualElement parent;
@@ -30,9 +31,9 @@ public class SaveBodyPopupHandler
         this.parent = parent;
         this.body = body;
 
-        if (parent.Q<VisualElement>("BodyTemplatePopup") != null) return;
+        if (parent.Q<VisualElement>(identifier) != null) return;
 
-        popup.name = "BodyTemplatePopup";
+        popup.name = identifier;
         parent.Add(popup);
 
         popup.Q<TextField>("Name").value = body.Name;

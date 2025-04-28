@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering.LookDev;
 using UnityEngine.UIElements;
 
 
@@ -24,7 +25,6 @@ public class SimulatorHandler
     public VisualTreeAsset optionsPopup;
     public VisualTreeAsset savePopup;
     public VisualTreeAsset bodyTemplatePopup;
-    public VisualTreeAsset helpPopup;
     
     private string selectedBodyItem;
     private VisualElement focusedField;
@@ -44,8 +44,7 @@ public class SimulatorHandler
         VisualTreeAsset explorerEntry,
         VisualTreeAsset optionsPopup,
         VisualTreeAsset savePopup,
-        VisualTreeAsset bodyTemplatePopup,
-        VisualTreeAsset helpPopup
+        VisualTreeAsset bodyTemplatePopup
     ) {
         this.ui = ui;
         this.uiController = uiController;
@@ -54,66 +53,23 @@ public class SimulatorHandler
         this.optionsPopup = optionsPopup;
         this.savePopup = savePopup;
         this.bodyTemplatePopup = bodyTemplatePopup;
-        this.helpPopup = helpPopup;
 
-        ui.Q<VisualElement>("ToolBar").Q<Label>("Title").text = simController.simulation.settings.Name;
-        ui.Q<Button>("Options").clicked += OnOptionsClicked;
-        ui.Q<Button>("Save").clicked += OnSaveClicked;
-        ui.Q<Button>("SaveAs").clicked += OnSaveAsClicked;
-        ui.Q<Button>("Help").clicked += OnHelpClicked;
-        ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
+        ui.Q<VisualElement>("Toolbar").Q<Label>("Title").text 
+            = simController.simulation.settings.Name;
 
-        ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
-        InitialiseExplorerSearchBar();
-        ui.Q("Explorer").Q<Button>("Close").clicked += OnExplorerCloseClicked;
-        ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
-        RefreshExplorer();
+        InitialiseToolbarButtons();
+        
+        InitialiseToolboxButtons();
 
-        ui.Q<Button>("Bodies").clicked += OnBodiesClicked;
-        InitialiseBodyItemButtons();
-        ui.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
-
-        ui.Q<Button>("Modes").clicked += OnModesClicked;
-        InitialiseModeButtons();
-        SelectModeItem("FreePlacement");
-        ui.Q<VisualElement>("ModeList").style.display = DisplayStyle.None;
-
-        ui.Q<Button>("Distance").clicked += OnDistanceClicked;
-        InitialiseDistanceButtons();
-        SelectDistanceItem("Kilometre");
-        ui.Q<VisualElement>("DistanceList").style.display = DisplayStyle.None;
-
-        UpdateScaleLabel();
-
-        ui.Q<Button>("ToggleLabels").clicked += OnToggleLabelsClicked;
-
-        ui.Q<Button>("ToggleTrails").clicked += OnToggleTrailsClicked;
-
-        ui.Q<Button>("TogglePlay").clicked += OnTogglePlayClicked;
-    
-        // could be either playing or paused (depending on where this sim was loaded from)
-        ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
-            = Resources.Load<Texture2D>($"Icons/Toolbox/Options/{(simController.IsRunning ? "Paused" : "Playing")}");
-
-        // will always start with time going forward & 1s/s
-        ui.Q<Button>("ToggleFlow").clicked += OnToggleFlowClicked;
-        simController.physics.TimePerSecond = "1 Second";
-        simController.IsRewinding = false;
-
-        ui.Q<Button>("SlowTime").clicked += OnSlowTimeClicked;
-
-        ui.Q<Button>("SpeedTime").clicked += OnSpeedTimeClicked;
+        InitialiseExplorer();
 
         InitialiseBodyTools();
-        SetBodyToolsVisible(false);
 
-        InitialisePropertyFields();
-        ui.Q<Button>("Close").clicked += OnPropertiesCloseClicked;
-        SetPropertiesVisible(false);
-        UpdateProperties(null); // hide fields too
+        InitialiseProperties();
+
+        InitialiseInputs();
 
         SubscribeEvents();
-        InitialiseInputs();
     }
 
     #endregion Constructor
@@ -243,7 +199,32 @@ public class SimulatorHandler
     #endregion Simulator Events
 
 
+    #region General UI
+
+    public void MarkAsSelected(VisualElement element)
+    {
+        element.AddToClassList("selectedButton");
+    }
+
+    public void MarkAsDeselected(VisualElement element)
+    {
+        element.RemoveFromClassList("selectedButton");
+    }
+
+    #endregion General UI
+
+
     #region Toolbar Methods
+
+    // prepares all toolbar buttons
+    public void InitialiseToolbarButtons()
+    {
+        ui.Q<Button>("Options").clicked += OnOptionsClicked;
+        ui.Q<Button>("Save").clicked += OnSaveClicked;
+        ui.Q<Button>("SaveAs").clicked += OnSaveAsClicked;
+        ui.Q<Button>("Help").clicked += OnHelpClicked;
+        ui.Q<Button>("ExitSimulator").clicked += OnExitSimulatorClicked;
+    }
 
     // sets the title of the interface at the top of the screen
     public void SetTitle(string title)
@@ -279,7 +260,7 @@ public class SimulatorHandler
         else
         {
             if (simController.IsRunning)
-                OnTogglePlayClicked(); // pause
+                OnPlayClicked(); // pause
 
             uiController.ShowSaveSimulationPopup(ui, simController.simulation);
         }
@@ -293,7 +274,7 @@ public class SimulatorHandler
         if (savePopup == null)
         {
             if (simController.IsRunning)
-                OnTogglePlayClicked(); // pause
+                OnPlayClicked(); // pause
 
             uiController.ShowSaveSimulationPopup(ui, simController.simulation);
         }
@@ -318,10 +299,95 @@ public class SimulatorHandler
         CameraController.SetCameraMode(CameraController.CameraMode.MainMenu);
     }
 
+    // toggles the visibility of the help popup on click
+    public void OnHelpClicked()
+    {
+        VisualElement existingPopup = ui.Q<VisualElement>(TutorialPopupHandler.identifier);
+
+        if (existingPopup == null)
+        {
+            uiController.ShowTutorialPopup(ui);
+        }
+        else
+        {
+            existingPopup.RemoveFromHierarchy();
+        }
+    }
+
     #endregion Toolbar Methods
 
 
     #region Toolbox Methods
+
+    // prepares the toolbox
+    public void InitialiseToolboxButtons()
+    {
+        VisualElement toolbox = ui.Q<VisualElement>("Toolbox");
+        VisualElement subToolbox = ui.Q<VisualElement>("SubToolbox");
+
+        // bodies
+        toolbox.Q<Button>("Bodies").clicked += OnBodiesClicked;
+        subToolbox.Q<VisualElement>("BodyList").style.display = DisplayStyle.None;
+        InitialiseBodyItemButtons();
+
+        // plane tools
+        toolbox.Q<Button>("Plane").clicked += OnPlaneClicked;
+        subToolbox.Q<VisualElement>("PlaneList").style.display = DisplayStyle.None;
+        InitialisePlaneButtons();
+
+        // orbit mode
+        toolbox.Q<Button>("Orbit").clicked += OnOrbitClicked;
+        ui.Q<Label>("Eccentricity").style.display = DisplayStyle.None;
+
+        // distances
+        toolbox.Q<Button>("Distance").clicked += OnDistanceClicked;
+        subToolbox.Q<VisualElement>("DistanceList").style.display = DisplayStyle.None;
+        InitialiseDistanceButtons();
+        
+        SelectDistanceItem("Kilometre");
+        UpdateScaleLabel();
+
+        // body labels
+        toolbox.Q<Button>("Labels").clicked += OnLabelsClicked;
+
+        if (simController.ShowTrails)
+        {
+            MarkAsSelected(toolbox.Q<Button>("Labels"));
+        }
+        else
+        {
+            MarkAsDeselected(toolbox.Q<Button>("Labels"));
+        }
+
+        // body trails
+        toolbox.Q<Button>("Trails").clicked += OnTrailsClicked;
+
+        if (simController.ShowTrails)
+        {
+            MarkAsSelected(toolbox.Q<Button>("Trails"));
+        }
+        else
+        {
+            MarkAsDeselected(toolbox.Q<Button>("Trails"));
+        }
+
+        // time options
+        toolbox.Q<Button>("Time").clicked += OnTimeClicked;
+        subToolbox.Q<VisualElement>("TimeList").style.display = DisplayStyle.None;
+        InitialiseTimeButtons();
+
+        // skybox background
+        toolbox.Q<Button>("Skybox").clicked += OnSkyboxClicked;
+
+        if (Camera.main.GetComponent<Skybox>().material.name != "Black")
+        {
+            MarkAsSelected(toolbox.Q<Button>("Skybox"));
+        }
+        else
+        {
+            MarkAsDeselected(toolbox.Q<Button>("Skybox"));
+        }
+    }
 
     // toggles the visibility of the explorer on click
     public void OnExplorerClicked()
@@ -337,107 +403,126 @@ public class SimulatorHandler
         bodyList.style.display = bodyList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
-    // toggles the visibility of the placement modes list on click
-    public void OnModesClicked()
+    // toggles the visibility of the plane and plane tools list on click
+    public void OnPlaneClicked()
     {
-        VisualElement modeList = ui.Q<VisualElement>("ModeList");
-        modeList.style.display = modeList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+        VisualElement planeList = ui.Q<VisualElement>("PlaneList");
+        Button planeButton = ui.Q<VisualElement>("Toolbox").Q<Button>("Plane");
+
+        if (!simController.planeEnabled)
+        {
+            simController.EnablePlane();
+            planeList.style.display = DisplayStyle.Flex;
+            MarkAsSelected(planeButton);
+        }
+        else
+        {
+            planeList.style.display = DisplayStyle.None;
+            simController.DisablePlane();
+            MarkAsDeselected(planeButton);
+        }
+    }
+
+    // toggles orbit mode on click
+    public void OnOrbitClicked()
+    {
+        Button orbitButton = ui.Q<VisualElement>("Toolbox").Q<Button>("Orbit");
+
+        if (!simController.orbitEnabled)
+        {
+            simController.EnableOrbit();
+            MarkAsSelected(orbitButton);
+            ui.Q<Label>("Eccentricity").style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            simController.DisableOrbit();
+            MarkAsDeselected(orbitButton);
+            ui.Q<Label>("Eccentricity").style.display = DisplayStyle.None;
+        }
     }
 
     // toggles the visibility of the distances units list on click
     public void OnDistanceClicked()
     {
         VisualElement distanceList = ui.Q<VisualElement>("DistanceList");
-        distanceList.style.display = distanceList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+        bool visible = distanceList.style.display == DisplayStyle.Flex;
+
+        if (!visible)
+        {
+            distanceList.style.display = DisplayStyle.Flex;
+            MarkAsSelected(ui.Q<VisualElement>("Toolbox").Q<Button>("Distance"));
+        }
+        else
+        {
+            distanceList.style.display = DisplayStyle.None;
+            MarkAsDeselected(ui.Q<VisualElement>("Toolbox").Q<Button>("Distance"));
+        }
     }
     
     // toggles the visibility of all labels on click (where individual labels aren't disabled)
-    private void OnToggleLabelsClicked()
+    private void OnLabelsClicked()
     {
         simController.ShowLabels = !simController.ShowLabels;
 
-        VisualElement disabledIcon = ui.Q<Button>("ToggleLabels").Q<VisualElement>("Disabled");
-        disabledIcon.style.display = simController.ShowLabels ? DisplayStyle.None : DisplayStyle.Flex;
+        Button labelsButton = ui.Q<VisualElement>("Toolbox").Q<Button>("Labels");
 
-        // TODO: render body labels individually
+        if (simController.ShowLabels)
+        {
+            MarkAsSelected(labelsButton);
+        }
+        else
+        {
+            MarkAsDeselected(labelsButton);
+        }
     }
 
     // toggles the visibility of all trails on click (where individual trail aren't disabled)
-    private void OnToggleTrailsClicked()
+    private void OnTrailsClicked()
     {
         simController.ShowTrails = !simController.ShowTrails;
 
-        VisualElement disabledIcon = ui.Q<Button>("ToggleTrails").Q<VisualElement>("Disabled");
-        disabledIcon.style.display = simController.ShowTrails ? DisplayStyle.None : DisplayStyle.Flex;
-    }
+        Button trailsButton = ui.Q<VisualElement>("Toolbox").Q<Button>("Trails");
 
-    // plays or pauses the simulation
-    public void OnTogglePlayClicked()
-    {
-        if (simController.IsRunning)
+        if (simController.ShowTrails)
         {
-            simController.IsRunning = false;
-
-            ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage 
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Playing");
+            MarkAsSelected(trailsButton);
         }
         else
         {
-            simController.IsRunning = true;
-
-            ui.Q<Button>("TogglePlay").Q<VisualElement>("Icon").style.backgroundImage
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Paused");
+            MarkAsDeselected(trailsButton);
         }
     }
 
-    // toggles whether time is moving forward or backwards 
-    public void OnToggleFlowClicked()
+    // toggles the visibility of the time options on click
+    public void OnTimeClicked()
     {
-        simController.IsRewinding = !simController.IsRewinding;
+        VisualElement timeList = ui.Q<VisualElement>("TimeList");
+        timeList.style.display = timeList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+    }
 
-        if (simController.IsRewinding)
+    // toggles the visibility of the skybox on click (space / black)
+    public void OnSkyboxClicked()
+    {
+        Button skyboxButton = ui.Q<VisualElement>("Toolbox").Q<Button>("Skybox");
+        Skybox skybox = Camera.main.GetComponent<Skybox>();
+
+        if (skybox.material.name == "Black")
         {
-            ui.Q<Button>("ToggleFlow").Q<VisualElement>("Icon").style.backgroundImage
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Reverse");
+            MarkAsSelected(skyboxButton);
+            skybox.material = Resources.Load<Material>("Skyboxes/Space");
         }
         else
         {
-            ui.Q<Button>("ToggleFlow").Q<VisualElement>("Icon").style.backgroundImage
-                = Resources.Load<Texture2D>("Icons/Toolbox/Options/Forward");
+            skybox.material = Resources.Load<Material>("Skyboxes/Black");
+            MarkAsDeselected(skyboxButton);
         }
     }
-
-    // slows down time by "one metric" on click (e.g., hour -> minute -> second)
-    public void OnSlowTimeClicked()
-    {
-        List<string> keys = new(UnitReference.TIME_UNITS.Keys);
-        int keyIndex = keys.IndexOf(simController.physics.TimePerSecond);
-        keyIndex -= 1;
-
-        if (keyIndex >= 0)
-            simController.physics.TimePerSecond = keys[keyIndex];
-
-        UpdateTimeLabel();
-    }
-
-    // speeds up time by "one metric" on click (e.g., second -> minute -> hour)
-    public void OnSpeedTimeClicked()
-    {
-        List<string> keys = new(UnitReference.TIME_UNITS.Keys);
-        int keyIndex = keys.IndexOf(simController.physics.TimePerSecond);
-        keyIndex += 1;
-
-        if (keyIndex < keys.Count)
-            simController.physics.TimePerSecond = keys[keyIndex];
-
-        UpdateTimeLabel();
-    }
-
 
     #endregion Toolbox Functions
 
 
-    #region Preview Selection
+    #region Body Selection
 
     // selects the respective body as a preview on click
     public void InitialiseBodyItemButtons()
@@ -491,7 +576,7 @@ public class SimulatorHandler
         if (selectedBodyItem != null)
         {
             Button button = ui.Q<Button>(selectedBodyItem);
-            button.RemoveFromClassList("selectedButton");
+            MarkAsDeselected(button);
 
             selectedBodyItem = null;
         }
@@ -499,43 +584,60 @@ public class SimulatorHandler
         simController.RemoveEntityPreview();
     }
 
-    #endregion Preview Selection
+    #endregion Body Selection
 
 
-    #region Mode Selection
+    #region Plane Controls
 
-    // selects the respective placement mode on click
-    public void InitialiseModeButtons()
+    // prepares functionality for all plane buttons
+    public void InitialisePlaneButtons()
     {
-        foreach (var element in ui.Q<VisualElement>("ModeList").Children())
-        {
-            if (element is Button mode)
+        VisualElement planeList = ui.Q<VisualElement>("PlaneList");
+
+        planeList.Q<Button>("Stick").clicked += () => {
+            if (!simController.stickToPlane)
             {
-                mode.clicked += () => {
-                    SelectModeItem(mode.name);
-                };
+                simController.EnableStickToPlane();
+                MarkAsSelected(planeList.Q<Button>("Stick"));
             }
-        }
+            else
+            {
+                simController.DisableStickToPlane();
+                MarkAsDeselected(planeList.Q<Button>("Stick"));
+            }
+        };
+
+        planeList.Q<Button>("Lower").clicked += () => {
+            simController.TranslatePlane(new Vector3(0, -1, 0));
+        };
+
+        planeList.Q<Button>("Raise").clicked += () => {
+            simController.TranslatePlane(new Vector3(0, 1, 0));
+        };
+        
+        planeList.Q<Button>("TurnLeft").clicked += () => {
+            simController.TurnPlane(new Vector3(-1, 0, 0));
+        };
+
+        planeList.Q<Button>("TurnRight").clicked += () => {
+            simController.TurnPlane(new Vector3(1, 0, 0));
+        };
+
+        planeList.Q<Button>("TurnBackwards").clicked += () => {
+            simController.TurnPlane(new Vector3(0, 0, -1));
+        };
+
+        planeList.Q<Button>("TurnForwards").clicked += () => {
+            simController.TurnPlane(new Vector3(0, 0, 1));
+        };
+
+        planeList.Q<Button>("Reset").clicked += () => {
+            simController.SetPlanePositionAndRotation(
+                Vector3.zero, Quaternion.Euler(90, 0, 0));
+        };
     }
 
-    // selects the given mode button
-    public void SelectModeItem(string newMode)
-    {
-        Button oldButton = ui.Q<Button>(simController.placementMode.ToString());
-        oldButton.RemoveFromClassList("selectedButton");
-
-        simController.SetPlacementMode(newMode);
-
-        Button newButton = ui.Q<Button>(newMode);
-        newButton.AddToClassList("selectedButton");
-
-        ui.Q<Label>("Eccentricity").style.display 
-            = (newMode == "OrbitPlacement") ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    // NB: a placement mode is ALWAYS selected - there can never be none
-
-    #endregion Mode Selection
+    #endregion Plane Controls
 
 
     #region Distance Selection
@@ -561,10 +663,10 @@ public class SimulatorHandler
         string newDistance = newItem.Replace(" ", "");
 
         Button oldButton = ui.Q<Button>(oldDistance);
-        oldButton.RemoveFromClassList("selectedButton");
+        MarkAsDeselected(oldButton);
 
         Button newButton = ui.Q<Button>(newDistance);
-        newButton.AddToClassList("selectedButton");
+        MarkAsSelected(newButton);
 
         simController.renderer.Distance = newItem.Replace("_", " ");
         simController.renderer.ZoomFactor = 0;
@@ -577,55 +679,92 @@ public class SimulatorHandler
     #endregion Distance Selection
 
 
-    #region Help Popup
-    
-    // toggles the visibility of the help popup on click
-    public void OnHelpClicked()
+    #region Time Selection
+
+    // prepares all time-related buttons
+    public void InitialiseTimeButtons()
     {
-        if (ui.Q<VisualElement>("HelpPopup") == null)
+        ui.Q<Button>("Play").clicked += OnPlayClicked;
+    
+        // could be either playing or paused (depending on where this sim was loaded from)
+        ui.Q<Button>("Play").Q<VisualElement>("Icon").style.backgroundImage 
+            = Resources.Load<Texture2D>($"Icons/Toolbox/Time/{(simController.IsRunning ? "Pause" : "Play")}");
+
+        // will always start with time going forward & 1s/s
+        ui.Q<Button>("Flow").clicked += OnFlowClicked;
+        simController.physics.TimePerSecond = "1 Second";
+        simController.IsRewinding = false;
+
+        ui.Q<Button>("SlowTime").clicked += OnSlowTimeClicked;
+
+        ui.Q<Button>("SpeedTime").clicked += OnSpeedTimeClicked;
+    }
+
+    // plays or pauses the simulation
+    public void OnPlayClicked()
+    {
+        if (simController.IsRunning)
         {
-            DisplayHelpPopup();
+            simController.IsRunning = false;
+
+            ui.Q<VisualElement>("TimeList").Q<Button>("Play")
+                .Q<VisualElement>("Icon").style.backgroundImage 
+                = Resources.Load<Texture2D>("Icons/Toolbox/Time/Play");
         }
         else
         {
-            CloseHelpPopup();
+            simController.IsRunning = true;
+
+            ui.Q<VisualElement>("TimeList").Q<Button>("Play")
+                .Q<VisualElement>("Icon").style.backgroundImage
+                = Resources.Load<Texture2D>("Icons/Toolbox/Time/Pause");
         }
     }
 
-    // shows a help popup with the current controls
-    public void DisplayHelpPopup()
+    // toggles whether time is moving forward or backwards 
+    public void OnFlowClicked()
     {
-        VisualElement existingPopup = ui.Q<VisualElement>("HelpPopup");
-        if (existingPopup != null) return;
-        
-        VisualElement popup = UIController.CloneInterface(helpPopup);
-        popup.name = "HelpPopup";
+        simController.IsRewinding = !simController.IsRewinding;
 
-        // load text based on current controls
-        string finalText = "";
-
-        foreach(KeyValuePair<string, KeyCode> pair in AppControls.keybinds)
-            finalText += $"<b>{pair.Key}</b>   -   {pair.Value}<br>";
-
-        popup.Q<Label>("Controls").text = finalText;
-
-        popup.Q<Button>("Close").clicked += () => {
-            popup.RemoveFromHierarchy();
-        };
-
-        ui.Add(popup);
+        if (simController.IsRewinding)
+        {
+            ui.Q<Button>("Flow").Q<VisualElement>("Icon").style.backgroundImage
+                = Resources.Load<Texture2D>("Icons/Toolbox/Time/Reverse");
+        }
+        else
+        {
+            ui.Q<Button>("Flow").Q<VisualElement>("Icon").style.backgroundImage
+                = Resources.Load<Texture2D>("Icons/Toolbox/Time/Forward");
+        }
     }
 
-    // closes the existing help popup
-    public void CloseHelpPopup()
+    // slows down time by "one metric" on click (e.g., hour -> minute -> second)
+    public void OnSlowTimeClicked()
     {
-        VisualElement existingPopup = ui.Q<VisualElement>("HelpPopup");
-        if (existingPopup == null) return;
-        
-        existingPopup.RemoveFromHierarchy();
+        List<string> keys = new(UnitReference.TIME_UNITS.Keys);
+        int keyIndex = keys.IndexOf(simController.physics.TimePerSecond);
+        keyIndex -= 1;
+
+        if (keyIndex >= 0)
+            simController.physics.TimePerSecond = keys[keyIndex];
+
+        UpdateTimeLabel();
     }
 
-    #endregion Help Popup`
+    // speeds up time by "one metric" on click (e.g., second -> minute -> hour)
+    public void OnSpeedTimeClicked()
+    {
+        List<string> keys = new(UnitReference.TIME_UNITS.Keys);
+        int keyIndex = keys.IndexOf(simController.physics.TimePerSecond);
+        keyIndex += 1;
+
+        if (keyIndex < keys.Count)
+            simController.physics.TimePerSecond = keys[keyIndex];
+
+        UpdateTimeLabel();
+    }
+
+    #endregion Time Selection
 
 
     #region Unit Methods
@@ -653,6 +792,17 @@ public class SimulatorHandler
 
     
     #region Explorer
+
+    // prepares functionality for the explorer window
+    public void InitialiseExplorer()
+    {
+        ui.Q<Button>("Explorer").clicked += OnExplorerClicked;
+        InitialiseExplorerSearchBar();
+        ui.Q("Explorer").Q<Button>("Close").clicked += OnExplorerCloseClicked;
+        RefreshExplorer();
+
+        SetExplorerVisible(false);
+    }
 
     // sets whether the explorer is visible or not
     public void SetExplorerVisible(bool visible)
@@ -718,13 +868,13 @@ public class SimulatorHandler
     {
         ClearExplorer();
 
-        List<Body> bodies = simController.GetBodies();
+        List<Body> bodies = simController.simulation.bodies;
 
         if (bodies.Count > 0)
         {
             ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
 
-            foreach (Body body in simController.GetBodies())
+            foreach (Body body in bodies)
             {
                 CreateExplorerEntry(body);
             }
@@ -800,14 +950,32 @@ public class SimulatorHandler
         // updating body tool button visuals accordingly
         if (visible)
         {
-            bodyTools.Q<Button>("Trail").Q<VisualElement>("Disabled")
-                .style.display = simController.SelectedBody.ShowTrail ? DisplayStyle.None : DisplayStyle.Flex;
+            if (simController.SelectedBody.ShowTrail)
+            {
+                MarkAsSelected(bodyTools.Q<Button>("Trail"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Trail"));
+            }
 
-            bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled")
-                .style.display = simController.SelectedBody.ShowLabel ? DisplayStyle.None : DisplayStyle.Flex;
+            if (simController.SelectedBody.ShowLabel)
+            {
+                MarkAsSelected(bodyTools.Q<Button>("Label"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Label"));
+            }
 
-            bodyTools.Q<Button>("Anchored").Q<VisualElement>("Disabled")
-                .style.display = simController.SelectedBody.Anchored ? DisplayStyle.None : DisplayStyle.Flex;
+            if (simController.SelectedBody.Anchored)
+            {
+                MarkAsSelected(bodyTools.Q<Button>("Anchor"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Anchor"));
+            }
         }
     }
 
@@ -842,12 +1010,20 @@ public class SimulatorHandler
             bool visible = !simController.SelectedBody.ShowTrail;
             simController.SelectedBody.ShowTrail = visible;
 
+            if (visible)
+            {
+                MarkAsSelected(bodyTools.Q<Button>("Trail"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Trail"));
+            }
+
             // keep the trail hidden if all labels are hidden
             if (!simController.ShowTrails)
+            {
                 simController.SelectedBody.SetTrailVisibility(false);
-
-            bodyTools.Q<Button>("Trail").Q<VisualElement>("Disabled").style.display
-                = visible ? DisplayStyle.None : DisplayStyle.Flex;
+            }
         };
 
         // toggles the body's label on click
@@ -857,23 +1033,37 @@ public class SimulatorHandler
             bool visible = !simController.SelectedBody.ShowLabel;
             simController.SelectedBody.ShowLabel = visible;
 
+            if (visible)
+                        {
+                MarkAsSelected(bodyTools.Q<Button>("Label"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Label"));
+            }
+
             // keep the label hidden if all labels are hidden
             if (!simController.ShowLabels)
+            {
                 simController.SelectedBody.SetLabelVisibility(false);
-
-            bodyTools.Q<Button>("Label").Q<VisualElement>("Disabled").style.display
-                = visible ? DisplayStyle.None : DisplayStyle.Flex;
+            }
         };
 
         // toggles the body's anchor on click (affected by gravity or not)
-        bodyTools.Q<Button>("Anchored").clicked += () => {
+        bodyTools.Q<Button>("Anchor").clicked += () => {
             if (simController.SelectedBody == null) return;
 
             bool anchored = !simController.SelectedBody.Anchored;
             simController.SelectedBody.Anchored = anchored;
 
-            bodyTools.Q<Button>("Anchored").Q<VisualElement>("Disabled").style.display
-                = anchored ? DisplayStyle.None : DisplayStyle.Flex;
+            if (anchored)
+            {
+                MarkAsSelected(bodyTools.Q<Button>("Anchor"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Anchor"));
+            }
         };
 
         // opens a prompt to save the selected body as a template
@@ -881,7 +1071,7 @@ public class SimulatorHandler
             if (simController.SelectedBody == null) return;
 
             if (simController.IsRunning)
-                OnTogglePlayClicked(); // pause
+                OnPlayClicked(); // pause
 
             uiController.ShowSaveBodyPopup(ui, simController.SelectedBody);
         };
@@ -892,12 +1082,24 @@ public class SimulatorHandler
 
             simController.RemoveBody(simController.SelectedBody);
         };
+
+        SetBodyToolsVisible(false);
     }
 
     #endregion Body Tools
 
 
     #region Properties
+
+    // prepares functionality for the properties window
+    public void InitialiseProperties()
+    {
+        InitialisePropertyFields();
+        ui.Q<Button>("Close").clicked += OnPropertiesCloseClicked;
+        UpdateProperties(null); // hide fields too
+
+        SetPropertiesVisible(false);
+    }
     
     // changes the selected body's properties when any property field is changed
     private void InitialisePropertyFields()

@@ -32,7 +32,7 @@ public class SpaceSnapshot
 
         capture.Clear();
 
-        foreach (Body body in simController.GetBodies())
+        foreach (Body body in simController.simulation.bodies)
         {
             BodySnapshot bodySnapshot = new(body);
             capture.Add(bodySnapshot);

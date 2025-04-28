@@ -4,11 +4,12 @@
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-public class SaveSimulationPopupHandler
+public class SaveSimulationPopupHandler : IPopup
 {
 
     #region Attributes
 
+    public static string identifier = "SaveSimulationPopup";
     public VisualElement popup;
     public UIController uiController;
     public VisualElement parent;
@@ -32,9 +33,9 @@ public class SaveSimulationPopupHandler
         this.parent = parent;
         this.simulation = simulation;
         
-        if (parent.Q<VisualElement>("SavePopup") != null) return;
+        if (parent.Q<VisualElement>(identifier) != null) return;
         
-        popup.name = "SavePopup";
+        popup.name = identifier;
         parent.Add(popup);
 
         UIController.PrepareFieldFocus(popup);
@@ -63,7 +64,7 @@ public class SaveSimulationPopupHandler
             simulation.id = newSave.id;
 
             // TODO: change this so that it's not specific!
-            parent.Q<VisualElement>("ToolBar").Q<Label>("Title").text = newSave.settings.Name;
+            parent.Q<VisualElement>("Toolbar").Q<Label>("Title").text = newSave.settings.Name;
         }; 
 
         popup.Q<Button>("SaveTemplate").clicked += () => {

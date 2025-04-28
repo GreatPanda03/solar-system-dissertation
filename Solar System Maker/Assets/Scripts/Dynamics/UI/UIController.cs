@@ -13,14 +13,13 @@ public class UIController : MonoBehaviour
     public VisualTreeAsset savedSimulationsUI;
     public VisualTreeAsset saveEntry;
     public VisualTreeAsset templateSimulationsUI;
-    public VisualTreeAsset tutorialUI;
+    public VisualTreeAsset tutorialPopup;
     public VisualTreeAsset simulatorUI;
     public VisualTreeAsset explorerEntry;
     public VisualTreeAsset saveBodyPopup;
     public VisualTreeAsset bodyTemplatesPopup;
     public VisualTreeAsset optionsPopup;
     public VisualTreeAsset saveSimulationPopup;
-    public VisualTreeAsset helpPopup;
     public VisualTreeAsset tooltip;
     public VisualElement root; // main screen holder
 
@@ -114,17 +113,6 @@ public class UIController : MonoBehaviour
         PrepareScreen(root);
     }
 
-    // shows a new instance of the "Tutorial" interface
-    public void ShowTutorial()
-    {
-        root.Clear();
-        VisualElement screen = CloneInterface(tutorialUI);
-        root.Add(screen);
-        new TutorialHandler(screen, this);
-        
-        PrepareScreen(root);
-    }
-
     // shows a new instance of the "Simulator" interface
     public void ShowSimulator()
     {
@@ -138,8 +126,7 @@ public class UIController : MonoBehaviour
             explorerEntry,
             optionsPopup,
             saveSimulationPopup,
-            saveBodyPopup,
-            helpPopup);
+            saveBodyPopup);
 
         PrepareScreen(screen);
     }
@@ -148,6 +135,13 @@ public class UIController : MonoBehaviour
 
 
     #region Popup Methods
+
+    // shows a new instance of a "Tutorial" popup for the given screen
+    public void ShowTutorialPopup(VisualElement screen)
+    {
+        VisualElement popup = CloneInterface(tutorialPopup);
+        new TutorialPopupHandler(popup, this, screen);
+    }
 
     // shows a new instance of an "Options" popup for the given screen and simulation instance
     public void ShowOptionsPopup(VisualElement screen, SimulationController simController)

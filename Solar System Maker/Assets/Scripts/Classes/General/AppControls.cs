@@ -12,10 +12,21 @@ public class AppControls
         ["Properties"]          = KeyCode.P,
         ["Follow"]              = KeyCode.F,
         ["Adjust Scale"]        = KeyCode.V,
+
         ["Move Slower"]         = KeyCode.LeftShift,
         ["Move Faster"]         = KeyCode.LeftControl,
-        ["Decrease Eccentricity"] = KeyCode.Z,
-        ["Increase Eccentricity"] = KeyCode.X,
-        ["Flip Orbit"]          = KeyCode.C
+        
+        ["Decrease Eccentricity"]   = KeyCode.Z,
+        ["Increase Eccentricity"]   = KeyCode.X,
+        ["Flip Orbit"]          = KeyCode.C,
+
+        ["Lower Plane"]         = KeyCode.U,
+        ["Raise Plane"]         = KeyCode.I,
+        ["Turn Plane Left"]     = KeyCode.J,
+        ["Turn Plane Right"]      = KeyCode.K,
+        ["Turn Plane Backwards"]  = KeyCode.N,
+        ["Turn Plane Forwards"]   = KeyCode.M,
+        ["Reset Plane"]         = KeyCode.O,
+        ["Localise Plane"]      = KeyCode.L
     };
 }

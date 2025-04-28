@@ -3,11 +3,12 @@
 
 using UnityEngine.UIElements;
 
-public class OptionsPopupHandler
+public class OptionsPopupHandler : IPopup
 {
 
     #region Attributes
 
+    public static string identifier = "OptionsPopup";
     public VisualElement popup;
     public UIController uiController;
     public VisualElement parent;
@@ -31,9 +32,9 @@ public class OptionsPopupHandler
         this.parent = parent;
         this.simController = simController;
 
-        if (parent.Q<VisualElement>("OptionsPopup") != null) return;
+        if (parent.Q<VisualElement>(identifier) != null) return;
 
-        popup.name = "OptionsPopup";
+        popup.name = identifier;
         parent.Add(popup);
 
         UIController.PrepareFieldFocus(popup);
@@ -63,7 +64,7 @@ public class OptionsPopupHandler
             string quality = popup.Q<DropdownField>("CollisionQuality").value;
             simController.physics.SetCollisionQuality(quality);
 
-            parent.Q<VisualElement>("ToolBar").Q<Label>("Title").text = settings.Name;
+            parent.Q<VisualElement>("Toolbar").Q<Label>("Title").text = settings.Name;
         }; 
 
         popup.Q<Button>("Close").clicked += () => {

@@ -4,15 +4,15 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 
-public class BodyTemplatesPopupHandler
+public class BodyTemplatesPopupHandler : IPopup
 {
 
     #region Attributes
 
+    public static string identifier = "BodyTemplatePopup";
     public VisualElement popup;
     public UIController uiController;
     public VisualTreeAsset templateEntry;
@@ -39,9 +39,9 @@ public class BodyTemplatesPopupHandler
         this.templateEntry = templateEntry;
         this.parent = parent;
 
-        if (parent.Q<VisualElement>("BodyTemplates") != null) return;
+        if (parent.Q<VisualElement>(identifier) != null) return;
 
-        popup.name = "BodyTemplates";
+        popup.name = identifier;
         parent.Add(popup);
 
         ScrollView list = popup.Q<ScrollView>("List");

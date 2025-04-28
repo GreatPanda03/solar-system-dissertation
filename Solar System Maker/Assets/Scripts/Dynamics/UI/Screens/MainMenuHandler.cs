@@ -26,7 +26,7 @@ public class MainMenuHandler
         ui.Q<Button>("NewSimulation").clicked += OnNewSimulationClicked;
         ui.Q<Button>("SavedSimulations").clicked += OnSavedSimulationsClicked;
         ui.Q<Button>("TemplateSimulations").clicked += OnTemplateSimulationsClicked;
-        // ui.Q<Button>("Tutorial").clicked += OnTutorialButtonClicked;             // WIP
+        ui.Q<Button>("Tutorial").clicked += OnTutorialButtonClicked;
         ui.Q<Button>("ExitApp").clicked += OnExitClicked;
 
         // loading a sample simulation
@@ -87,7 +87,7 @@ public class MainMenuHandler
     // shows the "Tutorial" interface on click
     private void OnTutorialButtonClicked()
     {
-        uiController.ShowTutorial();
+        uiController.ShowTutorialPopup(ui);
     }
 
     // completely closes the application
