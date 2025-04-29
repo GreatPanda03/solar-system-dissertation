@@ -1,21 +1,28 @@
 // Handles the orbit demo for the main menu
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OurSystemDemoScript : MonoBehaviour
-{  
+public class OurSystemDemoScript
+{
+
+    #region Attributes
+
     public GameObject StarTemplate;
     public GameObject PlanetTemplate;
 
     public List<GameObject> planets;
     public Vector3 systemCentre;
 
-    private Dictionary<string, Dictionary<string, string>> systemData;
-    private Dictionary<string, Color> planetColours;
+    public Dictionary<string, Dictionary<string, string>> systemData;
+    public Dictionary<string, Color> planetColours;
 
-    private void Awake() {
+    #endregion Attributes
+
+
+    #region Methods
+
+    public void GetSolarSystem() {
         systemCentre = new Vector3(0,0,0);
 
         // fixed data for the entire solar system
@@ -116,55 +123,5 @@ public class OurSystemDemoScript : MonoBehaviour
         };
     }
 
-    // preparing the initial demo with a single star and some number of planets
-    private void Start()
-    {
-        foreach (string bodyName in systemData.Keys)
-        {
-            GameObject body = null;
-            GameObject systemContainer = GameObject.Find("SimulatorContents");
-
-            if (systemData[bodyName]["Type"] == "Star")
-            {
-                body = Instantiate(StarTemplate);
-                body.transform.position = systemCentre;
-                body.transform.localScale = new Vector3(3,3,3);
-                body.transform.name = "Sun";
-            }
-            else if (systemData[bodyName]["Type"] == "Planet")
-            {
-                float distance = Convert.ToSingle(systemData[bodyName]["Distance"]) 
-                    * 10f;
-
-                body = Instantiate(PlanetTemplate);
-                body.transform.position = new Vector3(distance,0,0);
-                body.transform.name = bodyName;
-                body.GetComponent<MeshRenderer>().material.color = planetColours[bodyName];
-                body.transform.localScale = new Vector3(1,1,1);
-                    // * (float) Math.Log(Convert.ToSingle(systemData[bodyName]["Mass"]));
-
-                planets.Add(body);
-            }
-
-            if (body != null)
-            {
-                body.transform.parent = systemContainer.transform;
-            }
-            
-        }
-
-        Debug.Log("[OUR SYSTEM] SUCESS: System Loaded");
-    }
-
-    // making the planets orbit around the star indefinitely
-    private void FixedUpdate()
-    {
-        foreach (GameObject planet in planets)
-        {
-            string planetName = planet.transform.name;
-            float period = Convert.ToSingle(systemData[planetName]["Period"]);
-
-            planet.transform.RotateAround(systemCentre, Vector3.up, 1 / period);
-        }
-    }
+    #endregion Methods
 }

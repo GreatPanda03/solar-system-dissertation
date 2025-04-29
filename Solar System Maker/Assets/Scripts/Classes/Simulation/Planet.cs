@@ -71,22 +71,18 @@ public class Planet : Body
 
     #region Methods
 
-    public override Body GetCopy()
+    public override Body GetShallowCopy()
     {
-        return new Planet()
-        {
-            name = name,
-            mass = mass,
-            position = position,
-            velocity = velocity,
-            acceleration = acceleration,
-            surfaceTemp = surfaceTemp,
-            density = density,
-            radius = radius,
+        return (Planet) MemberwiseClone();
+    }
 
-            habitability = habitability,
-            waterContent = waterContent,
-        };
+    public override Body GetDeepCopy()
+    {
+        Planet copy = (Planet) MemberwiseClone();
+        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
+        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
+
+        return copy;
     }
 
     #endregion

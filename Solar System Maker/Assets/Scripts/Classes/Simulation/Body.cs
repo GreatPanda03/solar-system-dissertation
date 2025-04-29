@@ -143,6 +143,14 @@ public class Body
             radius = GetRadiusFromMassAndDensity();
         }
     }
+
+    protected float angularVelocity; // measured in radians/s
+    public float AngularVelocity {
+        get => angularVelocity;
+        set {
+            angularVelocity = value;
+        }
+    }
     
     // private Texture texture {
     //     get { return texture; }
@@ -167,21 +175,19 @@ public class Body
         acceleration = new Vector3(0,0,0);
         surfaceTemp = 0f;
         density = 1f;
+        angularVelocity = 1 * Mathf.Deg2Rad;
 
         radius = GetRadiusFromMassAndDensity();
     }
 
     public Body(float mass, Vector3 position, Vector3 velocity)
     {
-        name = "Body";
-        this.mass = mass;
-        this.position = position;
-        this.velocity = velocity;
-        acceleration = new Vector3(0,0,0);
-        surfaceTemp = 0f;
-        density = 1f;
-
-        radius = GetRadiusFromMassAndDensity();
+        new Body()
+        {
+            mass = mass,
+            position = position,
+            velocity = velocity
+        };
     }
 
     #endregion Constructor
@@ -189,20 +195,18 @@ public class Body
 
     #region General Methods
 
-    // returns a copy of the body
-    public virtual Body GetCopy()
+    public virtual Body GetShallowCopy()
     {
-        return new Body()
-        {
-            name = name,
-            mass = mass,
-            position = position,
-            velocity = velocity,
-            acceleration = acceleration,
-            surfaceTemp = surfaceTemp,
-            density = density,
-            radius = radius
-        };
+        return (Body) MemberwiseClone();
+    }
+
+    public virtual Body GetDeepCopy()
+    {
+        Body copy = (Body) MemberwiseClone();
+        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
+        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
+
+        return copy;
     }
 
     public override string ToString()
@@ -243,6 +247,12 @@ public class Body
     // updates the body's physics
     public void Update(float dt)
     {
+        if (entity != null)
+        {
+            entity.transform.rotation 
+                *= Quaternion.Euler(0, -angularVelocity * Mathf.Rad2Deg * dt, 0);
+        }
+
         velocity += acceleration * dt;
         position += velocity * dt;
         acceleration = new Vector3(0,0,0);

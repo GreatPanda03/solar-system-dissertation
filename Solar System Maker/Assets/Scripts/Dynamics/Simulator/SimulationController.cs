@@ -12,7 +12,7 @@ public class SimulationController : MonoBehaviour
     #region Attributes
 
     public Simulation simulation;
-    public new RenderingHandler renderer; // reserved library? hence new
+    public new RenderingHandler renderer;   // reserved keyword? hence new?
     public PhysicsHandler physics;
     
     public GameObject simulatorSpace;       // general placement
@@ -436,7 +436,8 @@ public class SimulationController : MonoBehaviour
 
     #region Simulation Loop
 
-    // main physics loop - applies planet forces between each other
+    // main physics loop - applies body interactions to each other
+    // * FixedUpdate happens at a constant rate, regardless of framerate - use it!
     void FixedUpdate()
     {
         if (!isActive) return;
@@ -445,12 +446,10 @@ public class SimulationController : MonoBehaviour
         {
             ApplyPhysics(); // includes scaling
         }
-        else
+        
+        foreach (Body body in simulation.bodies)
         {
-            foreach (Body body in simulation.bodies)
-            {
-                renderer.ApplyScale(body);
-            }
+            renderer.ApplyScale(body);
         }
 
         OnPhysicsUpdate?.Invoke();
@@ -489,8 +488,6 @@ public class SimulationController : MonoBehaviour
             {
                 bodyA.Update(physics.TimeCoefficient);
             }
-
-            renderer.ApplyScale(bodyA);
         }
     }
     
@@ -679,7 +676,7 @@ public class SimulationController : MonoBehaviour
     {
         if (Input.GetKeyDown(AppControls.keybinds["Place Body"]) && UIController.FocusedField == null)
         {
-            Body body = bodyPreview.GetCopy(); // incl. Position & Velocity
+            Body body = bodyPreview.GetShallowCopy(); // incl. Position & Velocity
             body.CreateEntity();
             body.Name = body.Type;
             AddBody(body);
@@ -790,8 +787,6 @@ public class SimulationController : MonoBehaviour
     // returns the space position of the mouse's position along the plane (intersection)
     private Vector3 RunPlanePlacement()
     {
-        Debug.Log("running plane placement");
-
         if (startVelocityPoint == null)
         {
             Vector3? position = GetMouseOnPlane();

@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AppScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SimulatorScene.unity
     guid: 1e9e62a84edfd7e498df86ffa7b657f2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/OurSolarSystem.unity
     guid: 3c0837a6919a8f24290ca6b030b05c64
   m_configObjects:

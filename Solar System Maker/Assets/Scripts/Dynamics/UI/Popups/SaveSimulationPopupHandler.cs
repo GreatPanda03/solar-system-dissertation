@@ -54,7 +54,7 @@ public class SaveSimulationPopupHandler : IPopup
 
             List<Body> bodyCopies = new();
             foreach (Body body in simulation.bodies)
-                bodyCopies.Add(body.GetCopy());
+                bodyCopies.Add(body.GetShallowCopy());
 
             Simulation newSave = DataHandler.GetNextSimulationSaveSlot();
             newSave.settings = settings;
@@ -76,7 +76,7 @@ public class SaveSimulationPopupHandler : IPopup
 
             List<Body> bodyCopies = new();
             foreach (Body body in simulation.bodies)
-                bodyCopies.Add(body.GetCopy());
+                bodyCopies.Add(body.GetShallowCopy());
 
             Simulation newSave = DataHandler.GetNextSimulationTemplateSlot();
             newSave.settings = settings;

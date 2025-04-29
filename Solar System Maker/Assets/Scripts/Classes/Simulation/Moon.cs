@@ -35,19 +35,18 @@ public class Moon : Body
     
     #region Methods
 
-    public override Body GetCopy()
+    public override Body GetShallowCopy()
     {
-        return new Moon()
-        {
-            name = name,
-            mass = mass,
-            position = position,
-            velocity = velocity,
-            acceleration = acceleration,
-            surfaceTemp = surfaceTemp,
-            density = density,
-            radius = radius,
-        };
+        return (Moon) MemberwiseClone();
+    }
+
+    public override Body GetDeepCopy()
+    {
+        Moon copy = (Moon) MemberwiseClone();
+        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
+        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
+
+        return copy;
     }
 
     #endregion Methods

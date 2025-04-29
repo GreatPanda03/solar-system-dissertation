@@ -169,7 +169,7 @@
 .propertiesPanel .unity-label {
     color: rgb(255, 255, 255);
     min-width: auto;
-    flex-basis: 40%;
+    flex-basis: 45%;
     padding-top: 0;
     padding-right: 0;
     padding-bottom: 0;
@@ -186,19 +186,7 @@
     padding-bottom: 0;
     padding-left: 0;
     -unity-text-align: middle-left;
-    flex-basis: auto;
-}
-
-.propertiesFields .unity-label {
-    color: rgb(255, 255, 255);
-    min-width: auto;
-    flex-basis: 40%;
-    -unity-text-align: upper-left;
-    font-size: 12px;
-    padding-top: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    padding-left: 0;
+    flex-basis: 50%;
 }
 
 .propertiesClose {
@@ -328,4 +316,8 @@
     max-width: 5px;
     min-width: 5px;
     width: 5px;
+}
+
+#Search .unity-label {
+    flex-basis: 30%;
 }

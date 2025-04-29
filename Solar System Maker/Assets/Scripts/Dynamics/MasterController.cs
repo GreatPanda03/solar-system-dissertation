@@ -1,4 +1,4 @@
-// masters processes throughout the entire application
+// manages processes throughout the entire application
 
 using UnityEditor;
 using UnityEngine;

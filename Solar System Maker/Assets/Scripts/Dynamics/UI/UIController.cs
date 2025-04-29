@@ -1,3 +1,5 @@
+// manages core and common UI functionality
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;

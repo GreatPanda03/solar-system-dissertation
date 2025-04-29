@@ -55,21 +55,18 @@ public class Star : Body
 
     #region Methods
 
-    public override Body GetCopy()
+    public override Body GetShallowCopy()
     {
-        return new Star()
-        {
-            name = name,
-            mass = mass,
-            position = position,
-            velocity = velocity,
-            acceleration = acceleration,
-            surfaceTemp = surfaceTemp,
-            density = density,
-            radius = radius,
+        return (Star) MemberwiseClone();
+    }
 
-            luminosity = luminosity
-        };
+    public override Body GetDeepCopy()
+    {
+        Star copy = (Star) MemberwiseClone();
+        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
+        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
+
+        return copy;
     }
 
     #endregion Methods

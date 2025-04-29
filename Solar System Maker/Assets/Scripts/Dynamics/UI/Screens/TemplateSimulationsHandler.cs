@@ -1,7 +1,6 @@
 // creates instances of the "Templates Simulations" interface
 // * the interface shows all templates the user has which they can load a copy of and run
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Rendering.LookDev;
 using UnityEngine.UIElements;
 
 
@@ -1228,6 +1227,7 @@ public class SimulatorHandler
 
             properties.Q<FloatField>("Speed_custom").value = body.Velocity.magnitude * DTScale;
             properties.Q<FloatField>("Acceleration_custom").value = (lastVelocity - body.Velocity).magnitude * DTScale;
+            properties.Q<FloatField>("Rotations_custom").value = body.AngularVelocity / (2 * MathF.PI) * timeScale;
 
             lastVelocity = body.Velocity;
 
