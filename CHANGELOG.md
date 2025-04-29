@@ -11,6 +11,19 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.15.2
+**Date:** 2025/04/29
+<br/>**Bug Fixes:**
+* **1)** Amended the calculation for orbit radius label
+* **2)** Refined trail refreshing to be more consistent with clearing trails when scaling
+* **Note:** scaling is a little off, like Earth taking more than a year to orbit the Sun
+
+**Additions / Changes:**
+* **1)** Trails now scale with body size to not be so thick when small
+* **2)** Added the remaining units for property fields
+
+---
+
 ### Version: 1.15.1
 **Date:** 2025/04/29
 <br/>**Additions / Changes:**
