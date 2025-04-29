@@ -14,7 +14,7 @@ public class Star : Body
 
     #region Attributes
 
-    readonly string type = "Star";
+    private readonly string type = "Star";
     public override string Type { get => type; }
 
     protected float luminosity;
@@ -31,23 +31,11 @@ public class Star : Body
     public Star() : base()
     {
         name = "Star";
-        mass = 1000f;
+        mass = (float) UnitReference.MASS_UNITS["Sun"];
+        radius = (float) UnitReference.DISTANCE_UNITS["Sun Radius"];
         luminosity = 1f;
-        radius = GetRadiusFromMassAndDensity();
-    }
 
-    public Star(float mass, Vector3 position, Vector3 velocity)
-        : base(mass, position, velocity)
-    {
-        name = "Star";
-        luminosity = 1f;
-    }
-
-    public Star(float mass, Vector3 position, Vector3 velocity, float luminosity)
-        : base(mass, position, velocity)
-    {
-        name = "Star";
-        this.luminosity = luminosity;
+        density = GetDensityFromMassAndRadius();
     }
 
     #endregion Constructors
@@ -70,4 +58,21 @@ public class Star : Body
     }
 
     #endregion Methods
+
+
+    #region Entity Methods
+
+        // returns a new generic Body entity
+    public override void CreateEntity() {
+        base.CreateEntity();
+
+        GameObject lightPrefab = Resources.Load<GameObject>("Prefabs/Light");
+        
+        GameObject light = GameObject.Instantiate(lightPrefab);
+        light.name = "Light";
+        light.transform.SetParent(entity.transform, false);
+    }
+
+
+    #endregion Entity Methods
 }

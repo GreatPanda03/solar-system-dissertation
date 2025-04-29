@@ -190,9 +190,22 @@ public class SimulatorHandler
         }
     }
 
-    public void OnOrbitChanged(float eccentricity)
+    public void OnOrbitChanged(float eccentricity, Body attractor)
     {
-        ui.Q<Label>("Eccentricity").text = $"(e = {eccentricity:0.000})";
+        ui.Q<Label>("Eccentricity").text = $"(Eccentricity = {eccentricity:0.000})";
+
+        if (simController.BodyPreview != null && attractor != null)
+        {
+            float distance = (simController.BodyPreview.Position - attractor.Position).magnitude;
+            float scaledDistance = distance * simController.renderer.Scale;
+            string unit = simController.renderer.Distance;
+
+            ui.Q<Label>("OrbitRadius").text = $"(Orbit Radius = {scaledDistance} {unit}(s))";
+        }
+        else
+        {
+            ui.Q<Label>("OrbitRadius").text = $"(Orbit Radius = No target)";
+        }
     }
 
     #endregion Simulator Events
@@ -336,7 +349,7 @@ public class SimulatorHandler
 
         // orbit mode
         toolbox.Q<Button>("Orbit").clicked += OnOrbitClicked;
-        ui.Q<Label>("Eccentricity").style.display = DisplayStyle.None;
+        ui.Q<VisualElement>("OrbitDetails").style.display = DisplayStyle.None;
 
         // distances
         toolbox.Q<Button>("Distance").clicked += OnDistanceClicked;
@@ -391,15 +404,26 @@ public class SimulatorHandler
     // toggles the visibility of the explorer on click
     public void OnExplorerClicked()
     {
-        bool state = ui.Q<VisualElement>("Explorer").style.display == DisplayStyle.Flex;
-        SetExplorerVisible(!state);        
+        bool visible = ui.Q<VisualElement>("Explorer").style.display == DisplayStyle.Flex;
+        SetExplorerVisible(!visible);
     }
 
     // toggles the visibility of the bodies list on click
     public void OnBodiesClicked()
     {
         VisualElement bodyList = ui.Q<VisualElement>("BodyList");
-        bodyList.style.display = bodyList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+        bool visible = bodyList.style.display == DisplayStyle.Flex;
+
+        if (!visible)
+        {
+            bodyList.style.display = DisplayStyle.Flex;
+            MarkAsSelected(ui.Q<VisualElement>("Toolbox").Q<Button>("Bodies"));
+        }
+        else
+        {
+            bodyList.style.display = DisplayStyle.None;
+            MarkAsDeselected(ui.Q<VisualElement>("Toolbox").Q<Button>("Bodies"));
+        }
     }
 
     // toggles the visibility of the plane and plane tools list on click
@@ -431,13 +455,13 @@ public class SimulatorHandler
         {
             simController.EnableOrbit();
             MarkAsSelected(orbitButton);
-            ui.Q<Label>("Eccentricity").style.display = DisplayStyle.Flex;
+            ui.Q<VisualElement>("OrbitDetails").style.display = DisplayStyle.Flex;
         }
         else
         {
             simController.DisableOrbit();
             MarkAsDeselected(orbitButton);
-            ui.Q<Label>("Eccentricity").style.display = DisplayStyle.None;
+            ui.Q<VisualElement>("OrbitDetails").style.display = DisplayStyle.None;
         }
     }
 
@@ -497,7 +521,18 @@ public class SimulatorHandler
     public void OnTimeClicked()
     {
         VisualElement timeList = ui.Q<VisualElement>("TimeList");
-        timeList.style.display = timeList.style.display == DisplayStyle.Flex ? DisplayStyle.None : DisplayStyle.Flex;
+        bool visible = timeList.style.display == DisplayStyle.Flex;
+        
+        if (!visible)
+        {
+            timeList.style.display = DisplayStyle.Flex;
+            MarkAsSelected(ui.Q<VisualElement>("Toolbox").Q<Button>("Time"));
+        }
+        else
+        {
+            timeList.style.display = DisplayStyle.None;
+            MarkAsDeselected(ui.Q<VisualElement>("Toolbox").Q<Button>("Time"));
+        }
     }
 
     // toggles the visibility of the skybox on click (space / black)
@@ -549,10 +584,10 @@ public class SimulatorHandler
         list.Q<Button>("Templates").clicked += () => {
             BodyTemplatesPopupHandler popup = uiController.ShowBodyTemplatesPopup(ui);
             
-            popup.OnTemplateSelected += body =>
+            popup.OnTemplateSelected += template =>
             {
                 DeselectBodyItem();
-                simController.SetEntityPreview(body);
+                simController.SetEntityPreviewToTemplate(template);
             };
         };
     }
@@ -772,7 +807,7 @@ public class SimulatorHandler
     private void UpdateScaleLabel()
     {
         string zoomText = string.Format("<b>Scale:</b> 1 {0} x {1:0.000}", 
-            simController.renderer.Distance.ToLower(), 
+            simController.renderer.Distance,
             1 / Math.Pow(10, simController.renderer.ZoomFactor));
 
         ui.Q<Label>("Scale").text = zoomText;
@@ -806,8 +841,16 @@ public class SimulatorHandler
     // sets whether the explorer is visible or not
     public void SetExplorerVisible(bool visible)
     {
-        ui.Q<VisualElement>("Explorer").style.display
-            = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        if (visible)
+        {
+            ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.Flex;
+            MarkAsSelected(ui.Q<VisualElement>("Toolbox").Q<Button>("Explorer"));
+        }
+        else
+        {
+            ui.Q<VisualElement>("Explorer").style.display = DisplayStyle.None;
+            MarkAsDeselected(ui.Q<VisualElement>("Toolbox").Q<Button>("Explorer"));
+        }
     }
 
     // enables bodies to be searched for by name

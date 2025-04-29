@@ -44,26 +44,12 @@ public class Planet : Body
     public Planet() : base()
     {
         name = "Planet";
-        mass = 10f;
+        mass = (float) UnitReference.MASS_UNITS["Earth"];
+        radius = (float) UnitReference.DISTANCE_UNITS["Earth Radius"];
         habitability = 0;
         waterContent = 0;
-        radius = GetRadiusFromMassAndDensity();
-    }
-
-    public Planet(float mass, Vector3 position, Vector3 velocity)
-        : base(mass, position, velocity)
-    {
-        name = "Planet";
-        habitability = 0;
-        waterContent = 0;
-    }
-
-    public Planet(float mass, Vector3 position, Vector3 velocity, float habitability, float waterContent)
-        : base(mass, position, velocity)
-    {
-        name = "Planet";
-        this.habitability = habitability;
-        this.waterContent = waterContent;
+        
+        density = GetDensityFromMassAndRadius();
     }
 
     #endregion Constructors

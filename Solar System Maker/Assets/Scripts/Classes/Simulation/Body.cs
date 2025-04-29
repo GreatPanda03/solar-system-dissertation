@@ -19,7 +19,7 @@ public class Body
 
     #region Attributes
 
-    readonly string type = "Body";
+    private readonly string type = "Body";
     public virtual string Type { get => type; }
 
     protected string name;
@@ -152,14 +152,18 @@ public class Body
         }
     }
     
-    // private Texture texture {
-    //     get { return texture; }
-    //     set
-    //     {
-    //         texture = value;
-    //         // apply texture to body... 
-    //     }
-    // }
+    private Material texture;
+    public Material Texture {
+        get => texture;
+        set {
+            texture = value;
+
+            if (entity != null)
+            {
+                entity.GetComponent<MeshRenderer>().material = value;
+            }
+        }
+    }
 
     #endregion Attributes
 
@@ -178,16 +182,6 @@ public class Body
         angularVelocity = 1 * Mathf.Deg2Rad;
 
         radius = GetRadiusFromMassAndDensity();
-    }
-
-    public Body(float mass, Vector3 position, Vector3 velocity)
-    {
-        new Body()
-        {
-            mass = mass,
-            position = position,
-            velocity = velocity
-        };
     }
 
     #endregion Constructor
@@ -259,15 +253,25 @@ public class Body
     }
 
     // returns a new generic Body entity
-    public void CreateEntity() {
-        GameObject bodyPrefab = Resources.Load<GameObject>($"Prefabs/{this.Type}");
+    public virtual void CreateEntity() {
+        GameObject bodyPrefab = Resources.Load<GameObject>($"Prefabs/Body");
         entity = GameObject.Instantiate(bodyPrefab);
         entity.name = this.Name;
         entity.transform.position = this.position;
 
-        GameObject labelPrefab = Resources.Load<GameObject>("Prefabs/BodyLabel");
+        if (texture != null)
+        {
+            entity.GetComponent<MeshRenderer>().material = texture;
+        }
+        else
+        {
+            entity.GetComponent<MeshRenderer>().material    // reference PROPERTY
+                = Resources.Load<Material>($"Materials/Generic/{this.Type}");
+        }
+
+        GameObject labelPrefab = Resources.Load<GameObject>("Prefabs/Label");
         label = GameObject.Instantiate(labelPrefab);
-        label.name = "BodyLabel";
+        label.name = "Label";
         label.GetComponent<TextMeshProUGUI>().text = name;
         label.transform.SetParent(GameObject.Find("Overlay").transform, false);
     }

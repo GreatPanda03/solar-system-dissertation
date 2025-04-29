@@ -24,7 +24,7 @@ public class Settings
     }
 
     [SerializeField]
-    private float gravitationalConstant;
+    private float gravitationalConstant; // relative to unit G
     public float GravitationalConstant {
         get => gravitationalConstant;
         set => gravitationalConstant = value;
@@ -39,7 +39,7 @@ public class Settings
     {
         name = "New Simulation";
         description = "";
-        gravitationalConstant = 0.01f;
+        gravitationalConstant = 1f;
     }
 
     #endregion Constructor

@@ -25,6 +25,7 @@ public class SimulationController : MonoBehaviour
     public bool orbitEnabled = false;      // orbit placement
     public float eccentricity = 0;
     public float orbitDirection = -1;
+    public float lastScale; // only used to clear trails when scaled
     
     public event Action<Body> OnBodyAdded;
     public event Action<Body> OnBodyRemoved;
@@ -32,7 +33,7 @@ public class SimulationController : MonoBehaviour
     public event Action<Body> OnBodyDeselected;
     public event Action<float> OnScaleChanged;
     public event Action OnPhysicsUpdate;
-    public event Action<float> OnOrbitChanged;
+    public event Action<float, Body> OnOrbitChanged;
 
     public List<SpaceSnapshot> snapshots;
 
@@ -412,14 +413,12 @@ public class SimulationController : MonoBehaviour
                 if (Input.GetKey(AppControls.keybinds["Decrease Eccentricity"]))
                 {
                     eccentricity = Mathf.Max(eccentricity - 0.001f, 0);
-                    OnOrbitChanged?.Invoke(eccentricity);
                 }
 
                 // when "X" pressed - increase eccentricity (only to 0.999)
                 if (Input.GetKey(AppControls.keybinds["Increase Eccentricity"]))
                 {
                     eccentricity = Mathf.Min(eccentricity + 0.001f, 0.99f); // to avoid zero-division
-                    OnOrbitChanged?.Invoke(eccentricity);
                 }
 
                 // when "C" pressed - swap orbit direction
@@ -452,6 +451,17 @@ public class SimulationController : MonoBehaviour
             renderer.ApplyScale(body);
         }
 
+        // refresh trails if scale has changed
+        if (lastScale != renderer.Scale)
+        {
+            lastScale = renderer.Scale;
+
+            foreach (Body body in simulation.bodies)
+            {
+                body.Entity.GetComponent<TrailRenderer>().Clear();
+            }
+        }
+
         OnPhysicsUpdate?.Invoke();
     }
     
@@ -474,7 +484,7 @@ public class SimulationController : MonoBehaviour
                 Body bodyB = bodies[b];
 
                 Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
-                    simulation.settings.GravitationalConstant);
+                    simulation.settings.GravitationalConstant * (float) UnitReference.G);
 
                 if (!bodyA.Anchored) 
                 {
@@ -558,7 +568,7 @@ public class SimulationController : MonoBehaviour
         } 
         else 
         {
-            Debug.LogWarning($"ERROR: '{bodyType}' is not a valid Body type - defaulting to Body");
+            Debug.Log($"ERROR: '{bodyType}' is not a valid Body type - defaulting to Body");
             bodyPreview = new Body();
         }
 
@@ -568,10 +578,10 @@ public class SimulationController : MonoBehaviour
     }
 
     // creates a new preview instance from the given body
-    public void SetEntityPreview(Body body)
+    public void SetEntityPreviewToTemplate(BodyTemplate template)
     {
-        bodyPreview = body;
-        bodyPreview.Name = body.Name;
+        bodyPreview = template.Body;
+        bodyPreview.Name = template.Name;
 
         PreparePreviewVisuals();
     }
@@ -645,7 +655,7 @@ public class SimulationController : MonoBehaviour
 
             if (attractor != null) // also restricts to beyond attractor's radius
             {
-                float G = simulation.settings.GravitationalConstant * UnitReference.G;
+                float G = simulation.settings.GravitationalConstant * (float) UnitReference.G;
 
                 bodyPreview.Position = RestrictToRadiusOfTarget(bodyPreview, attractor);
                 
@@ -655,6 +665,8 @@ public class SimulationController : MonoBehaviour
                 renderer.DrawOrbitBetweenBodies(
                     attractor, bodyPreview, eccentricity, orbitDirection);
             }
+
+            OnOrbitChanged?.Invoke(eccentricity, attractor);
         }
         else
         {

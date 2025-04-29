@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 
@@ -20,7 +21,7 @@ public class BodyTemplatesPopupHandler : IPopup
 
     public VisualElement selectedEntry;
     public BodyTemplate selectedTemplate;
-    public event Action<Body> OnTemplateSelected;
+    public event Action<BodyTemplate> OnTemplateSelected;
 
     #endregion Attributes
 
@@ -52,7 +53,7 @@ public class BodyTemplatesPopupHandler : IPopup
         popup.Q<Button>("Delete").clicked += OnDeleteClicked;
         popup.Q<Button>("Close").clicked += OnCloseClicked;
 
-        LoadEntries();
+        LoadAllTemplates();
     }
 
     #endregion Constructor
@@ -66,7 +67,7 @@ public class BodyTemplatesPopupHandler : IPopup
         if (selectedTemplate != null)
         {
             popup.RemoveFromHierarchy();
-            OnTemplateSelected?.Invoke(selectedTemplate.Body);
+            OnTemplateSelected?.Invoke(selectedTemplate);
         }
     }
 
@@ -87,11 +88,19 @@ public class BodyTemplatesPopupHandler : IPopup
 
     #region Entry Management
 
-    // load all saves of the user as entries
-    public void LoadEntries()
+    // loads all available templates (index and user)
+    public void LoadAllTemplates()
     {
-        List<BodyTemplate> templates = DataHandler.BodyTemplates;
+        LoadEntriesForList(BodyIndex.stars);
+        LoadEntriesForList(BodyIndex.planets);
+        LoadEntriesForList(BodyIndex.moons);
+        
+        LoadEntriesForList(DataHandler.BodyTemplates);
+    }
 
+    // load the list of given templates into the templates list
+    public void LoadEntriesForList(List<BodyTemplate> templates)
+    {
         foreach (BodyTemplate template in templates)
         {
             VisualElement entry = CreateEntry(template);
@@ -163,6 +172,10 @@ public class BodyTemplatesPopupHandler : IPopup
             details.style.display = DisplayStyle.Flex;
 
             selectedTemplate = template;
+
+            // can't delete body's from the index
+            popup.Q<Button>("Delete").style.display 
+                = template.id == -1 ? DisplayStyle.None : DisplayStyle.Flex;
         }
         else
         {
@@ -180,7 +193,7 @@ public class BodyTemplatesPopupHandler : IPopup
 
         UpdateViewer(null);
         ClearList();
-        LoadEntries();
+        LoadAllTemplates();
     }
 
     // removes all entries from the saves list

@@ -30,26 +30,25 @@ public class MainMenuHandler
         ui.Q<Button>("ExitApp").clicked += OnExitClicked;
 
         // loading a sample simulation
-        float G = 0.000_1f;
-
-        List<Body> bodies = SystemGenerator.GenerateMenuSystem(G);
+        List<Body> bodies = SystemGenerator.GenerateMenuSystem(
+            (float) UnitReference.G); // actual G
 
         Simulation simulation = new()
         {
             bodies = bodies,
-            settings = new() { GravitationalConstant = G }
+            settings = new() { GravitationalConstant = 1 } // relative G
         };
 
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(simulation);
-        simController.renderer.Distance = "Metre";
-        simController.renderer.ZoomFactor = -0.5f;
-        simController.physics.TimePerSecond = "1 Minute";
+        simController.renderer.Distance = "Lunar Distance";
+        simController.renderer.ZoomFactor = -1.5f;
+        simController.physics.TimePerSecond = "1 Month";
 
         simController.IsActive = true;
         simController.IsRunning = true;
         simController.ShowLabels = true;
-        simController.ShowTrails = false;
+        simController.ShowTrails = true;
 
         // clear simulation when main menu is left
         foreach (VisualElement element in ui.Q<VisualElement>("Container").Children())

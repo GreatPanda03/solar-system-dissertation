@@ -6,14 +6,16 @@ using System.Collections.Generic;
 public class UnitReference
 {
     // public static float G = 6.674_301_5e-11f;
-    public static float G = 1;
+    public static double G = 6.674_301_5e-11;
 
     public static Dictionary<string, double> DISTANCE_UNITS = new() {
         ["Centimetre"]      = 0.01,
         ["Metre"]           = 1,
         ["Kilometre"]       = 1e+3,
         ["Mile"]            = 1.609_344e+3,
-        ["Lunar Distance"]  = 3.843_99e+8,
+        ["Earth Radius"]    = 6.367_5e+6,       // average between equator and pole
+        ["Sun Radius"]      = 6.957e+8, 
+        ["Lunar Distance"]  = 3.843_99e+8,      // average distance
         ["AU"]              = 1.495_978_707e+11
     };
 

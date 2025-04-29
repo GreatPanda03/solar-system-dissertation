@@ -9,7 +9,7 @@ public class Moon : Body
 
     #region Attributes
 
-    readonly string type = "Moon";
+    private readonly string type = "Moon";
     public override string Type { get => type; }
 
     #endregion Attributes
@@ -20,14 +20,10 @@ public class Moon : Body
     public Moon() : base()
     {
         name = "Moon";
-        mass = 1f;
-        radius = GetRadiusFromMassAndDensity();
-    }
+        mass = (float) UnitReference.MASS_UNITS["Moon"];
+        radius = 1.74e6f;
 
-    public Moon(float mass, Vector3 position, Vector3 velocity)
-        : base(mass, position, velocity)
-    {
-        name = "Moon";
+        density = GetRadiusFromMassAndDensity();
     }
 
     #endregion Constructors

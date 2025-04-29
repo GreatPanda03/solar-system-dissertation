@@ -1,5 +1,6 @@
 // holds data for body templates
 
+using UnityEngine;
 
 public class BodyTemplate
 {
@@ -30,7 +31,18 @@ public class BodyTemplate
 
     #region Methods
 
-    public BodyTemplate() { }
+    public BodyTemplate() {
+        id = -1;
+    }
+
+    public BodyTemplate(Body body)
+    {
+        Debug.Log(name);
+        Debug.Log(body.Name);
+        id = -1;
+        name ??= body.Name; // prioritises template name over body name
+        this.body = body;
+    }
 
     #endregion Methods
 }

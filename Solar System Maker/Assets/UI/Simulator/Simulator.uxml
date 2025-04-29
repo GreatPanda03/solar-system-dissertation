@@ -89,13 +89,18 @@
         <ui:Label text="Create bodies to view them in the list." name="NoBodies" class="propertiesNoBody" style="display: flex; font-size: 12px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;" />
     </ui:VisualElement>
     <ui:VisualElement name="SubToolbox" class="toolboxBar" style="bottom: 40px; flex-direction: column; margin-left: 0;">
-        <ui:Label text="(Orbit Eccentricity = 0.000)" name="Eccentricity" style="-unity-font-style: normal; color: rgb(255, 255, 255);" />
+        <ui:VisualElement name="OrbitDetails" style="flex-grow: 1;">
+            <ui:Label text="(Orbit Eccentricity = 0.000)" name="Eccentricity" style="-unity-font-style: normal; color: rgb(255, 255, 255);" />
+            <ui:Label text="(Orbit Radius = No target)" name="OrbitRadius" style="-unity-font-style: normal; color: rgb(255, 255, 255);" />
+        </ui:VisualElement>
         <ui:VisualElement name="DistanceList" class="toolboxList">
             <ui:Label text="Distance" name="DistanceLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
             <ui:Button text="cm" name="Centimetre" tooltip="Centimetres" class="toolboxButton" />
             <ui:Button text="m" name="Metre" tooltip="Metres" class="toolboxButton" />
             <ui:Button text="km" name="Kilometre" tooltip="Kilometres" class="toolboxButton" />
             <ui:Button text="mi" name="Mile" tooltip="Miles" class="toolboxButton" />
+            <ui:Button text="E&lt;sub&gt;R&lt;/sub&gt;" name="Earth_Radius" tooltip="Earth Radius" class="toolboxButton" />
+            <ui:Button text="S&lt;sub&gt;R&lt;/sub&gt;" name="Sun_Radius" tooltip="Earth Radius" class="toolboxButton" />
             <ui:Button text="LD" name="Lunar_Distance" tooltip="Lunar Distance" class="toolboxButton" />
             <ui:Button text="AU" name="AU" tooltip="Astronomical Unit" class="toolboxButton" />
         </ui:VisualElement>

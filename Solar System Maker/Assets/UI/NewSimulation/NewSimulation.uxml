@@ -16,8 +16,8 @@
                     <ui:TextField placeholder-text="A description for your simulation" name="Input" multiline="true" style="color: rgb(0, 0, 0); -unity-text-align: middle-left; opacity: 1; -unity-text-outline-color: rgb(255, 255, 255); -unity-text-outline-width: 0; white-space: normal; text-overflow: clip; font-size: 14px; flex-basis: 65%; flex-direction: row;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="GravitationalConstant" class="field" style="flex-grow: 1; flex-direction: row; -unity-text-align: middle-left; flex-basis: 100%; height: 15%; max-height: 20%; min-height: 20px;">
-                    <ui:Label text="G" name="Label" style="flex-basis: 30%; color: rgb(255, 255, 255); -unity-text-align: middle-right; font-size: 16px;" />
-                    <ui:FloatField value="0.01" name="Input" max-length="100" tooltip="The strength of gravity throughout the simulation" placeholder-text="(blank)" password="false" readonly="false" hide-placeholder-on-focus="false" mask-character="*" style="flex-basis: 65%; -unity-text-outline-color: rgba(255, 255, 255, 0);" />
+                    <ui:Label text="G (relative)" name="Label" style="flex-basis: 30%; color: rgb(255, 255, 255); -unity-text-align: middle-right; font-size: 16px;" />
+                    <ui:FloatField value="1" name="Input" max-length="100" tooltip="The strength of gravity throughout the simulation" placeholder-text="(blank)" password="false" readonly="false" hide-placeholder-on-focus="false" mask-character="*" style="flex-basis: 65%; -unity-text-outline-color: rgba(255, 255, 255, 0);" />
                 </ui:VisualElement>
                 <ui:Label name="Validation" enable-rich-text="true" style="color: rgb(224, 114, 37); -unity-font-style: normal;" />
             </ui:VisualElement>

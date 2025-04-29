@@ -64,7 +64,7 @@ public class PhysicsHandler
     // * F1 = F2 = G * (m1 * m2) / r^2
     // * NOTE: the force's magnitude is the same, but the direction is different
     //   > this method returns an attractive force by THIS on OTHER
-    public Vector3 GetGravitationalForce(Body A, Body B, float G)
+    public Vector3 GetGravitationalForce(Body A, Body B, float G) // actual G
     {
         Vector3 vector = B.Position - A.Position;
         Vector3 direction = vector.normalized;
