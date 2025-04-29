@@ -11,6 +11,21 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.15.1
+**Date:** 2025/04/29
+<br/>**Additions / Changes:**
+* **1)** New to-scale Sun, Earth, and Moon templates with textures *(built-in)*
+* **2)** Original Star, Planet, and Moon bodies have been scaled up to fit the new scale
+* **3)** "G" is now based on the real value *(so 1G is approx. 6e-11, 2G is double that, etc.)*
+* **4)** Added notices for "G" where relevant that the value provided is relative
+* **5)** Added "Earth Radius" and "Sun Radius" as distance scales
+* **6)** Added an orbit mode label showing the scaled distance to the target body, if any
+* **7)** Reverted scale unit capitalisation *(conflicts with AU, so maybe not)*
+* **8)** Added selection highlight to "Explorer", "Bodies", and "Time" toolbox buttons *(missed out)*
+* **9)** Stars now have a basic pointlight *(no brightness scaling yet)*
+
+---
+
 ### Version: 1.15.0
 **Date:** 2025/04/29
 <br/>**Additions / Changes:**
