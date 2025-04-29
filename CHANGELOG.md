@@ -11,6 +11,24 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.15.3
+**Date:** 2025/04/29
+<br/>**Bug Fixes:**
+* **1)** Fixed physics handler using a different delta time to simulator controller *(mismatch in physics rate!)*
+* **2)** Amended trail refreshes not being processed, and included distance changes for refreshes
+* **3)** Fixed disabling plane mode still sticking bodies to the plane
+* **4)** Fixed previews created from templates being a reference to the original template rather than a copy of it
+
+**Additions / Changes:**
+* **1)** Luminosity is now modeled according to a star's mass
+* **2)** Added Stefan-Boltzmann constant as a constant to UnitReference
+* **3)** Star surface temperature is now modeled according to a star's luminosity and radius
+* **4)** Renamed "Sun Radius" to "Solar Radius"
+* **5)** Added an option to change trail lifetime in real seconds
+* **6)** Reverted created body names to having the same name as the preview *(i.e., "New <type>")*
+
+---
+
 ### Version: 1.15.2
 **Date:** 2025/04/29
 <br/>**Bug Fixes:**
