@@ -64,6 +64,9 @@ public class OptionsPopupHandler : IPopup
             string quality = popup.Q<DropdownField>("CollisionQuality").value;
             simController.physics.SetCollisionQuality(quality);
 
+            float trailTime = popup.Q<FloatField>("TrailTime").value;
+            simController.TrailTime = trailTime;
+
             parent.Q<VisualElement>("Toolbar").Q<Label>("Title").text = settings.Name;
         }; 
 
@@ -92,7 +95,9 @@ public class OptionsPopupHandler : IPopup
         
         var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
 
-        if (gravitationalConstant.value == float.NaN || gravitationalConstant.value == 0)
+        if (gravitationalConstant.value == float.NaN 
+            || gravitationalConstant.text == ""
+            || gravitationalConstant.value == 0)
         {
             DisplayValidation("<b>'G'</b> must be greater than 0!");
             return false;
@@ -103,6 +108,14 @@ public class OptionsPopupHandler : IPopup
         if (collisionQuality.value == "")
         {
             DisplayValidation("<b>'Collisions'</b> cannot be blank!");
+        }
+
+        var trailTime = popup.Q<FloatField>("TrailTime");
+
+        if (trailTime.value == float.NaN || trailTime.text == "")
+        {
+            DisplayValidation("<b>'Trail Time'</b> cannot be blank!");
+            return false;
         }
 
         return true;

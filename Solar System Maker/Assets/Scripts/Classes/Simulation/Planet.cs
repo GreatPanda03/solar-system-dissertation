@@ -41,11 +41,13 @@ public class Planet : Body
 
     #region Constructors
 
+    // like the earth by default
     public Planet() : base()
     {
         name = "Planet";
         mass = (float) UnitReference.MASS_UNITS["Earth"];
         radius = (float) UnitReference.DISTANCE_UNITS["Earth Radius"];
+        angularVelocity = 7.29e-5f;
         habitability = 0;
         waterContent = 0;
         

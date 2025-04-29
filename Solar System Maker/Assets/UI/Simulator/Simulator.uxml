@@ -95,14 +95,14 @@
         </ui:VisualElement>
         <ui:VisualElement name="DistanceList" class="toolboxList">
             <ui:Label text="Distance" name="DistanceLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left;" />
-            <ui:Button text="cm" name="Centimetre" tooltip="Centimetres" class="toolboxButton" />
+            <ui:Button text="cm" name="Centimetre" tooltip="Centimetre" class="toolboxButton" />
             <ui:Button text="m" name="Metre" tooltip="Metres" class="toolboxButton" />
             <ui:Button text="km" name="Kilometre" tooltip="Kilometres" class="toolboxButton" />
             <ui:Button text="mi" name="Mile" tooltip="Miles" class="toolboxButton" />
-            <ui:Button text="E&lt;sub&gt;R&lt;/sub&gt;" name="Earth_Radius" tooltip="Earth Radius" class="toolboxButton" />
-            <ui:Button text="S&lt;sub&gt;R&lt;/sub&gt;" name="Sun_Radius" tooltip="Earth Radius" class="toolboxButton" />
-            <ui:Button text="LD" name="Lunar_Distance" tooltip="Lunar Distance" class="toolboxButton" />
-            <ui:Button text="AU" name="AU" tooltip="Astronomical Unit" class="toolboxButton" />
+            <ui:Button text="E&lt;sub&gt;R&lt;/sub&gt;" name="Earth_Radius" tooltip="Earth Radii" class="toolboxButton" />
+            <ui:Button text="S&lt;sub&gt;R&lt;/sub&gt;" name="Solar_Radius" tooltip="Solar Radii" class="toolboxButton" />
+            <ui:Button text="LD" name="Lunar_Distance" tooltip="Lunar Distances" class="toolboxButton" />
+            <ui:Button text="AU" name="AU" tooltip="Astronomical Units" class="toolboxButton" />
         </ui:VisualElement>
         <ui:VisualElement name="BodyList" class="toolboxList">
             <ui:Label text="Body" name="BodyLabel" style="-unity-font-style: bold; color: rgb(255, 255, 255);" />

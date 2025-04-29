@@ -37,11 +37,22 @@ public class BodyTemplate
 
     public BodyTemplate(Body body)
     {
+        id = -1;
+        this.body = body;
+        
+        // name the body after the template foremost, 
+        //   otherwise the template after the body
+        if (name != null)
+        {
+            body.Name = name;
+        }
+        else
+        {
+            name = body.Name;
+        }
+
         Debug.Log(name);
         Debug.Log(body.Name);
-        id = -1;
-        name ??= body.Name; // prioritises template name over body name
-        this.body = body;
     }
 
     #endregion Methods

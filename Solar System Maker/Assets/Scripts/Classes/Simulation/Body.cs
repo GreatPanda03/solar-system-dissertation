@@ -93,7 +93,7 @@ public class Body
     }
 
     protected float mass;
-    public float Mass {
+    public virtual float Mass {
         get => mass;
         set {
             mass = value;
@@ -130,7 +130,7 @@ public class Body
     }
 
     protected float surfaceTemp;
-    public float SurfaceTemp {
+    public virtual float SurfaceTemp {
         get => surfaceTemp; 
         set => surfaceTemp = value; 
     }
@@ -256,8 +256,8 @@ public class Body
     public virtual void CreateEntity() {
         GameObject bodyPrefab = Resources.Load<GameObject>($"Prefabs/Body");
         entity = GameObject.Instantiate(bodyPrefab);
-        entity.name = this.Name;
-        entity.transform.position = this.position;
+        entity.name = name;
+        entity.transform.position = position;
 
         if (texture != null)
         {

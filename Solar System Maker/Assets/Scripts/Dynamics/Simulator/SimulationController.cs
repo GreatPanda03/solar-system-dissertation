@@ -5,8 +5,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using UnityEngine.Rendering;
-using Unity.VisualScripting;
+using UnityEngine.LowLevelPhysics;
 
 public class SimulationController : MonoBehaviour
 {
@@ -27,7 +26,10 @@ public class SimulationController : MonoBehaviour
     public bool orbitEnabled = false;      // orbit placement
     public float eccentricity = 0;
     public float orbitDirection = -1;
-    public float lastZoomFactor; // mainly just to refresh trails when scaling
+
+    // mainly just to refresh trails when scaling
+    public float lastZoomFactor;
+    public string lastDistance;
     
     public event Action<Body> OnBodyAdded;
     public event Action<Body> OnBodyRemoved;
@@ -118,6 +120,15 @@ public class SimulationController : MonoBehaviour
                     body.SetTrailVisibility(false);
                 }
             }
+        }
+    }
+
+    private float trailTime = 60f;
+    public float TrailTime {
+        get => trailTime;
+        set {
+            trailTime = value;
+            ReadjustAllTrails();
         }
     }
 
@@ -438,8 +449,10 @@ public class SimulationController : MonoBehaviour
             renderer.ApplyScale(body);
         }
 
-        if (lastZoomFactor != renderer.ZoomFactor)
+        if (lastZoomFactor != renderer.ZoomFactor || lastDistance != renderer.Distance)
         {
+            lastZoomFactor = renderer.ZoomFactor;
+            lastDistance = renderer.Distance;
             ReadjustAllTrails();
         }
 
@@ -456,30 +469,36 @@ public class SimulationController : MonoBehaviour
     {
         List<Body> bodies = simulation.bodies;
 
-        for (int a = 0; a < bodies.Count; a++)
-        {
-            Body bodyA = bodies[a];
-
-            for (int b = a + 1; b < bodies.Count; b++)
+        // time loop - simulates up to "t" seconds at a time
+        // for (int t = 1; t <= UnitReference.TIME_UNITS[physics.TimePerSecond]; t++)
+        // { 
+            // main loop - runs physics
+            for (int a = 0; a < bodies.Count; a++)
             {
-                Body bodyB = bodies[b];
+                Body bodyA = bodies[a];
 
-                Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
-                    simulation.settings.GravitationalConstant * (float) UnitReference.G);
-
-                if (!bodyA.Anchored) 
+                for (int b = a + 1; b < bodies.Count; b++)
                 {
-                    bodyA.ApplyForce(force);
+                    Body bodyB = bodies[b];
+
+                    Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
+                        simulation.settings.GravitationalConstant * (float) UnitReference.G);
+
+                    if (!bodyA.Anchored) 
+                    {
+                        bodyA.ApplyForce(force);
+                    }
+
+                    bodyB.ApplyForce(-force);
                 }
 
-                bodyB.ApplyForce(-force);
+                if (!bodyA.Anchored)
+                {
+                    bodyA.Update(physics.TimeCoefficient);
+                    // bodyA.Update(Time.deltaTime);
+                }
             }
-
-            if (!bodyA.Anchored)
-            {
-                bodyA.Update(physics.TimeCoefficient);
-            }
-        }
+       ///}
     }
     
     #endregion Simulation Loop
@@ -506,10 +525,15 @@ public class SimulationController : MonoBehaviour
     {
         foreach (Body body in simulation.bodies)
         {
-            body.Entity.GetComponent<TrailRenderer>().Clear();
+            TrailRenderer trail = body.Entity.GetComponent<TrailRenderer>();
 
-            body.Entity.GetComponent<TrailRenderer>().widthMultiplier
-                = Mathf.Min(0.1f, 2 * body.Radius * renderer.Scale);
+            if (trail == null) continue;
+
+            trail.Clear();
+
+            trail.widthMultiplier = Mathf.Min(0.1f, 2 * body.Radius * renderer.Scale);
+
+            trail.time = trailTime;
         }
     }
 
@@ -587,8 +611,8 @@ public class SimulationController : MonoBehaviour
     // creates a new preview instance from the given body
     public void SetEntityPreviewToTemplate(BodyTemplate template)
     {
-        bodyPreview = template.Body;
-        bodyPreview.Name = template.Name;
+        bodyPreview = template.Body.GetShallowCopy();
+        bodyPreview.Name = template.Body.Name;
 
         PreparePreviewVisuals();
     }
@@ -632,7 +656,7 @@ public class SimulationController : MonoBehaviour
     public void RunPreviewBearings()
     {
         // determine position
-        if (stickToPlane)
+        if (planeEnabled && stickToPlane)
         {
             bodyPreview.Position = RunPlanePlacement();
         }
@@ -697,7 +721,6 @@ public class SimulationController : MonoBehaviour
         {
             Body body = bodyPreview.GetShallowCopy(); // incl. Position & Velocity
             body.CreateEntity();
-            body.Name = body.Type;
             AddBody(body);
             renderer.ApplyScale(body);
 

@@ -17,11 +17,13 @@ public class Moon : Body
 
     #region Constructors
 
+    // like the moon by default
     public Moon() : base()
     {
         name = "Moon";
         mass = (float) UnitReference.MASS_UNITS["Moon"];
         radius = 1.74e6f;
+        angularVelocity = 2.661_7e-6f;
 
         density = GetRadiusFromMassAndDensity();
     }

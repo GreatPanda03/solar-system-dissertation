@@ -113,8 +113,8 @@
     -unity-text-align: upper-right;
     -unity-font-style: normal;
     flex-grow: 1;
-    width: 30%;
-    max-width: 30%;
+    width: 35%;
+    max-width: 35%;
     min-width: 70%;
     padding-right: 5px;
 }
@@ -132,7 +132,7 @@
     flex-grow: 1;
     width: 100%;
     max-width: 100%;
-    min-width: 70%;
+    min-width: 65%;
     align-self: stretch;
     color: rgb(111, 111, 111);
 }

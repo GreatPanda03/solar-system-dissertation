@@ -5,21 +5,24 @@ using System.Collections.Generic;
 
 public class UnitReference
 {
-    // public static float G = 6.674_301_5e-11f;
     public static double G = 6.674_301_5e-11;
 
-    public static Dictionary<string, double> DISTANCE_UNITS = new() {
+    public static double STEFAN_BOLTZMANN = 5.670_374_419e-8; // W * m^2 * K^-4
+
+    public static Dictionary<string, double> DISTANCE_UNITS = new()
+    {
         ["Centimetre"]      = 0.01,
         ["Metre"]           = 1,
         ["Kilometre"]       = 1e+3,
         ["Mile"]            = 1.609_344e+3,
         ["Earth Radius"]    = 6.367_5e+6,       // average between equator and pole
-        ["Sun Radius"]      = 6.957e+8, 
+        ["Solar Radius"]    = 6.957e+8, 
         ["Lunar Distance"]  = 3.843_99e+8,      // average distance
         ["AU"]              = 1.495_978_707e+11
     };
 
-    public static Dictionary<string, double> MASS_UNITS = new() {
+    public static Dictionary<string, double> MASS_UNITS = new()
+    {
         ["Gram"]            = 1e-3,
         ["Pound"]           = 0.453_592_37,
         ["Kilogram"]        = 1,
@@ -29,7 +32,8 @@ public class UnitReference
         ["Sun"]             = 1.988_5e+30
     };
 
-    public static Dictionary<string, double> TIME_UNITS = new() {
+    public static Dictionary<string, double> TIME_UNITS = new()
+    {
         ["1 Millisecond"]     = 1e-3,
         ["10 Milliseconds"]   = 0.01,
         ["100 Milliseconds"]  = 0.1,
@@ -53,5 +57,10 @@ public class UnitReference
         ["1 Month"]           = 2.628e+6,   // 30.5 days (average)
         ["6 Months"]          = 1.5768e+7,  // ^ ditto
         ["1 Year"]            = 3.154e+7
+    };
+
+    public static Dictionary<string, double> LUMINOSITY_UNITS = new()
+    {
+        ["Sun"]   = 3.83e+26
     };
 }

@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/OptionsPopup/OptionsPopupStyles.uss?fileID=7433441132597879392&amp;guid=b17c8becfdc4d254089afa31f8a12ddf&amp;type=3#OptionsPopupStyles" />
     <ui:VisualElement name="Outer" style="flex-grow: 1; height: 447px;">
-        <ui:VisualElement name="Container" style="flex-grow: 1; height: 325px; max-height: 325px; min-height: 325px;">
+        <ui:VisualElement name="Container" style="flex-grow: 1; height: 350px; max-height: 350px; min-height: 350px;">
             <ui:VisualElement name="Header" style="flex-grow: 1;">
                 <ui:Button text="X" name="Close" class="close" />
                 <ui:Label text="Simulation Options" name="Title" class="title" />
@@ -13,6 +13,7 @@
                     <ui:TextField label="Description" placeholder-text="(blank)" name="Description" select-all-on-focus="false" select-all-on-mouse-up="false" />
                     <ui:FloatField label="G (relative)" value="0" name="GravitationalConstant" placeholder-text="(blank)" />
                     <ui:DropdownField label="Collisions" name="CollisionQuality" choices="None,Low,High" />
+                    <ui:FloatField label="Trail Time (s)" value="0" name="TrailTime" placeholder-text="(blank)" />
                 </ui:VisualElement>
                 <ui:Label name="Validation" />
             </ui:VisualElement>

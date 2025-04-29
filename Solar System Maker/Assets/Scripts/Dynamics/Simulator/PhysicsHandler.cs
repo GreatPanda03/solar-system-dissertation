@@ -18,8 +18,7 @@ public class PhysicsHandler
         get => timePerSecond;
         set {
             timePerSecond = value;
-            timeCoefficient = Time.deltaTime
-                * (float) UnitReference.TIME_UNITS[timePerSecond];
+            timeCoefficient = 0.02f * (float) UnitReference.TIME_UNITS[timePerSecond];
         }
     }
 
