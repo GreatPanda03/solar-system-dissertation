@@ -11,6 +11,18 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.15.0
+**Date:** 2025/04/29
+<br/>**Additions / Changes:**
+* **1)** Added angular velocity field to all body types
+* **2)** Generalised body copy methods to also cover any added fields
+* **3)** Added a "Rotations" field to the properties window *(revolutions per unit of time)*
+* **4)** Added scaling indicators to some fields in the properties window *(e.g., "Radius" is relative to the current distance "d")*
+* **5)** Made property fields less wide to give more space to field labels
+* **6)** Adjusted the size of the explorer search bar
+
+---
+
 ### Version: 1.14.0
 **Date:** 2025/04/28
 <br/>**Bug Fixes:**
