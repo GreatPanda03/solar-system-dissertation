@@ -46,6 +46,7 @@ Shader "Unlit/GridPlaneShader"
             {
                 float4 position : SV_POSITION;
                 float3 worldPosition : TEXCOORD0;
+                float4 screenPosition : TEXCOORD1;
             };
 
             // defining vertex
@@ -54,6 +55,7 @@ Shader "Unlit/GridPlaneShader"
                 v2f o;
                 o.position = UnityObjectToClipPos(v.vertex);
                 o.worldPosition = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.screenPosition = ComputeScreenPos(o.position);
                 return o;
             }
 
@@ -67,29 +69,65 @@ Shader "Unlit/GridPlaneShader"
                 return saturate(lineX + lineY);
             }
 
-            // fragmentation method:
-            // 1. a "subgrid" covers the "decimal" component of the zoom factor
-            // 2. a "supergrid" covers the "integer" component of the zoom factor
+            // with two grids, we can make an infinite effect:
+            // * Grid 1: covers 10^1, 10^3, 10^5, ... ( odd powers, 2n + 1)
+            // * Grid 2: covers 10^2, 10^4, 10^6, ... (even powers, 2n    )
+            // * you wouldn't see 10^3 if you were on the scale of 
+            //     10^1 for example (and vice versa), so swapping them works!
+
+            // WIP - using only two static grids for now with no infinite effect
+            
             float4 frag(v2f i) : SV_Target
             {
 
-                // fade out subgrid with height
-                float height = length(_WorldSpaceCameraPos.y);
-                float visibility = saturate(1.0 - height / 25.0);
-
-                float2 worldXZ = i.worldPosition.xz / _GridScale;
+                // components (drawing scale, line thickness, grid texture accumulation)
                 float scale, thickness, grid;
 
-                // super grid
-                scale = _GridScale * 10;
-                thickness = _GridLineThickness * 0.5;
-                grid = DrawGrid(worldXZ, scale, thickness);
-                
-                // subgrid
-                scale = _GridScale * 1;
-                thickness = _GridLineThickness;
-                grid += DrawGrid(worldXZ, scale, thickness) * visibility;
+                // defining thickness in pixels (same for both grids)
+                float2 screenUV = i.screenPosition.xy / i.screenPosition.w;
+                float dx = length(ddx(screenUV));
+                float dy = length(ddy(screenUV));
+                float pixelSize = length(dx) + length(dy);
 
+                // determining the layer and scale (by power of 10)
+                float height = length(_WorldSpaceCameraPos.y);
+                float2 worldXZ = i.worldPosition.xz / _GridScale;
+                
+                float power = log10(height);
+                int base_n = floor(power);
+
+                // // odd-power grid
+                // float odd_visibility 
+                
+                // if ((base_n + 1) % 2 == 1) { // it's on the "becoming visible" side
+                //     upper_n = ceil(power);
+                //     odd_transparency = map()
+                //     odd_visibility = saturate(1.0 - height / 10);
+                
+                // } else { // it's on the "becoming invisible" side
+
+                // }
+                
+                // odd_thickness = _GridLineThickness * pixelSize;
+                // odd_scale = _GridScale * 10;
+                // odd_grid = DrawGrid(worldXZ, scale, thickness * 0.1);
+
+                // // even-power grid
+                // float even_visibility = saturate(1.0 - height / 10);
+                // even_thickness = _GridLineThickness * pixelSize;
+                // even_scale = _GridScale * 10;
+                // even_grid = DrawGrid(worldXZ, scale, thickness * 0.1);
+                
+                // * original code
+                float visibility = saturate(1.0 - height / 10);
+                thickness = _GridLineThickness * 0.005;
+                
+                scale = _GridScale * 10;
+                grid = DrawGrid(worldXZ, scale, thickness * 0.1);
+                
+                scale = _GridScale;
+                grid += DrawGrid(worldXZ, scale, thickness) * visibility;
+                
                 grid = saturate(grid);
 
                 return float4(_GridLineColour.rgb, grid * _GridLineColour.a);

@@ -169,7 +169,7 @@
 .propertiesPanel .unity-label {
     color: rgb(255, 255, 255);
     min-width: auto;
-    flex-basis: 45%;
+    flex-basis: 48%;
     padding-top: 0;
     padding-right: 0;
     padding-bottom: 0;

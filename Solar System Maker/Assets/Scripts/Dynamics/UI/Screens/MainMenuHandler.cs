@@ -41,8 +41,8 @@ public class MainMenuHandler
 
         SimulationController simController = GameObject.Find("Simulator").GetComponent<SimulationController>();
         simController.LoadSimulation(simulation);
-        simController.renderer.Distance = "Lunar Distance";
-        simController.renderer.ZoomFactor = -1.5f;
+        simController.SetDistanceScale("Lunar Distance");
+        simController.SetZoomFactor(-1.5f);
         simController.physics.TimePerSecond = "1 Month";
 
         simController.IsActive = true;

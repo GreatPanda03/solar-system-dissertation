@@ -197,7 +197,8 @@ public class SimulatorHandler
         if (simController.BodyPreview != null && attractor != null)
         {
             float distance = (simController.BodyPreview.Position - attractor.Position).magnitude;
-            float scaledDistance = distance * simController.renderer.Scale;
+            float scale = (float) UnitReference.DISTANCE_UNITS[simController.renderer.Distance]; // zoomFactor not used here
+            float scaledDistance = distance / scale;
             string unit = simController.renderer.Distance;
 
             ui.Q<Label>("OrbitRadius").text = $"(Orbit Radius = {scaledDistance} {unit}(s))";
@@ -702,8 +703,8 @@ public class SimulatorHandler
         Button newButton = ui.Q<Button>(newDistance);
         MarkAsSelected(newButton);
 
-        simController.renderer.Distance = newItem.Replace("_", " ");
-        simController.renderer.ZoomFactor = 0;
+        simController.SetDistanceScale(newItem.Replace("_", " "));
+        simController.SetZoomFactor(0);
 
         UpdateScaleLabel();
     }

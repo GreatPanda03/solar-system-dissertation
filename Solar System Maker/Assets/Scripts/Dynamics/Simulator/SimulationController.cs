@@ -5,6 +5,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Rendering;
+using Unity.VisualScripting;
 
 public class SimulationController : MonoBehaviour
 {
@@ -25,7 +27,7 @@ public class SimulationController : MonoBehaviour
     public bool orbitEnabled = false;      // orbit placement
     public float eccentricity = 0;
     public float orbitDirection = -1;
-    public float lastScale; // only used to clear trails when scaled
+    public float lastZoomFactor; // mainly just to refresh trails when scaling
     
     public event Action<Body> OnBodyAdded;
     public event Action<Body> OnBodyRemoved;
@@ -248,9 +250,6 @@ public class SimulationController : MonoBehaviour
     {
         if (!isActive) return;
 
-        // keep track of whether to clear trails
-        float initialScale = renderer.Scale;
-
         // run keyboard / mouse controls
         if (IsInteractable)
         {
@@ -284,18 +283,6 @@ public class SimulationController : MonoBehaviour
                 }
             }
         }
-
-        // TEMPORARY: re-render trails if scale was changed
-        if (renderer.Scale != initialScale)
-        {
-            if (showTrails) // clear trails to remove streaks
-            {
-                foreach (Body body in simulation.bodies)
-                {
-                    body.Entity.GetComponent<TrailRenderer>().Clear();
-                }
-            }
-        }
     }
 
     // runs basic controls / keybinds
@@ -308,7 +295,7 @@ public class SimulationController : MonoBehaviour
         if (zoomAdjustment != 0)
         {
             float oldScale = renderer.Scale;
-            renderer.ZoomFactor += zoomAdjustment;
+            SetZoomFactor(renderer.ZoomFactor + zoomAdjustment);
             float newScale = renderer.Scale;
 
             // applying the main zoom offset
@@ -451,15 +438,9 @@ public class SimulationController : MonoBehaviour
             renderer.ApplyScale(body);
         }
 
-        // refresh trails if scale has changed
-        if (lastScale != renderer.Scale)
+        if (lastZoomFactor != renderer.ZoomFactor)
         {
-            lastScale = renderer.Scale;
-
-            foreach (Body body in simulation.bodies)
-            {
-                body.Entity.GetComponent<TrailRenderer>().Clear();
-            }
+            ReadjustAllTrails();
         }
 
         OnPhysicsUpdate?.Invoke();
@@ -506,6 +487,32 @@ public class SimulationController : MonoBehaviour
 
     #region Scale Management
 
+    // sets the zoom factor of the controller's renderer to the given value
+    public void SetZoomFactor(float zoomFactor)
+    {
+        renderer.ZoomFactor = zoomFactor;
+        ReadjustAllTrails();
+    }
+
+    // sets the distance unit of the controller's renderer to the given value
+    public void SetDistanceScale(string distance)
+    {
+        renderer.Distance = distance;
+        ReadjustAllTrails();
+    }
+
+    // readjusts trails (mainly for scale changes since they're a bit buggy)
+    public void ReadjustAllTrails()
+    {
+        foreach (Body body in simulation.bodies)
+        {
+            body.Entity.GetComponent<TrailRenderer>().Clear();
+
+            body.Entity.GetComponent<TrailRenderer>().widthMultiplier
+                = Mathf.Min(0.1f, 2 * body.Radius * renderer.Scale);
+        }
+    }
+
     // scales the simulation to fit the given body
     public void ScaleToFit(Body body)
     {
@@ -516,7 +523,7 @@ public class SimulationController : MonoBehaviour
         double value = targetDiameter * UnitReference.DISTANCE_UNITS[renderer.Distance] 
             / (2 * body.Radius * renderer.UNITS_PER_WORLDSPACE);
 
-        renderer.ZoomFactor = (float) Math.Log10(value);
+        SetZoomFactor((float) Math.Log10(value));
 
         OnScaleChanged?.Invoke(renderer.ZoomFactor);
 

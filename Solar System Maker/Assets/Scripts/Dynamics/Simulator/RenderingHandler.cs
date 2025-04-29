@@ -102,7 +102,7 @@ public class RenderingHandler
 
         LineRenderer pathDrawer = body.Entity.AddComponent<LineRenderer>();
         pathDrawer.material = new Material(Shader.Find("Sprites/Default"));
-        pathDrawer.widthMultiplier = 0.2f;
+        pathDrawer.widthMultiplier = 0.1f;
 
         Gradient gradient = new();
 
@@ -217,7 +217,7 @@ public class RenderingHandler
 
         TrailRenderer trailDrawer = body.Entity.AddComponent<TrailRenderer>();
         trailDrawer.material = new Material(Shader.Find("Sprites/Default"));
-        trailDrawer.widthMultiplier = 0.2f;
+        trailDrawer.widthMultiplier = 0.1f;
 
         Gradient gradient = new();
         

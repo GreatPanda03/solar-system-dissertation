@@ -52,19 +52,19 @@
         <ui:Label text="Properties" name="Title" class="propertiesTitle" style="display: flex; align-self: center;" />
         <ui:VisualElement name="Groups" style="flex-grow: 1; display: flex;">
             <ui:GroupBox name="Body" class="propertiesGroup" style="display: flex;">
-                <ui:Label text="Body" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
+                <ui:Label text="Body" name="Title" enable-rich-text="true" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
                 <ui:TextField label="Name" placeholder-text="(blank)" name="Name" tooltip="Name" class="propertiesField" />
                 <ui:FloatField label="Mass (kg)" value="10" name="Mass" tooltip="Mass" class="propertiesField" />
                 <ui:FloatField label="Radius (d)" value="10" name="Radius" tooltip="Radius" class="propertiesField" />
-                <ui:FloatField label="Surface Temp." value="10" name="SurfaceTemp" tooltip="Surface Temperature" class="propertiesField" />
-                <ui:FloatField label="Density" value="10" name="Density" tooltip="Density" class="propertiesField" />
+                <ui:FloatField label="Temp. (°C)" value="10" name="SurfaceTemp" tooltip="Surface Temperature" class="propertiesField" />
+                <ui:FloatField label="Density(kg/m&lt;sup&gt;3&lt;/sup&gt;)" value="10" name="Density" tooltip="Density" class="propertiesField" />
                 <ui:FloatField label="Speed (d/t)" value="10" name="Speed_custom" placeholder-text="(blank)" readonly="true" class="propertiesField" />
-                <ui:FloatField label="Accel. (d/t^2)" value="10" name="Acceleration_custom" placeholder-text="(blank)" readonly="true" focusable="true" class="propertiesField" />
+                <ui:FloatField label="Accel. (d/t&lt;sup&gt;2&lt;/sup&gt;)" value="10" name="Acceleration_custom" placeholder-text="(blank)" readonly="true" focusable="true" class="propertiesField" />
                 <ui:FloatField label="Rotations (t)" value="10" name="Rotations_custom" placeholder-text="(blank)" readonly="true" focusable="true" class="propertiesField" />
             </ui:GroupBox>
             <ui:GroupBox name="Star" class="propertiesGroup" style="display: flex;">
                 <ui:Label text="Star" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
-                <ui:FloatField label="Luminosity" value="10" name="Luminosity" tooltip="Luminosity" class="propertiesField" />
+                <ui:FloatField label="Luminosity (W)" value="10" name="Luminosity" tooltip="Luminosity" class="propertiesField" />
             </ui:GroupBox>
             <ui:GroupBox name="Planet" class="propertiesGroup" style="display: flex;">
                 <ui:Label text="Planet" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
