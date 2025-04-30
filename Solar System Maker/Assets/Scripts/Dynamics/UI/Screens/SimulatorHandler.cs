@@ -1156,6 +1156,26 @@ public class SimulatorHandler
 
         foreach (VisualElement group in groups.Children())
         {
+            Label title = group.Q<Label>("Title");
+
+            // collapsible groups on click
+            title.RegisterCallback<ClickEvent>((e) => {
+                VisualElement container = group.Q<VisualElement>("Container");
+                bool visible = container.style.display == DisplayStyle.Flex;
+
+                if (!visible)
+                {
+                    container.style.display = DisplayStyle.Flex;
+                    title.text = title.text.Replace(" +", " -");
+                }
+                else
+                {
+                    container.style.display = DisplayStyle.None;
+                    title.text = title.text.Replace(" -", " +");
+                }
+            });
+
+            // preparing each field accordingly
             foreach (VisualElement field in group.Children())
             {
                 string property = field.name;
@@ -1277,11 +1297,13 @@ public class SimulatorHandler
             properties.Q<FloatField>("Acceleration_custom").value = (lastVelocity - body.Velocity).magnitude * DTScale;
             properties.Q<FloatField>("Rotations_custom").value = body.AngularVelocity / (2 * MathF.PI) * timeScale;
 
-            lastVelocity = body.Velocity;
+            lastVelocity = body.Velocity; // for acceleration
 
+            // updating groups accordingly
             properties.Q<Label>("NoSelection").style.display = DisplayStyle.None;
             groups.Q<VisualElement>("Star").style.display = body is Star ? DisplayStyle.Flex : DisplayStyle.None;
             groups.Q<VisualElement>("Planet").style.display = body is Planet ? DisplayStyle.Flex : DisplayStyle.None;
+            groups.Q<VisualElement>("Planetary").style.display = body is SubBody ? DisplayStyle.Flex : DisplayStyle.None;
             groups.style.display = DisplayStyle.Flex;
         }
     }

@@ -50,34 +50,43 @@
     <ui:VisualElement name="PropertiesPanel" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: 40px; left: auto; right: 10px;">
         <ui:Button text="X" name="Close" class="propertiesClose" style="position: absolute;" />
         <ui:Label text="Properties" name="Title" class="propertiesTitle" style="display: flex; align-self: center;" />
-        <ui:VisualElement name="Groups" style="flex-grow: 1; display: flex;">
-            <ui:GroupBox name="Body" class="propertiesGroup" style="display: flex;">
-                <ui:Label text="Body" name="Title" enable-rich-text="true" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
-                <ui:VisualElement name="Container" style="flex-grow: 1;">
-                    <ui:TextField label="Name" placeholder-text="(blank)" name="Name" tooltip="Name" class="propertiesField" />
-                    <ui:FloatField label="Mass (kg)" value="10" name="Mass" tooltip="Mass" placeholder-text="(blank)" class="propertiesField" />
-                    <ui:FloatField label="Radius (d)" value="10" name="Radius" tooltip="Radius" placeholder-text="(blank)" class="propertiesField" />
-                    <ui:FloatField label="Temp. (°C)" value="10" name="SurfaceTemp" tooltip="Surface Temperature" placeholder-text="(blank)" class="propertiesField" />
-                    <ui:FloatField label="Density(kg/m&lt;sup&gt;3&lt;/sup&gt;)" value="10" name="Density" tooltip="Density" placeholder-text="(blank)" class="propertiesField" />
-                    <ui:FloatField label="Speed (d/t)" value="10" name="Speed_custom" placeholder-text="(blank)" readonly="true" tooltip="Speed" class="propertiesField" />
-                    <ui:FloatField label="Accel. (d/t&lt;sup&gt;2&lt;/sup&gt;)" value="10" name="Acceleration_custom" placeholder-text="(blank)" readonly="true" focusable="true" tooltip="Acceleration" class="propertiesField" />
-                    <ui:FloatField label="Rotations (t)" value="10" name="Rotations_custom" placeholder-text="(blank)" readonly="true" focusable="false" tooltip="Rotations" class="propertiesField" />
-                </ui:VisualElement>
-            </ui:GroupBox>
-            <ui:GroupBox name="Star" class="propertiesGroup" style="display: flex;">
-                <ui:Label text="Star" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
-                <ui:VisualElement name="Container" style="flex-grow: 1;">
-                    <ui:FloatField label="Luminosity (W)" value="10" name="Luminosity" tooltip="Luminosity" class="propertiesField" />
-                </ui:VisualElement>
-            </ui:GroupBox>
-            <ui:GroupBox name="Planet" class="propertiesGroup" style="display: flex;">
-                <ui:Label text="Planet" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
-                <ui:VisualElement name="Container" style="flex-grow: 1;">
-                    <ui:FloatField label="Water (%)" value="10" name="WaterContent" tooltip="Water Content" class="propertiesField" />
-                    <ui:FloatField label="Habitability" value="10" name="Habitability" tooltip="Habitability" readonly="false" class="propertiesField" />
-                </ui:VisualElement>
-            </ui:GroupBox>
-        </ui:VisualElement>
+        <ui:ScrollView name="Scoller" style="height: auto; max-height: 250px;">
+            <ui:VisualElement name="Groups" style="flex-grow: 0; display: flex;">
+                <ui:GroupBox name="Body" class="propertiesGroup" style="display: flex;">
+                    <ui:Label text="Body -" name="Title" enable-rich-text="true" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
+                    <ui:VisualElement name="Container" style="flex-grow: 1;">
+                        <ui:TextField label="Name" placeholder-text="(blank)" name="Name" tooltip="Name" class="propertiesField" />
+                        <ui:FloatField label="Mass (kg)" value="10" name="Mass" tooltip="Mass" placeholder-text="(blank)" class="propertiesField" />
+                        <ui:FloatField label="Radius (d)" value="10" name="Radius" tooltip="Radius" placeholder-text="(blank)" class="propertiesField" />
+                        <ui:FloatField label="Temp. (°C)" value="10" name="SurfaceTemp" tooltip="Surface Temperature" placeholder-text="(blank)" class="propertiesField" />
+                        <ui:FloatField label="Density(kg/m&lt;sup&gt;3&lt;/sup&gt;)" value="10" name="Density" tooltip="Density" placeholder-text="(blank)" class="propertiesField" />
+                        <ui:FloatField label="Speed (d/t)" value="10" name="Speed_custom" placeholder-text="(blank)" readonly="true" tooltip="Speed" class="propertiesField" />
+                        <ui:FloatField label="Accel. (d/t&lt;sup&gt;2&lt;/sup&gt;)" value="10" name="Acceleration_custom" placeholder-text="(blank)" readonly="true" focusable="true" tooltip="Acceleration" class="propertiesField" />
+                        <ui:FloatField label="Rotations (t)" value="10" name="Rotations_custom" placeholder-text="(blank)" readonly="true" focusable="false" tooltip="Rotations" class="propertiesField" />
+                    </ui:VisualElement>
+                </ui:GroupBox>
+                <ui:GroupBox name="Star" class="propertiesGroup" style="display: flex;">
+                    <ui:Label text="Star -" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
+                    <ui:VisualElement name="Container" style="flex-grow: 1;">
+                        <ui:FloatField label="Luminosity (W)" value="10" name="Luminosity" tooltip="Luminosity" class="propertiesField" />
+                    </ui:VisualElement>
+                </ui:GroupBox>
+                <ui:GroupBox name="Planetary" class="propertiesGroup" style="display: flex;">
+                    <ui:Label text="Planetary -" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
+                    <ui:VisualElement name="Container" style="flex-grow: 1;">
+                        <ui:FloatField label="Albedo" value="10" name="Albedo" tooltip="Albedo" class="propertiesField" />
+                        <ui:FloatField label="Emissivity" value="10" name="Emissivity" tooltip="Emissivity" readonly="false" class="propertiesField" />
+                    </ui:VisualElement>
+                </ui:GroupBox>
+                <ui:GroupBox name="Planet" class="propertiesGroup" style="display: flex;">
+                    <ui:Label text="Planet -" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
+                    <ui:VisualElement name="Container" style="flex-grow: 1;">
+                        <ui:FloatField label="Water (%)" value="10" name="WaterContent" tooltip="Water Content" class="propertiesField" />
+                        <ui:FloatField label="Habitability" value="10" name="Habitability" tooltip="Habitability" readonly="false" class="propertiesField" />
+                    </ui:VisualElement>
+                </ui:GroupBox>
+            </ui:VisualElement>
+        </ui:ScrollView>
         <ui:Label text="Select a body in the system to see its properties" name="NoSelection" class="propertiesNoBody" style="display: none; margin-top: 5px; font-size: 12px;" />
     </ui:VisualElement>
     <ui:VisualElement name="Explorer" class="propertiesPanel" style="background-color: rgba(0, 0, 0, 0.59); top: auto; left: auto; right: 10px; bottom: 65px;">
