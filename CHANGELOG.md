@@ -11,6 +11,33 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.15.4
+**Date:** 2025/04/30
+<br/>**Bug Fixes:**
+* **1)** Fixed physics silently being applied to "the other of the pair" of two bodies when the other is anchored
+* **2)** Fixed underlying plane being misaligned with the visual plane
+* **3)** Fixed Trail Time option not being populated with the current value
+* **4)** Fixed trails widths taking the planet radius rather than the minimum baseline *(wrong way around)*
+* **5)** Fixed default moons using radius as density
+* **Note:** orbit mode doesn't account plane alignment - this is a WIP
+
+**Additions / Changes:**
+* **1)** Collision quality is now functional and has two states:
+    * **a)** **None** - collisions aren't processed, so bodies can pass through each other
+    * **b)** **Low** - bodies which are too close combine into a single body instantaneously
+* **2)** Separated physics methods from Body classes into physics handler
+* **3)** Grouped planets and moons under a new category *("sub-body")*
+* **4)** Added a temperature system (WIP)
+    * **a)** Stars now emit power relative to their luminosity
+    * **b)** Sub-bodies now absorb power relative to their albedo rating *(currently internal only)*
+    * **c)** Sub-bodies now radiate power based on their temperature, surface area, and emissivity *(currently internal only)*
+    * **d)** The effective temperature of a sub-body is determined by the power it absorbs and the power it radiates
+    * * **Note:** temperature currently shows as NaN for sub-bodies - this is a WIP
+* **5)** Increased the minimum threshold for orbit paths *(to make them more visible further away)*
+* **6)** Added timescales greater than a year *(decade, century, millennium - simulations may be VERY inaccurate for close distances)*
+
+---
+
 ### Version: 1.15.3
 **Date:** 2025/04/29
 <br/>**Bug Fixes:**
