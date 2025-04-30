@@ -97,7 +97,7 @@ public class Body
         get => mass;
         set {
             mass = value;
-            density = GetDensityFromMassAndRadius();
+            density = GetDensityFromMassAndVolume();
         }
     }
 
@@ -106,7 +106,7 @@ public class Body
         get => radius;
         set { 
             radius = value;
-            density = GetDensityFromMassAndRadius();
+            density = GetDensityFromMassAndVolume();
         }
     }
 
@@ -151,6 +151,12 @@ public class Body
             angularVelocity = value;
         }
     }
+
+    protected Vector3 tilt; // relative to plane Y = 0
+    public Vector3 Tilt {
+        get => tilt;
+        set => tilt = value;
+    }
     
     private Material texture;
     public Material Texture {
@@ -180,6 +186,7 @@ public class Body
         surfaceTemp = 0f;
         density = 1f;
         angularVelocity = 1 * Mathf.Deg2Rad;
+        tilt = Vector3.up;
 
         radius = GetRadiusFromMassAndDensity();
     }
@@ -187,7 +194,7 @@ public class Body
     #endregion Constructor
 
 
-    #region General Methods
+    #region Object Methods
 
     public virtual Body GetShallowCopy()
     {
@@ -215,10 +222,15 @@ public class Body
         );
     }
 
-    #endregion General Methods
+    #endregion Object Methods
 
 
-    #region Entity Methods
+    #region Physics Methods
+
+    public float GetVolume()
+    {
+        return 4f / 3f * Mathf.PI * Mathf.Pow(radius, 3);
+    }
 
     // auxiliary: returns values in relation to "p = m / v"
     public float GetRadiusFromMassAndDensity()
@@ -226,31 +238,15 @@ public class Body
         return Mathf.Pow(mass / density * 0.75f / Mathf.PI, 1f / 3f);
     }
 
-    public float GetDensityFromMassAndRadius()
+    public float GetDensityFromMassAndVolume()
     {
-        return mass * 0.75f / Mathf.PI / Mathf.Pow(radius, 3);
+        return mass / GetVolume();
     }
 
-    // applies the given force to the body
-    // * F = m * a   :.   a = F / m
-    public void ApplyForce(Vector3 force)
-    {
-        acceleration += force / mass;
-    }
+    #endregion Physics Methods
 
-    // updates the body's physics
-    public void Update(float dt)
-    {
-        if (entity != null)
-        {
-            entity.transform.rotation 
-                *= Quaternion.Euler(0, -angularVelocity * Mathf.Rad2Deg * dt, 0);
-        }
 
-        velocity += acceleration * dt;
-        position += velocity * dt;
-        acceleration = new Vector3(0,0,0);
-    }
+    #region Entity Methods
 
     // returns a new generic Body entity
     public virtual void CreateEntity() {

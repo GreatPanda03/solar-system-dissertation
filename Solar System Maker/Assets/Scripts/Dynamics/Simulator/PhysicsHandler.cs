@@ -18,7 +18,7 @@ public class PhysicsHandler
         get => timePerSecond;
         set {
             timePerSecond = value;
-            timeCoefficient = 0.02f * (float) UnitReference.TIME_UNITS[timePerSecond];
+            timeCoefficient = Time.fixedDeltaTime * (float) UnitReference.TIME_UNITS[timePerSecond];
         }
     }
 
@@ -44,7 +44,7 @@ public class PhysicsHandler
     #endregion Constructor
 
 
-    #region General Methods
+    #region General
 
     public void SetCollisionQuality(string newQuality)
     {
@@ -54,15 +54,40 @@ public class PhysicsHandler
         }
     }
 
-    #endregion
+    // updates the given body's physics over the given timeframe
+    public void Update(Body body, float dt)
+    {
+        if (body.Entity != null)
+        {
+            body.Entity.transform.rotation // will automatically rotate according to tilt
+                *= Quaternion.Euler(0, -body.AngularVelocity * Mathf.Rad2Deg * dt, 0);
+        }
+
+        body.Velocity += body.Acceleration * dt;
+        body.Position += body.Velocity * dt;
+        body.Acceleration = Vector3.zero;
+
+        // special case for sub-bodies
+        if (body is SubBody subBody)
+        {
+            float powerAbsorbed = subBody.PowerAbsorbed;
+            float powerRadiated = GetPowerRadiated(subBody);
+
+            subBody.SurfaceTemp = Mathf.Pow(powerAbsorbed - powerRadiated, 0.25f)
+                - (float) UnitReference.TEMPERATURE_UNITS["Celsius"];
+
+            subBody.PowerAbsorbed = 0;
+        }
+    }
+
+    #endregion General
 
 
-    #region Physics Methods
+    #region Forces
     
-    // returns the force applied between two objects
+    // returns the gravitational force exerted by A on B (so B moves towards A)
     // * F1 = F2 = G * (m1 * m2) / r^2
-    // * NOTE: the force's magnitude is the same, but the direction is different
-    //   > this method returns an attractive force by THIS on OTHER
+    // * NOTE: the force's magnitude is the same, but the direction is important
     public Vector3 GetGravitationalForce(Body A, Body B, float G) // actual G
     {
         Vector3 vector = B.Position - A.Position;
@@ -74,6 +99,18 @@ public class PhysicsHandler
 
         return force;
     }
+
+    // applies the given force to the given body
+    // * F = m * a   :.   a = F / m
+    public void ApplyForce(Body body, Vector3 force)
+    {
+        body.Acceleration += force / body.Mass;
+    }
+
+    #endregion Forces
+
+
+    #region Velocity
 
     // returns the velocity required for the given child body to have a stable orbit around the given parent body
     // * velocity is based on the true positions of each body, which is then scaled accordingly later
@@ -112,22 +149,123 @@ public class PhysicsHandler
         return velocity;
     }
 
-    // processes a collision between the two bodies
-    public void ProcessCollision(Body bodyA, Body bodyB)
+    #endregion Velocity
+
+
+    #region Momentum
+
+    // returns the momentum of the given body
+    public Vector3 GetMomentum(Body body)
+    {
+        return body.Mass * body.Velocity;
+    }
+
+    // returns the angular momentum of the given body
+    public Vector3 GetAngularMomentum(Body body)
+    {
+        return body.Radius * body.AngularVelocity * body.Tilt;
+    }
+
+    #endregion Momentum
+
+
+    #region Collisions
+
+    // returns the larger of the two bodies colliding, if any collision
+    public Body IsColliding(Body bodyA, Body bodyB)
     {
         if (collisionQuality == CollisionQuality.None)
         {
-            return;
+            return null;
         }
-        else if (collisionQuality == CollisionQuality.Low)
+        else
         {
-            Debug.Log("[low collision quality processing method]");
-        }
-        else if (collisionQuality == CollisionQuality.High)
-        {
-            Debug.Log("[high collision quality processing method]");
+            float distance = (bodyA.Position - bodyB.Position).magnitude;
+            float tolerance = 0.75f;
+            // the threshold for how deep the "minor" body must be
+            //   to trigger a colllsion (0 = touching, 1 = completely in)
+
+            Body majorBody;
+            Body minorBody;
+
+            if (bodyA.Radius > bodyB.Radius)
+            {
+                majorBody = bodyA;
+                minorBody = bodyB;
+            }
+            else
+            {
+                majorBody = bodyB;
+                minorBody = bodyA;
+            }
+
+            bool colliding = distance < majorBody.Radius + minorBody.Radius * (1 - tolerance);
+
+            return colliding ? majorBody : null;
         }
     }
 
-    #endregion Physics Methods
+    // applies the forces of Body B onto Body A as if they were colliding
+    public void ApplyCollision(Body bodyA, Body bodyB)
+    {
+        float totalMass = bodyA.Mass + bodyB.Mass;
+        float totalVolume = bodyA.GetVolume() + bodyB.GetVolume();
+        Vector3 totalMomentum = GetMomentum(bodyA) + GetMomentum(bodyB);
+        Vector3 totalAngularMomentum = GetAngularMomentum(bodyA) - GetAngularMomentum(bodyB);
+        
+        // ^ subtraction - if A and B are rotating in the same direction,
+        //   they'd be opposing each other when they touch (and the opposite if in opposite directions)
+        
+        bodyA.Mass = totalMass;
+        bodyA.Radius = Mathf.Pow(0.75f * totalVolume / Mathf.PI, 1f / 3f);
+        if (!bodyA.Anchored) ApplyForce(bodyA, totalMomentum / totalMass);
+        bodyA.AngularVelocity = totalAngularMomentum.magnitude / (bodyA.Radius + bodyB.Radius);
+
+        // ^ "instantaneous acceleration" will be processed as velocity when "velocity += acceleration"
+    }
+
+    #endregion Collisions
+
+
+    #region Temperature
+
+    // returns the power absorbed by the given sub body from the given star
+    //   based on luminosity, planet radius, distance, and albedo
+    public float GetPowerReceived(Star star, SubBody body)
+    {
+        float r = body.Radius;
+        float D = (star.Position - body.Position).magnitude;
+        
+        float numerator = star.Luminosity * (r*r); // albedo not considered here - see "Apply Power"
+        float denominator = 4 * D*D;
+
+        float powerReceived = numerator / denominator;
+
+        return powerReceived;
+    }
+
+    // returns the power being emitted by the given body based on 
+    //   its current temperature and emissivity
+    public float GetPowerRadiated(SubBody body)
+    {
+        float r = body.Radius;
+
+        float power = body.Emissivity * (float) UnitReference.STEFAN_BOLTZMANN 
+            * Mathf.Pow(body.SurfaceTemp + (float) UnitReference.TEMPERATURE_UNITS["Kelvin"], 4);
+
+        float surfaceArea = 4 * Mathf.PI * (r*r);
+        
+        float powerRadiated = power * surfaceArea;
+        powerRadiated = powerRadiated == float.NaN ? float.MaxValue : powerRadiated;
+
+        return powerRadiated;
+    }
+
+    // applies the given power directly to the given sub-body
+    public void ApplyPower(SubBody body, float power)
+    {
+        body.PowerAbsorbed += power * (1 - body.Albedo);
+    }
+
+    #endregion Temperature
 }

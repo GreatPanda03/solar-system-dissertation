@@ -39,19 +39,8 @@ public class OptionsPopupHandler : IPopup
 
         UIController.PrepareFieldFocus(popup);
 
-        Settings settings = simController.simulation.settings;
-        popup.Q<TextField>("Name").value = settings.Name;
-        popup.Q<TextField>("Description").value = settings.Description;
-        popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
-        popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
-
-        popup.Q<Button>("Reset").clicked += () => {
-            Settings settings = simController.simulation.settings;
-            popup.Q<TextField>("Name").value = settings.Name;
-            popup.Q<TextField>("Description").value = settings.Description;
-            popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
-            popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
-        };
+        LoadCurrentSettings();
+        popup.Q<Button>("Reset").clicked += LoadCurrentSettings;
 
         popup.Q<Button>("Save").clicked += () => {
             if (!ValidateDetails(popup)) return;
@@ -76,6 +65,21 @@ public class OptionsPopupHandler : IPopup
     }
 
     #endregion Constructor
+
+    
+    #region General
+
+    public void LoadCurrentSettings()
+    {
+        Settings settings = simController.simulation.settings;
+        popup.Q<TextField>("Name").value = settings.Name;
+        popup.Q<TextField>("Description").value = settings.Description;
+        popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
+        popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
+        popup.Q<FloatField>("TrailTime").value = simController.TrailTime;
+    }
+
+    #endregion General
 
 
     #region Validation

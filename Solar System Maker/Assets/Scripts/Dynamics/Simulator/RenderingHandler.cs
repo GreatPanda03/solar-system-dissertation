@@ -217,7 +217,7 @@ public class RenderingHandler
 
         TrailRenderer trailDrawer = body.Entity.AddComponent<TrailRenderer>();
         trailDrawer.material = new Material(Shader.Find("Sprites/Default"));
-        trailDrawer.widthMultiplier = 0.1f;
+        trailDrawer.widthMultiplier = Math.Max(body.Radius * scale, 0.1f);
 
         Gradient gradient = new();
         

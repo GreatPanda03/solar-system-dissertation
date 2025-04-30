@@ -469,6 +469,9 @@ public class SimulationController : MonoBehaviour
     {
         List<Body> bodies = simulation.bodies;
 
+        List<Body> bodiesToRemove = new();
+
+        // * playing with increasing simulation calculations / update, rather than rate
         // time loop - simulates up to "t" seconds at a time
         // for (int t = 1; t <= UnitReference.TIME_UNITS[physics.TimePerSecond]; t++)
         // { 
@@ -477,26 +480,68 @@ public class SimulationController : MonoBehaviour
             {
                 Body bodyA = bodies[a];
 
+                // gravity / collisions loop - mutual attraction, so "cut in half"
                 for (int b = a + 1; b < bodies.Count; b++)
                 {
                     Body bodyB = bodies[b];
 
-                    Vector3 force = physics.GetGravitationalForce(bodyA, bodyB,
+                    // collision handling - stop here if colliding
+                    Body majorBody = physics.IsColliding(bodyA, bodyB);
+
+                    if (majorBody != null)
+                    {
+                        Body minorBody = majorBody == bodyA ? bodyB : bodyA;
+
+                        physics.ApplyCollision(majorBody, minorBody);
+                        bodiesToRemove.Add(minorBody);
+
+                        if (selectedBody == minorBody) // swap over to dominating body
+                        {
+                            CameraController.SetSubject(majorBody);
+                            SelectBody(majorBody);
+                        }
+
+                        continue;
+                    }
+                    
+                    // if no collisions, continue with general forces
+                    Vector3 gravity = physics.GetGravitationalForce(bodyA, bodyB,
                         simulation.settings.GravitationalConstant * (float) UnitReference.G);
 
                     if (!bodyA.Anchored) 
                     {
-                        bodyA.ApplyForce(force);
+                        physics.ApplyForce(bodyA, gravity);
                     }
 
-                    bodyB.ApplyForce(-force);
+                    if (!bodyB.Anchored)
+                    {
+                        physics.ApplyForce(bodyB, -gravity);
+                    }
                 }
 
-                if (!bodyA.Anchored)
+                // temperature loop - special case for star / sub-body interaction
+                if (bodyA is Star star)
                 {
-                    bodyA.Update(physics.TimeCoefficient);
-                    // bodyA.Update(Time.deltaTime);
+                    foreach (Body body in bodies)
+                    {
+                        if (body is SubBody subBody)
+                        {
+                            float power = physics.GetPowerReceived(star, subBody);
+                            physics.ApplyPower(subBody, power);
+                        }
+                    }
                 }
+
+                // final update
+                physics.Update(bodyA, physics.TimeCoefficient);
+                
+                // bodyA.Update(Time.deltaTime);
+            }
+
+            // removes any bodies marked for removal by physics
+            foreach (Body body in bodiesToRemove)
+            {
+                RemoveBody(body);
             }
        ///}
     }
@@ -531,7 +576,7 @@ public class SimulationController : MonoBehaviour
 
             trail.Clear();
 
-            trail.widthMultiplier = Mathf.Min(0.1f, 2 * body.Radius * renderer.Scale);
+            trail.widthMultiplier = Mathf.Max(body.Radius * renderer.Scale, 0.1f);
 
             trail.time = trailTime;
         }
@@ -878,7 +923,7 @@ public class SimulationController : MonoBehaviour
         simulatorPlane.transform.rotation = rotation;
 
         placementPlane.SetNormalAndPosition(
-            simulatorPlane.transform.up, simulatorPlane.transform.position);
+            simulatorPlane.transform.forward, simulatorPlane.transform.position);
     }
 
     // adjusts the plane by the given vector

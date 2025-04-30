@@ -51,11 +51,12 @@ public class Star : Body
         name = "Star";
         mass = (float) UnitReference.MASS_UNITS["Sun"];
         radius = (float) UnitReference.DISTANCE_UNITS["Solar Radius"];
-        luminosity = (float) UnitReference.LUMINOSITY_UNITS["Sun"];
         surfaceTemp = CalculateSurfaceTemperature(radius, luminosity);
         angularVelocity = 2.7e-6f;
 
-        density = GetDensityFromMassAndRadius();
+        luminosity = (float) UnitReference.LUMINOSITY_UNITS["Sun"];
+
+        density = GetDensityFromMassAndVolume();
     }
 
     #endregion Constructors

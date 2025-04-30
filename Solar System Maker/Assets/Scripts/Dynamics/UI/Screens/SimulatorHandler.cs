@@ -785,9 +785,6 @@ public class SimulatorHandler
             simController.physics.TimePerSecond = keys[keyIndex];
         }
 
-        Debug.Log(simController.physics.TimePerSecond);
-        Debug.Log(UnitReference.TIME_UNITS[simController.physics.TimePerSecond]);
-
         UpdateTimeLabel();
     }
 
@@ -802,9 +799,6 @@ public class SimulatorHandler
         {
             simController.physics.TimePerSecond = keys[keyIndex];
         }
-
-        Debug.Log(simController.physics.TimePerSecond);
-        Debug.Log(UnitReference.TIME_UNITS[simController.physics.TimePerSecond]);
 
         UpdateTimeLabel();
     }
@@ -1276,7 +1270,7 @@ public class SimulatorHandler
 
             // special case fields
             float distanceScale = simController.renderer.Scale;
-            float timeScale = simController.physics.TimeCoefficient / 0.02f;
+            float timeScale = simController.physics.TimeCoefficient / Time.fixedDeltaTime;
             float DTScale = distanceScale * timeScale;
 
             properties.Q<FloatField>("Speed_custom").value = body.Velocity.magnitude * DTScale;

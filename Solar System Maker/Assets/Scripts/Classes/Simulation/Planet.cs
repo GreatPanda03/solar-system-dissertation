@@ -9,7 +9,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class Planet : Body
+public class Planet : SubBody
 {
 
     #region Attributes
@@ -48,10 +48,15 @@ public class Planet : Body
         mass = (float) UnitReference.MASS_UNITS["Earth"];
         radius = (float) UnitReference.DISTANCE_UNITS["Earth Radius"];
         angularVelocity = 7.29e-5f;
+        
+        // source: https://climatepuzzles.org/technical/surface-emissivity/
+        albedo = 0.31f;
+        emissivity = 0.65f;
+        
         habitability = 0;
         waterContent = 0;
         
-        density = GetDensityFromMassAndRadius();
+        density = GetDensityFromMassAndVolume();
     }
 
     #endregion Constructors
@@ -73,5 +78,5 @@ public class Planet : Body
         return copy;
     }
 
-    #endregion
+    #endregion Methods
 }

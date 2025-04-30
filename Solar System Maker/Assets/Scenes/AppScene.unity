@@ -348,6 +348,8 @@ MonoBehaviour:
   orbitEnabled: 0
   eccentricity: 0
   orbitDirection: -1
+  lastZoomFactor: 0
+  lastDistance: 
 --- !u!1 &562911921
 GameObject:
   m_ObjectHideFlags: 0
