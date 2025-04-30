@@ -11,6 +11,18 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.15.5
+**Date:** 2025/04/30
+<br/>**Bug Fixes:**
+* **1)** Handled inputting values into read-only fields
+
+**Additions / Changes:**
+* **1)** Added a "Planetary" category to properties window to cover sub-body fields
+* **2)** Added "Emissivity" and "Albedo" to the properties window under "Planetary"
+* **3)** Made properties window groups collapsible & adjusted the UI
+
+---
+
 ### Version: 1.15.4
 **Date:** 2025/04/30
 <br/>**Bug Fixes:**
