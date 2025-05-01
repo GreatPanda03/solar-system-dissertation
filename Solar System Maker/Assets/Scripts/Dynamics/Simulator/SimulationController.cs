@@ -5,6 +5,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Unity.VisualScripting;
 
 public class SimulationController : MonoBehaviour
 {
@@ -98,6 +99,23 @@ public class SimulationController : MonoBehaviour
             else
             {
                 HideAllTrails();
+            }
+        }
+    }
+
+    private bool showHabitableZones = false;
+    public bool ShowHabitableZones {
+        get => showHabitableZones;
+        set {
+            showHabitableZones = value;
+
+            if (value == true)
+            {
+                ShowAllHabitableZones();
+            }
+            else
+            {
+                HideAllHabitableZones();
             }
         }
     }
@@ -270,6 +288,9 @@ public class SimulationController : MonoBehaviour
 
     void Update()
     {
+        // simulatorPlane.GetComponent<MeshRenderer>().material.SetVector(
+        //     "_VirtualPosition", (Vector3) CameraController.VirtualPosition);
+
         if (!isActive) return;
 
         // run keyboard / mouse controls
@@ -281,12 +302,20 @@ public class SimulationController : MonoBehaviour
             if (preview != null && preview.Entity != null)
             {
                 RunPreviewBearings();
-                preview.RenderBody(renderer.Scale);
+                preview.RenderBody(Vector3d.zero, renderer.Scale);
                 RunPreviewPlacement();
 
                 if (showLabels)
                 {
                     preview.RenderLabel();
+                }
+
+                if (preview is RenderableStar starPreview)
+                {
+                    if (starPreview.ShowHabitableZone)
+                    {
+                        starPreview.RenderHabitableZone(renderer.Scale);
+                    }
                 }
             }
 
@@ -302,6 +331,21 @@ public class SimulationController : MonoBehaviour
                 if (rBody.ShowLabel)
                 {
                     rBody.RenderLabel();
+                }
+            }
+        }
+
+        // habitable zone rendering - special case
+        if (showHabitableZones)
+        {
+            foreach (RenderableBody rBody in rBodies)
+            {
+                if (rBody is RenderableStar rStar)
+                {
+                    if (rStar.ShowHabitableZone)
+                    {
+                        rStar.RenderHabitableZone(renderer.Scale);
+                    }
                 }
             }
         }
@@ -326,6 +370,13 @@ public class SimulationController : MonoBehaviour
 
             Vector3d spacePosition = (Vector3d) (Camera.main.transform.position + direction) / (float) oldScale;
             Camera.main.transform.position = (Vector3) (spacePosition * (double) newScale);
+
+            // also moves the subject to make zooming a followed body more seamless
+            if (CameraController.Subject != null)
+            {
+                CameraController.Subject.RenderBody(Vector3d.zero, newScale);
+                CameraController.Subject.Trail.Clear();
+            }
 
             OnScaleChanged?.Invoke(newScale);
         }
@@ -454,7 +505,10 @@ public class SimulationController : MonoBehaviour
         
         foreach (RenderableBody rBody in rBodies)
         {
-            rBody.RenderBody(renderer.Scale);
+            // use only xz offset here, since y follows the camera anyway
+            // Vector3d offset = new(CameraController.VirtualPosition.x, 0, CameraController.VirtualPosition.z);
+            // Vector3d offset = CameraController.VirtualPosition;
+            rBody.RenderBody(Vector3d.zero, renderer.Scale);
         }
 
         if (lastZoomFactor != renderer.ZoomFactor || lastDistance != renderer.Distance)
@@ -640,7 +694,15 @@ public class SimulationController : MonoBehaviour
             body = new Body();
         }
 
-        preview = new() { Body = body };
+        if (body is Star)
+        {
+            preview = new RenderableStar() { Body = body };
+        }
+        else
+        {
+            preview = new() { Body = body };
+        }
+
         preview.Body.Name = "New " + type.ToString();
 
         PreparePreviewVisuals();
@@ -651,7 +713,15 @@ public class SimulationController : MonoBehaviour
     {
         RemoveEntityPreview();
 
-        preview = new() { Body = template.Body.GetCopy() };
+        if (template.Body is Star)
+        {
+            preview = new RenderableStar() { Body = template.Body.GetCopy() };
+        }
+        else
+        {
+            preview = new() { Body = template.Body.GetCopy() };
+        }
+        
         preview.Body.Name = template.Body.Name;
 
         PreparePreviewVisuals();
@@ -665,10 +735,17 @@ public class SimulationController : MonoBehaviour
         preview.CreateEntity();
         preview.CreateLabel();
         preview.CreateLine();
+
+        if (preview is RenderableStar previewStar)
+        {
+            previewStar.CreateHabitableZone();
+            previewStar.SetHabitableZoneVisibility(showHabitableZones);
+        }
+
         preview.Entity.transform.parent = simulatorSpace.transform;
 
         Material m = preview.Entity.GetComponent<MeshRenderer>().material;
-        m.color = new Color(m.color.r, m.color.g, m.color.b, 0.25f);
+        m.color = new Color(m.color.r, m.color.g, m.color.b, 0.5f);
     }
 
     // removes the current body preview
@@ -766,20 +843,43 @@ public class SimulationController : MonoBehaviour
         if (Input.GetKeyDown(AppControls.keybinds["Place Body"]) 
             && UIController.FocusedField == null)
         {
-            RenderableBody rBody = new() { Body = preview.Body.GetCopy() };
+            // preview.Body.Position += CameraController.VirtualPosition / renderer.Scale;
+
+            RenderableBody rBody;
+
+            if (preview is RenderableStar)
+            {
+                rBody = new RenderableStar() { Body = preview.Body.GetCopy() };
+            }
+            else
+            {
+                rBody = new() { Body = preview.Body.GetCopy() };
+            }
+        
             rBody.CreateEntity();
             rBody.CreateLabel();
             rBody.CreateTrail();
 
             rBody.Trail.widthMultiplier = (float) Math.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
 
-            rBody.RenderBody(renderer.Scale);
+            // use full xyz offset here
+            // CameraController.VirtualPosition
+            rBody.RenderBody(Vector3d.zero, renderer.Scale);
 
             AddBody(rBody);
 
             if (showLabels) 
             {
-                rBody.RenderBody(renderer.Scale);
+                // CameraController.VirtualPosition
+                rBody.RenderLabel();
+            }
+
+            if (showHabitableZones)
+            {
+                if (rBody is RenderableStar rStar)
+                {
+                    rStar.RenderHabitableZone(renderer.Scale);
+                }
             }
         }
     }
@@ -1054,7 +1154,9 @@ public class SimulationController : MonoBehaviour
                 if (hit.collider != null)
                 {
                     GameObject hitPart = hit.collider.gameObject;
-                    RenderableBody rBody = GetRenderableBodyFromEntity(hitPart);
+                    var rBody = GetRenderableBodyFromEntity(hitPart);
+
+
 
                     if (rBody != null)
                     {
@@ -1136,4 +1238,42 @@ public class SimulationController : MonoBehaviour
     }
 
     #endregion Trail Methods
+
+
+    #region Habitable Zone Methods
+
+    // shows all habitable zones (depending on independent habitable zones)
+    public void ShowAllHabitableZones()
+    {
+        foreach (RenderableBody body in rBodies)
+        {
+            if (body is RenderableStar rStar)
+            {
+                rStar.SetHabitableZoneVisibility(rStar.ShowHabitableZone);
+            }
+        }
+
+        if (preview is RenderableStar previewStar)
+        {
+            previewStar.SetHabitableZoneVisibility(true);
+        }
+    }
+
+    public void HideAllHabitableZones()
+    {
+        foreach (RenderableBody body in rBodies)
+        {
+            if (body is RenderableStar rStar)
+            {
+                rStar.SetHabitableZoneVisibility(false);
+            }
+        }
+
+        if (preview is RenderableStar previewStar)
+        {
+            previewStar.SetHabitableZoneVisibility(false);
+        }
+    }
+
+    #endregion Habitable Zone Methods
 }

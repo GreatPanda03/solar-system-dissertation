@@ -12,7 +12,7 @@ public class RenderableBody
     #region Attributes
 
     private Body body;
-    public Body Body {
+    public virtual Body Body {
         get => body;
         set => body = value;
     }
@@ -108,12 +108,12 @@ public class RenderableBody
     public virtual void CreateEntity() {
         GameObject bodyPrefab = Resources.Load<GameObject>($"Prefabs/Body");
         entity = GameObject.Instantiate(bodyPrefab);
-        entity.name = body.Name;
-        entity.transform.position = (Vector3) body.Position;
+        entity.name = Body.Name;
+        entity.transform.position = (Vector3) Body.Position;
 
-        if (body.Texture != null)
+        if (Body.Texture != null)
         {
-            Material material = Resources.Load<Material>(body.Texture);
+            Material material = Resources.Load<Material>(Body.Texture);
 
             if (material != null)
             {
@@ -134,7 +134,7 @@ public class RenderableBody
     public void ApplyDefaultTexture()
     {
         entity.GetComponent<MeshRenderer>().material // standard material
-                = Resources.Load<Material>($"Materials/Generic/{body.GetType()}");
+                = Resources.Load<Material>($"Materials/Generic/{Body.GetType()}");
     }
 
     // creates all decorators for the entity
@@ -145,21 +145,26 @@ public class RenderableBody
         CreateTrail();
     }
 
-    // renders the body in physical space at the given scale
-    public void RenderBody(double scale)
+    // renders the body in physical space at the given offset and scale
+    public virtual void RenderBody(Vector3d offset, double scale)
     {
-        if (entity == null || body == null) return;
+        if (entity == null || Body == null) return;
 
-        Transform transform = entity.transform;
-        transform.position = (Vector3) (scale * body.Position);
-        transform.localScale = (Vector3) (body.Radius * 2 * scale * Vector3d.one);
+        entity.transform.position = (Vector3) (scale * Body.Position - offset);
+        entity.transform.localScale = (Vector3) (Body.Radius * 2 * scale * Vector3d.one);
+        entity.transform.rotation = Body.Tilt 
+            * Quaternion.Euler(0, (float) Body.Rotation * Mathf.Rad2Deg, 0);
+    }
 
-        transform.rotation = body.Tilt 
-            * Quaternion.Euler(0, (float) body.Rotation * Mathf.Rad2Deg, 0);
+    // renders all decorators for the body with the given offset and scale
+    public void RenderAll(Vector3d offset, double scale)
+    {
+        RenderBody(offset, scale);
+        RenderLabel();
     }
     
     // destroys the entity's physical components
-    public void DestroyEntity()
+    public virtual void DestroyEntity()
     {
         if (entity != null)
         {
@@ -185,7 +190,7 @@ public class RenderableBody
         GameObject labelPrefab = Resources.Load<GameObject>("Prefabs/Label");
         label = GameObject.Instantiate(labelPrefab);
         label.name = "Label";
-        label.GetComponent<TextMeshProUGUI>().text = body.Name;
+        label.GetComponent<TextMeshProUGUI>().text = Body.Name;
         label.transform.SetParent(GameObject.Find("Overlay").transform, false);
     }
 

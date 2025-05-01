@@ -11,6 +11,7 @@ Shader "Unlit/GridPlaneShader"
         _GridLineThickness ("Grid Line Thickness", Float) = 1
         _GridScale ("Grid Scale", Float) = 0.02
         _FadeWidth ("Fade Width", Float) = 1
+        _VirtualPosition ("Virtual Position", Vector) = (0,0,0,0)
     }
     
     SubShader
@@ -36,6 +37,7 @@ Shader "Unlit/GridPlaneShader"
             float  _GridLineThickness;
             float  _GridScale;
             float  _FadeWidth;
+            float4 _VirtualPosition;
 
             struct appdata
             {
@@ -84,7 +86,7 @@ Shader "Unlit/GridPlaneShader"
                 float scale, thickness, grid;
 
                 // defining thickness in pixels (same for both grids)
-                float2 screenUV = i.screenPosition.xy / i.screenPosition.w;
+                float2 screenUV = i.screenPosition.xy / i.screenPosition.w; 
                 float dx = length(ddx(screenUV));
                 float dy = length(ddy(screenUV));
                 float pixelSize = length(dx) + length(dy);
@@ -93,6 +95,8 @@ Shader "Unlit/GridPlaneShader"
                 float height = length(_WorldSpaceCameraPos.y);
                 float2 worldXZ = i.worldPosition.xz / _GridScale;
                 
+                // float2 worldXZ = (i.worldPosition.xz + _VirtualPosition.xz) / _GridScale;
+
                 float power = log10(height);
                 int base_n = floor(power);
 

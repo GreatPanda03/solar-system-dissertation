@@ -13,8 +13,8 @@ public class AppControls
         ["Follow"]              = KeyCode.F,
         ["Adjust Scale"]        = KeyCode.V,
 
-        ["Move Slower"]         = KeyCode.LeftShift,
-        ["Move Faster"]         = KeyCode.LeftControl,
+        ["Move Slower"]         = KeyCode.LeftControl,
+        ["Move Faster"]         = KeyCode.LeftShift,
         
         ["Decrease Eccentricity"]   = KeyCode.Z,
         ["Increase Eccentricity"]   = KeyCode.X,

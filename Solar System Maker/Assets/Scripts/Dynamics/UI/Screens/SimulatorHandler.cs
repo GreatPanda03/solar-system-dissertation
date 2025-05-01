@@ -201,7 +201,11 @@ public class SimulatorHandler
             double scaledDistance = distance / scale;
             string unit = simController.renderer.Distance;
 
-            ui.Q<Label>("OrbitRadius").text = $"(Orbit Radius = {scaledDistance} {unit}(s))";
+            double periapsis = scaledDistance;
+            double apoapsis = scaledDistance * (1 + eccentricity) / (1 - eccentricity);
+
+            ui.Q<Label>("OrbitRadius").text 
+                = $"(Orbit Radius = {periapsis:0.000} - {apoapsis:0.000} {unit}(s))";
         }
         else
         {
@@ -384,6 +388,18 @@ public class SimulatorHandler
             MarkAsDeselected(toolbox.Q<Button>("Trails"));
         }
 
+        // star habitable zones
+        toolbox.Q<Button>("Habitability").clicked += OnHabitabilityClicked;
+
+        if (simController.ShowHabitableZones)
+        {
+            MarkAsSelected(toolbox.Q<Button>("Habitability"));
+        }
+        else
+        {
+            MarkAsDeselected(toolbox.Q<Button>("Habitability"));
+        }
+
         // time options
         toolbox.Q<Button>("Time").clicked += OnTimeClicked;
         subToolbox.Q<VisualElement>("TimeList").style.display = DisplayStyle.None;
@@ -515,6 +531,23 @@ public class SimulatorHandler
         else
         {
             MarkAsDeselected(trailsButton);
+        }
+    }
+
+    // toggles the visibility of all habitable zones on click
+    private void OnHabitabilityClicked()
+    {
+        simController.ShowHabitableZones = !simController.ShowHabitableZones;
+
+        Button habitabilityButton = ui.Q<VisualElement>("Toolbox").Q<Button>("Habitability");
+
+        if (simController.ShowHabitableZones)
+        {
+            MarkAsSelected(habitabilityButton);
+        }
+        else
+        {
+            MarkAsDeselected(habitabilityButton);
         }
     }
 
@@ -1022,6 +1055,26 @@ public class SimulatorHandler
             {
                 MarkAsDeselected(bodyTools.Q<Button>("Anchor"));
             }
+
+            if (simController.SelectedBody.Body is Star)
+            {
+                RenderableStar rStar = (RenderableStar) simController.SelectedBody;
+
+                bodyTools.Q<Button>("Habitability").style.display = DisplayStyle.Flex;
+
+                if (rStar.ShowHabitableZone)
+                {
+                    MarkAsSelected(bodyTools.Q<Button>("Habitability"));
+                }
+                else
+                {
+                    MarkAsDeselected(bodyTools.Q<Button>("Habitability"));
+                }
+            }
+            else
+            {
+                bodyTools.Q<Button>("Habitability").style.display = DisplayStyle.None;
+            }
         }
     }
 
@@ -1090,6 +1143,24 @@ public class SimulatorHandler
             if (!simController.ShowLabels)
             {
                 simController.SelectedBody.SetLabelVisibility(false);
+            }
+        };
+
+        // toggles the visibility of the body's habitable zone if it's a star
+        bodyTools.Q<Button>("Habitability").clicked += () => {
+            if (simController.SelectedBody == null 
+                || simController.SelectedBody is not RenderableStar rStar) return;
+
+            bool visible = !rStar.ShowHabitableZone;
+            rStar.ShowHabitableZone = visible;
+
+            if (visible)
+            {
+                MarkAsSelected(bodyTools.Q<Button>("Habitability"));
+            }
+            else
+            {
+                MarkAsDeselected(bodyTools.Q<Button>("Habitability"));
             }
         };
 

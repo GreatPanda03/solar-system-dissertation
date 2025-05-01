@@ -37,6 +37,9 @@
         <ui:Button name="Trail" tooltip="Toggle Trail" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Trail&apos;);" />
         </ui:Button>
+        <ui:Button name="Habitability" tooltip="Distance Units" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Habitability&apos;);" />
+        </ui:Button>
         <ui:Button name="Anchor" tooltip="Anchor" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Anchor&apos;);" />
         </ui:Button>
@@ -190,6 +193,9 @@
         </ui:Button>
         <ui:Button name="Trails" tooltip="Toggle Trails" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/Trails&apos;);" />
+        </ui:Button>
+        <ui:Button name="Habitability" tooltip="Distance Units" class="toolboxButton">
+            <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Options/Habitability&apos;);" />
         </ui:Button>
         <ui:Button name="Time" tooltip="Toggle Play" class="toolboxButton">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Options/Time&apos;);" />

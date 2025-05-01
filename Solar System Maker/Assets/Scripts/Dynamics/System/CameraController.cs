@@ -56,8 +56,8 @@ public class CameraController : MonoBehaviour
     {
         cameraMode = Mode.Fixed;
         
-        virtualPosition = (Vector3d) Camera.main.transform.position;
-        virtualRotation = Camera.main.transform.rotation;
+        // virtualPosition = (Vector3d) Camera.main.transform.position;
+        // virtualRotation = Camera.main.transform.rotation;
         
         Debug.Log("Camera loaded");
     }
@@ -162,10 +162,7 @@ public class CameraController : MonoBehaviour
         currentSpeed *= speed;
         Vector3 movement = currentSpeed * Time.deltaTime * (Vector3) input;
 
-        Debug.Log(movement);
-
-        virtualPosition += (Vector3d) (virtualRotation * movement);
-        Debug.Log(virtualPosition);
+        // virtualPosition += (Vector3d) (virtualRotation * movement);
 
         Camera.main.transform.Translate(movement);
     }
@@ -187,7 +184,7 @@ public class CameraController : MonoBehaviour
 
         combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
 
-        virtualRotation = combinedRotation;
+        // virtualRotation = combinedRotation;
 
         Camera.main.transform.rotation = combinedRotation;
     }
@@ -244,11 +241,9 @@ public class CameraController : MonoBehaviour
         Vector3 offset = combinedRotation * new Vector3(0, 0, (float) -followDistance);
         
         // essentially makes the body the "point of focus"
-        virtualPosition = (Vector3d) subject.Entity.transform.position;
-        Debug.Log(virtualPosition);
+        // virtualPosition = (Vector3d) subject.Entity.transform.position;
 
-        Camera.main.transform.SetPositionAndRotation(
-            origin + offset, combinedRotation);
+        Camera.main.transform.SetPositionAndRotation(origin + offset, combinedRotation);
     }
 
     #endregion Follow Mode
