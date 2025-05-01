@@ -11,6 +11,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.16.2
+**Date:** 2025/05/01
+<br/>**Additions / Changes:**
+* **1)** Added star habitable zones & toggle buttons *(global and independent)*
+* **2)** For orbit mode, added the range of the orbit's major axis *(from the periapsis to the apoapsis)*
+* **3)** Updated the tutorial popup with pages *(currently not navigable)*
+
+---
+
 ### Version: 1.16.1
 **Date:** 2025/05/01
 <br/>**Bug Fixes:**
