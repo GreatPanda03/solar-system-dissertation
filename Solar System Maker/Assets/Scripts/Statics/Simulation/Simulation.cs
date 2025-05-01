@@ -35,7 +35,7 @@ public class Simulation
         List<Body> bodiesCopy = new();
         
         foreach (Body body in bodies)
-            bodiesCopy.Add(body.GetShallowCopy());
+            bodiesCopy.Add(body.GetCopy());
 
         return new()
         {

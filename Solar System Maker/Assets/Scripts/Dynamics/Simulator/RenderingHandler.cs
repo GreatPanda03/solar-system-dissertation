@@ -1,4 +1,6 @@
-// manages rendering operations
+// handles rendering operations
+// * this class is standalone and can be used to calculate / apply operations
+//     given the appropriate bodies, values, etc.
 
 using System;
 using TMPro;
@@ -8,11 +10,9 @@ public class RenderingHandler
 {
 
     #region Attributes
-
-    SimulationController simController;
     
     public readonly float UNITS_PER_WORLDSPACE = 1;
-    
+
     private string distance;
     public string Distance {
         get => distance;
@@ -42,9 +42,8 @@ public class RenderingHandler
 
     #region General Methods
 
-    public RenderingHandler(SimulationController simController)
+    public RenderingHandler()
     {
-        this.simController = simController;
         distance = "Kilometre";
         zoomFactor = 0;
         scale = CalculateScale();
@@ -63,10 +62,14 @@ public class RenderingHandler
     }
 
     // extra: applies the current scale to the given body
-    public void ApplyScale(Body body)
+    public void RenderBody(RenderableBody rBody)
     {
-        body.Entity.transform.position = (float) scale * body.Position;
-        body.Entity.transform.localScale = (float) (body.Radius * 2) * scale * new Vector3(1,1,1);
+        if (rBody.Entity == null) return;
+
+        Transform transform = rBody.Entity.transform;
+        transform.position = (float) scale * rBody.Body.Position;
+        transform.localScale = (float) (rBody.Body.Radius * 2) * scale * new Vector3(1,1,1);
+        transform.rotation = Quaternion.Euler(0, rBody.Body.Rotation * Mathf.Rad2Deg, 0);
     }
 
     #endregion Scaling Methods
@@ -76,15 +79,19 @@ public class RenderingHandler
 
     // renders the given body's label
     // * positions the label at "top right" of body, relative to the camera
-    public void RenderLabel(Body body)
+    public void RenderLabel(RenderableBody rBody)
     {
-        Transform origin = Camera.main.transform;
-        Vector3 bodyPosition = body.Entity.transform.position;
-        Vector3 bodyEdge = body.Radius * scale * (origin.right + origin.up); // parallel to camera forward
-        Vector3 screenPosition = Camera.main.WorldToScreenPoint(bodyPosition + bodyEdge);
+        if (rBody.Label == null) return;
 
-        body.Label.transform.position = screenPosition;
-        body.Label.GetComponent<TextMeshProUGUI>().enabled = screenPosition.z >= 0;
+        Transform origin = Camera.main.transform;
+        Vector3 position = rBody.Entity.transform.position;
+        float size = rBody.Entity.transform.localScale.magnitude / 2; // radius
+
+        Vector3 edge = size * (origin.right + origin.up); // parallel to camera forward
+        Vector3 screenPoint = Camera.main.WorldToScreenPoint(position + edge);
+
+        rBody.Label.transform.position = screenPoint;
+        rBody.Label.GetComponent<TextMeshProUGUI>().enabled = screenPoint.z >= 0;
 
         // ^ technically has a screen position even when BEHIND the camera
         // * this check stops the label from showing up when behind the camera
@@ -93,53 +100,37 @@ public class RenderingHandler
     #endregion Label Methods
 
 
-    #region Path Drawing
+    #region Trajectory Methods
 
-    // supplies the given body's entity with a line renderer for use
-    public void GiveLineRenderer(Body body)
-    {
-        if (body.Entity == null) return;
-
-        LineRenderer pathDrawer = body.Entity.AddComponent<LineRenderer>();
-        pathDrawer.material = new Material(Shader.Find("Sprites/Default"));
-        pathDrawer.widthMultiplier = 0.1f;
-
-        Gradient gradient = new();
-
-        gradient.SetKeys( // line that fades out
-            new GradientColorKey[] {new(Color.white, 0), new(Color.white, 1)},
-            new GradientAlphaKey[] {new(1, 0), new(0, 1)});
-
-        pathDrawer.colorGradient = gradient;
-    }
 
     // draws a trajectory for the given body based on the given vector
-    public void DrawTrajectory(Body body, Vector3 trajectory)
+    public void DrawTrajectory(RenderableBody rBody, Vector3 trajectory)
     {
-        Vector3 scaledOrigin = body.Position * scale;
+        if (rBody.Line == null) return;
+
+        Vector3 scaledOrigin = rBody.Body.Position * scale;
         Vector3 scaledTrajectory = trajectory * scale;
 
-    	LineRenderer pathDrawer = body.Entity.GetComponent<LineRenderer>();
-	    pathDrawer.positionCount = 2;
-
-        pathDrawer.SetPosition(0, scaledOrigin);
-        pathDrawer.SetPosition(1, scaledOrigin + scaledTrajectory);
+	    rBody.Line.positionCount = 2;
+        rBody.Line.SetPosition(0, scaledOrigin);
+        rBody.Line.SetPosition(1, scaledOrigin + scaledTrajectory);
     }
 
     // draws the orbit of one body around another
     // * source (ellipse in 3D):    https://math.stackexchange.com/questions/3994666/parametric-equation-of-an-ellipse-in-the-3d-space#:~:text=with%20c%3D(c1%2C,v2%2Cv3).
     // * source (orbital velocity): https://www.youtube.com/watch?v=Wy2Sihu2dWk
     // * LOTS of maths...
-    public void DrawOrbitBetweenBodies(
-        Body parent, 
-        Body child, 
+    public void DrawOrbitAroundPoint(
+        RenderableBody satellite, 
+        Vector3 point, 
         float eccentricity = 0,
         float orbitDirection = 1)
     {
+        if (satellite.Line == null) return;
 
         // measurements
-        Vector3 centre = parent.Position;
-        Vector3 edge = child.Position;
+        Vector3 centre = point;
+        Vector3 edge = satellite.Body.Position;
 
         Vector3 scaledCentre = (float) scale * centre;
         Vector3 scaledEdge = (float) scale * edge;
@@ -177,8 +168,7 @@ public class RenderingHandler
         int resolution = 100;
         Vector3[] points = new Vector3[resolution + 1];
 
-        LineRenderer pathDrawer = child.Entity.GetComponent<LineRenderer>();
-	    pathDrawer.positionCount = resolution;
+	    satellite.Line.positionCount = resolution;
 
         for (int p = 0; p <= resolution; p++)
         {
@@ -202,32 +192,8 @@ public class RenderingHandler
             points[p] = orbitCentre + U + V;
         }
 
-        pathDrawer.SetPositions(points);
+        satellite.Line.SetPositions(points);
     }
 
-    #endregion Path Drawing
-
-
-    #region Trail Drawing
-
-    // supplies the given body with a trail renderer to show where it has passed
-    public void GiveTrailRenderer(Body body)
-    {
-        if (body.Entity == null) return;
-
-        TrailRenderer trailDrawer = body.Entity.AddComponent<TrailRenderer>();
-        trailDrawer.material = new Material(Shader.Find("Sprites/Default"));
-        trailDrawer.widthMultiplier = Math.Max(body.Radius * scale, 0.1f);
-
-        Gradient gradient = new();
-        
-        gradient.SetKeys( // trail that fades out
-            new GradientColorKey[] {new(Color.white, 0), new(Color.white, 1)},
-            new GradientAlphaKey[] {new(1, 0), new(0, 1)});
-
-        trailDrawer.colorGradient = gradient;
-        trailDrawer.time = 60;
-    }
-
-    #endregion Trail Drawing
+    #endregion Trajectory Methods
 }

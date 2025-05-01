@@ -1,4 +1,4 @@
-// stores an index of planets to be used
+// holds lists of pre-made body templates
 
 using System.Collections.Generic;
 using UnityEngine;

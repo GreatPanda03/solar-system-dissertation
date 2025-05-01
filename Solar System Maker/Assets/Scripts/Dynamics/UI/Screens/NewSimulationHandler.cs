@@ -50,7 +50,7 @@ public class NewSimulationHandler
         uiController.ShowSimulator();
 
         // adjusting the camera        
-        CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+        CameraController.CameraMode = CameraController.Mode.Free;
     }
 
     // returns to the "Main Menu" on click

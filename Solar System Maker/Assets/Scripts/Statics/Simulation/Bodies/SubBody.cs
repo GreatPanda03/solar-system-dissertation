@@ -2,6 +2,10 @@
 // * these are different from stars in that they don't have their properties, like Luminosity
 // * instead, they have their own properties, like temperature-related variables
 
+using System;
+using Newtonsoft.Json;
+
+[Serializable]
 public class SubBody : Body
 {
     
@@ -21,6 +25,7 @@ public class SubBody : Body
     }
 
     protected float powerAbsorbed; // used similarly to velocity to determine position
+    [JsonIgnore] // 0 between frames
     public float PowerAbsorbed {
         get => powerAbsorbed;
         set => powerAbsorbed = value;
@@ -39,23 +44,4 @@ public class SubBody : Body
     }
 
     #endregion Constructor
-
-
-    #region Object Methods
-
-    public override Body GetShallowCopy()
-    {
-        return (SubBody) MemberwiseClone();
-    }
-
-    public override Body GetDeepCopy()
-    {
-        SubBody copy = (SubBody) MemberwiseClone();
-        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
-        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
-
-        return copy;
-    }
-
-    #endregion Object Methods
 }

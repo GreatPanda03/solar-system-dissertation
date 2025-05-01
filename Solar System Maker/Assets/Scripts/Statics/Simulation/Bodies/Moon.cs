@@ -1,7 +1,6 @@
 // class for Moon instances (inherits from Body)
 
 using System;
-using UnityEngine;
 
 [Serializable]
 public class Moon : SubBody
@@ -9,8 +8,7 @@ public class Moon : SubBody
 
     #region Attributes
 
-    private readonly string type = "Moon";
-    public override string Type { get => type; }
+    // ... no additional
 
     #endregion Attributes
 
@@ -33,23 +31,4 @@ public class Moon : SubBody
     }
 
     #endregion Constructors
-
-    
-    #region Methods
-
-    public override Body GetShallowCopy()
-    {
-        return (Moon) MemberwiseClone();
-    }
-
-    public override Body GetDeepCopy()
-    {
-        Moon copy = (Moon) MemberwiseClone();
-        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
-        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
-
-        return copy;
-    }
-
-    #endregion Methods
 }

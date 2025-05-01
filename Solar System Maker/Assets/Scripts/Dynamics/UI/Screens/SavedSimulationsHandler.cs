@@ -172,7 +172,7 @@ public class SavedSimulationsHandler
 
         uiController.ShowSimulator();
 
-        CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+        CameraController.CameraMode = CameraController.Mode.Free;
     }
 
     // deletes the given save using its ID

@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
-  - component: {fileID: 330585548}
+  - component: {fileID: 330585550}
   - component: {fileID: 330585549}
   m_Layer: 0
   m_Name: Camera
@@ -180,7 +180,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.01
-  far clip plane: 1e+10
+  far clip plane: 1e+9
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -258,7 +258,16 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &330585548
+--- !u!45 &330585549
+Skybox:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 2100000, guid: 1a9728aa908b54f0b9558667655d45ed, type: 2}
+--- !u!114 &330585550
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -272,21 +281,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   centre: {x: 0, y: 0, z: 0}
   offset: {x: 15, y: 10, z: 15}
-  angle: {x: 25, y: 225, z: 0}
-  sensitivity: 3
-  speed: 25
-  slowRate: 0.5
+  angle: {x: 27.5, y: 225, z: 0}
+  sensitivity: 10
+  speed: 10
+  slowRate: 0.2
   normalRate: 1
-  fastRate: 2
---- !u!45 &330585549
-Skybox:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
-  m_CustomSkybox: {fileID: 2100000, guid: 1a9728aa908b54f0b9558667655d45ed, type: 2}
+  fastRate: 5
+  followDistance: 30
 --- !u!1 &443073567
 GameObject:
   m_ObjectHideFlags: 0
@@ -348,8 +349,6 @@ MonoBehaviour:
   orbitEnabled: 0
   eccentricity: 0
   orbitDirection: -1
-  lastZoomFactor: 0
-  lastDistance: 
 --- !u!1 &562911921
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,7 +409,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100000, y: 100000, z: 1}
+  m_LocalScale: {x: 1000, y: 1000, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 443073568}

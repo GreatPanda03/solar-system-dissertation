@@ -7,25 +7,33 @@ public class CameraController : MonoBehaviour
 
     #region Attributes
 
-    // a mode for each situation
-    public enum CameraMode { MainMenu, Simulator, Following }
+    public enum Mode { Fixed, Free, Follow }
+    private static Mode cameraMode;
+    public static Mode CameraMode {
+        get => cameraMode;
+        set => cameraMode = value;
+    }
 
-    private static CameraMode cameraMode;
-
-    [Header("Main Menu Mode")]
+    // these properties can be set from the inspector
+    [Header("Fixed Mode")]
     public Vector3 centre;
     public Vector3 offset;
     public Vector3 angle;
 
-    [Header("Simulator Mode")]
+    [Header("Free Mode")]
     public float sensitivity;
     public float speed;
     public float slowRate, normalRate, fastRate;
     private float currentSpeed;
 
     [Header("Follow Mode")]
-    public static Body subject;
-    public static float followDistance = 30f;
+    public float followDistance;
+
+    private static RenderableBody subject;
+    [HideInInspector] public static RenderableBody Subject {
+        get => subject;
+        set => subject = value;
+    }
 
     #endregion Attributes
 
@@ -34,8 +42,7 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        cameraMode = CameraMode.MainMenu;
-
+        cameraMode = Mode.Fixed;
         Debug.Log("Camera loaded");
     }
 
@@ -61,29 +68,19 @@ public class CameraController : MonoBehaviour
 
     #region Camera Loop
 
-    public static void SetCameraMode(CameraMode newMode)
-    {
-        cameraMode = newMode;
-    }
-
-    public static CameraMode GetCameraMode()
-    {
-        return cameraMode;
-    }
-
     private void Update()
     {
-        if (cameraMode == CameraMode.MainMenu)
+        if (cameraMode == Mode.Fixed)
         {
-            RunMainMenuMode();
+            RunFixedMode();
         } 
-        else if (cameraMode == CameraMode.Simulator)
+        else if (cameraMode == Mode.Free)
         {
-            RunSimulatorMode();
+            RunFreeMode();
         } 
-        else if (cameraMode == CameraMode.Following)
+        else if (cameraMode == Mode.Follow)
         {
-            RunFollowingMode();
+            RunFollowMode();
         }
         else
         {
@@ -95,29 +92,29 @@ public class CameraController : MonoBehaviour
     #endregion
 
 
-    #region Main Menu Mode
+    #region Fixed Mode
 
-    // runs the camera in Main Menu mode
-    private void RunMainMenuMode()
+    // fixes the camera at the specified point at an angled offset
+    private void RunFixedMode()
     {
         Camera.main.transform.SetPositionAndRotation(
             centre + offset, Quaternion.Euler(angle));
     }
 
-    #endregion
+    #endregion Fixed Mode
 
 
-    #region Simulator Mode
+    #region Free Mode
 
-    // runs the camera in Simulator mode
-    private void RunSimulatorMode()
+    // allows the camera to be moved and turned freely in all directions
+    private void RunFreeMode()
     {
-        RunSimulatorMovement();
+        RunFreeMovement();
 
         if (Input.GetMouseButton(1)) {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Confined;
-            RunSimulatorRotation();
+            RunFreeRotation();
         }
         else
         {
@@ -127,8 +124,7 @@ public class CameraController : MonoBehaviour
     }
 
     // updates the camera's movement based on key presses
-    // * NB: no need for separate WASD binds - automatically done by input!
-    private void RunSimulatorMovement()
+    private void RunFreeMovement()
     {
         if (UIController.FocusedField != null) return;
 
@@ -152,7 +148,7 @@ public class CameraController : MonoBehaviour
     }
 
     // updates the camera's rotation with mouse movement
-    private void RunSimulatorRotation()
+    private void RunFreeRotation()
     {
         Vector2 mouseChange = new()
         {
@@ -171,23 +167,27 @@ public class CameraController : MonoBehaviour
         Camera.main.transform.rotation = combinedRotation;
     }
 
-    #endregion Simulator Mode
+    #endregion Free Mode
 
 
-    #region Following Mode
+    #region Follow Mode
 
-    public static void SetSubject(Body body)
+    // sets the camera to follow the given subject
+    public static void SetToFollow(RenderableBody newSubject)
     {
-        subject = body;
+        subject = newSubject;
+        cameraMode = Mode.Follow;
     }
 
-    public static Body GetSubject()
+    // sets the camera to stop following the current subject
+    public static void SetToUnfollow()
     {
-        return subject;
+        cameraMode = Mode.Free;
+        subject = null;
     }
 
-    // handles following mode
-    private void RunFollowingMode()
+    // only allows rotation around a subject
+    private void RunFollowMode()
     {
         if (subject == null) return;
 
@@ -222,5 +222,5 @@ public class CameraController : MonoBehaviour
         Camera.main.transform.rotation = combinedRotation;
     }
 
-    #endregion Following Mode
+    #endregion Follow Mode
 }

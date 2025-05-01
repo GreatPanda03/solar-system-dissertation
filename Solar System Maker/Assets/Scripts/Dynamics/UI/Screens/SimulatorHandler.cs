@@ -142,19 +142,19 @@ public class SimulatorHandler
 
     #region Simulator Events
 
-    public void OnBodyAdded(Body addedBody)
+    public void OnBodyAdded(RenderableBody addedBody)
     {
         CreateExplorerEntry(addedBody);
         
         ApplyExplorerFilters();
 
-        if (simController.simulation.bodies.Count > 0)
+        if (simController.bodies.Count > 0)
         {
             ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
         }
     }
 
-    public void OnBodyRemoved(Body removedBody)
+    public void OnBodyRemoved(RenderableBody removedBody)
     {
         if (simController.SelectedBody == removedBody)
         {   
@@ -164,13 +164,13 @@ public class SimulatorHandler
         RefreshExplorer();
     }
 
-    public void OnBodySelected(Body selectedBody)
+    public void OnBodySelected(RenderableBody selectedBody)
     {
         SetBodyToolsVisible(true);
         SetPropertiesVisible(true);
     }
 
-    public void OnBodyDeselected(Body deselectedBody)
+    public void OnBodyDeselected(RenderableBody deselectedBody)
     {
         SetBodyToolsVisible(false);
         SetPropertiesVisible(false);
@@ -186,7 +186,7 @@ public class SimulatorHandler
     {
         if (ui.Q<VisualElement>("PropertiesPanel").style.display == DisplayStyle.Flex)
         {
-            UpdateProperties(simController.SelectedBody);
+            UpdateProperties(simController.SelectedBody.Body);
         }
     }
 
@@ -194,9 +194,9 @@ public class SimulatorHandler
     {
         ui.Q<Label>("Eccentricity").text = $"(Eccentricity = {eccentricity:0.000})";
 
-        if (simController.BodyPreview != null && attractor != null)
+        if (simController.Preview != null && attractor != null)
         {
-            float distance = (simController.BodyPreview.Position - attractor.Position).magnitude;
+            float distance = (simController.Preview.Body.Position - attractor.Position).magnitude;
             float scale = (float) UnitReference.DISTANCE_UNITS[simController.renderer.Distance]; // zoomFactor not used here
             float scaledDistance = distance / scale;
             string unit = simController.renderer.Distance;
@@ -309,7 +309,7 @@ public class SimulatorHandler
         
         uiController.ShowMainMenu();
 
-        CameraController.SetCameraMode(CameraController.CameraMode.MainMenu);
+        CameraController.CameraMode = CameraController.Mode.Fixed;
     }
 
     // toggles the visibility of the help popup on click
@@ -588,7 +588,7 @@ public class SimulatorHandler
             popup.OnTemplateSelected += template =>
             {
                 DeselectBodyItem();
-                simController.SetEntityPreviewToTemplate(template);
+                simController.SetPreviewByTemplate(template);
             };
         };
     }
@@ -602,7 +602,7 @@ public class SimulatorHandler
         newButton.AddToClassList("selectedButton");
         selectedBodyItem = newItem;
 
-        simController.SetEntityPreview(newItem);
+        simController.SetPreviewByType(newItem);
     }
 
     // deselects the current item as a body preview
@@ -915,15 +915,15 @@ public class SimulatorHandler
     {
         ClearExplorer();
 
-        List<Body> bodies = simController.simulation.bodies;
+        List<RenderableBody> bodies = simController.bodies;
 
         if (bodies.Count > 0)
         {
             ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
 
-            foreach (Body body in bodies)
+            foreach (RenderableBody rBody in bodies)
             {
-                CreateExplorerEntry(body);
+                CreateExplorerEntry(rBody);
             }
 
             ApplyExplorerFilters();
@@ -943,21 +943,20 @@ public class SimulatorHandler
     }
 
     // creates an entry for the given body
-    public VisualElement CreateExplorerEntry(Body body)
+    public VisualElement CreateExplorerEntry(RenderableBody rBody)
     {
         VisualElement entry = explorerEntry.Instantiate();
 
-        entry.Q<Label>("Type").text = body.Type;
-        entry.Q<Label>("Name").text = body.Name;
+        entry.Q<Label>("Type").text = rBody.Body.GetType().ToString();
+        entry.Q<Label>("Name").text = rBody.Body.Name;
         entry.Q<Button>("Delete").visible = false;
 
         ui.Q<ScrollView>("List").Add(entry);
 
         entry.RegisterCallback<ClickEvent>(e =>
         {
-            simController.SelectBody(body);
-            CameraController.SetSubject(body);
-            CameraController.SetCameraMode(CameraController.CameraMode.Following);
+            simController.SelectBody(rBody);
+            CameraController.SetToFollow(rBody);
         });
 
         entry.RegisterCallback<MouseEnterEvent>(e =>
@@ -972,7 +971,7 @@ public class SimulatorHandler
 
         entry.Q<Button>("Delete").clicked += () => 
         {
-            simController.RemoveBody(body);
+            simController.RemoveBody(rBody);
         };
 
         return entry;
@@ -1015,7 +1014,7 @@ public class SimulatorHandler
                 MarkAsDeselected(bodyTools.Q<Button>("Label"));
             }
 
-            if (simController.SelectedBody.Anchored)
+            if (simController.SelectedBody.Body.Anchored)
             {
                 MarkAsSelected(bodyTools.Q<Button>("Anchor"));
             }
@@ -1039,14 +1038,12 @@ public class SimulatorHandler
 
         // follows the body on click
         bodyTools.Q<Button>("Follow").clicked += () => {
-            CameraController.SetSubject(simController.SelectedBody);
-            CameraController.SetCameraMode(CameraController.CameraMode.Following);
+            CameraController.SetToFollow(simController.SelectedBody);
         };
 
         // adjusts the scale to the selected body on click
         bodyTools.Q<Button>("Scale").clicked += () => {
-            CameraController.SetSubject(simController.SelectedBody);
-            CameraController.SetCameraMode(CameraController.CameraMode.Following);
+            CameraController.SetToFollow(simController.SelectedBody);
             simController.ScaleToFit(simController.SelectedBody);
         };
 
@@ -1100,8 +1097,8 @@ public class SimulatorHandler
         bodyTools.Q<Button>("Anchor").clicked += () => {
             if (simController.SelectedBody == null) return;
 
-            bool anchored = !simController.SelectedBody.Anchored;
-            simController.SelectedBody.Anchored = anchored;
+            bool anchored = !simController.SelectedBody.Body.Anchored;
+            simController.SelectedBody.Body.Anchored = anchored;
 
             if (anchored)
             {
@@ -1120,7 +1117,7 @@ public class SimulatorHandler
             if (simController.IsRunning)
                 OnPlayClicked(); // pause
 
-            uiController.ShowSaveBodyPopup(ui, simController.SelectedBody);
+            uiController.ShowSaveBodyPopup(ui, simController.SelectedBody.Body);
         };
 
         // deletes the body on click
@@ -1202,15 +1199,15 @@ public class SimulatorHandler
     {   
         field.RegisterCallback<KeyDownEvent>((e) =>
         {
-            Body selectedBody = simController.SelectedBody;
+            Body body = simController.SelectedBody.Body;
 
-            if (selectedBody == null) return;
+            if (body == null) return;
 
-            if (e.keyCode == KeyCode.Return && selectedBody != null)
+            if (e.keyCode == KeyCode.Return && body != null)
             {
                 var value = field.value;
-                PropertyInfo info = selectedBody.GetType().GetProperty(property);
-                info.SetValue(selectedBody, field.value);
+                PropertyInfo info = body.GetType().GetProperty(property);
+                info.SetValue(body, field.value);
                 field.Blur(); // unfocuses the field
 
                 RefreshExplorer();

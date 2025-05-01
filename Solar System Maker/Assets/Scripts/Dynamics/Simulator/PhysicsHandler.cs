@@ -1,4 +1,6 @@
-// manages the physics operations
+// handles physics operations
+// * this class is standalone and can be used to calculate / apply operations
+//     given the appropriate bodies, values, etc.
 
 using System;
 using UnityEngine;
@@ -8,7 +10,6 @@ public class PhysicsHandler
 {
 
     #region Attributes
-    public SimulationController simController;
 
     public enum CollisionQuality { None, Low, High }
     public CollisionQuality collisionQuality = CollisionQuality.Low;
@@ -33,11 +34,7 @@ public class PhysicsHandler
 
     #region Constructor
 
-    public PhysicsHandler() {}
-
-    public PhysicsHandler(SimulationController simController)
-    {
-        this.simController = simController;
+    public PhysicsHandler() {
         timePerSecond = "1 Second";
     }
 
@@ -57,12 +54,7 @@ public class PhysicsHandler
     // updates the given body's physics over the given timeframe
     public void Update(Body body, float dt)
     {
-        if (body.Entity != null)
-        {
-            body.Entity.transform.rotation // will automatically rotate according to tilt
-                *= Quaternion.Euler(0, -body.AngularVelocity * Mathf.Rad2Deg * dt, 0);
-        }
-
+        body.Rotation = (body.Rotation - body.AngularVelocity * dt) % (2 * Mathf.PI);
         body.Velocity += body.Acceleration * dt;
         body.Position += body.Velocity * dt;
         body.Acceleration = Vector3.zero;
@@ -163,7 +155,7 @@ public class PhysicsHandler
     // returns the angular momentum of the given body
     public Vector3 GetAngularMomentum(Body body)
     {
-        return body.Radius * body.AngularVelocity * body.Tilt;
+        return body.Radius * body.AngularVelocity * body.Axis;
     }
 
     #endregion Momentum

@@ -14,9 +14,6 @@ public class Star : Body
 
     #region Attributes
 
-    private readonly string type = "Star";
-    public override string Type { get => type; }
-
     protected float luminosity;
     public float Luminosity {
         get => luminosity;
@@ -62,37 +59,7 @@ public class Star : Body
     #endregion Constructors
 
 
-    #region Methods
-
-    public override Body GetShallowCopy()
-    {
-        return (Star) MemberwiseClone();
-    }
-
-    public override Body GetDeepCopy()
-    {
-        Star copy = (Star) MemberwiseClone();
-        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
-        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
-
-        return copy;
-    }
-
-    #endregion Methods
-
-
     #region Entity Methods
-
-        // returns a new generic Body entity
-    public override void CreateEntity() {
-        base.CreateEntity();
-
-        GameObject lightPrefab = Resources.Load<GameObject>("Prefabs/Light");
-        
-        GameObject light = GameObject.Instantiate(lightPrefab);
-        light.name = "Light";
-        light.transform.SetParent(entity.transform, false);
-    }
 
     // class-wide method to return star luminosity by mass
     // * source: https://en.wikipedia.org/wiki/Mass%E2%80%93luminosity_relation

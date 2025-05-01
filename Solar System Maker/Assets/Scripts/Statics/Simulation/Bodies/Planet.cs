@@ -14,9 +14,6 @@ public class Planet : SubBody
 
     #region Attributes
 
-    readonly string type = "Planet";
-    public override string Type { get => type; }
-
     protected float habitability;
     public float Habitability {
         get => habitability;
@@ -60,23 +57,4 @@ public class Planet : SubBody
     }
 
     #endregion Constructors
-
-
-    #region Methods
-
-    public override Body GetShallowCopy()
-    {
-        return (Planet) MemberwiseClone();
-    }
-
-    public override Body GetDeepCopy()
-    {
-        Planet copy = (Planet) MemberwiseClone();
-        copy.entity = entity != null ? UnityEngine.Object.Instantiate(entity) : null;
-        copy.label = label != null ? UnityEngine.Object.Instantiate(label) : null; 
-
-        return copy;
-    }
-
-    #endregion Methods
 }

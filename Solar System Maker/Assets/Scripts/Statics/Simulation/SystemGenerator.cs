@@ -25,8 +25,8 @@ public class SystemGenerator
             Vector2 offset = Random.insideUnitCircle.normalized 
                 * (float) UnitReference.DISTANCE_UNITS["AU"];
 
-            float elevation = (float) UnitReference.DISTANCE_UNITS["Lunar Distance"]
-                * Random.Range(-10f, 10f);
+            float elevation = (float) UnitReference.DISTANCE_UNITS["AU"]
+                * Random.Range(-0.1f, 0.1f);
 
             Vector3 position = star.Position 
                 + new Vector3(offset.x, 0, offset.y) * Mathf.Pow(p, 1.25f)

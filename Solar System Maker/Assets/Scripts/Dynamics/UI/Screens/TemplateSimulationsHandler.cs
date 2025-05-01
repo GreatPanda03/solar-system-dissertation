@@ -175,7 +175,7 @@ public class TemplateSimulationsHandler
 
         uiController.ShowSimulator();
 
-        CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+        CameraController.CameraMode = CameraController.Mode.Free;
     }
 
     // deletes the given item using its ID

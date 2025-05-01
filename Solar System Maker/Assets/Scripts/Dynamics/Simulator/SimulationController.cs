@@ -1,11 +1,10 @@
-// Manages the core Simulation functionality
+// controls core simulation functionality
 // * the Simulator acts as a container which runs the physics for all bodies
 // * it itself does NOT manage UI directly
 
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using UnityEngine.LowLevelPhysics;
 
 public class SimulationController : MonoBehaviour
 {
@@ -15,7 +14,9 @@ public class SimulationController : MonoBehaviour
     public Simulation simulation;
     public new RenderingHandler renderer;   // reserved keyword? hence new?
     public PhysicsHandler physics;
-    
+
+    public List<RenderableBody> bodies;
+
     public GameObject simulatorSpace;       // general placement
     public GameObject simulatorPlane;
     private Vector3? startVelocityPoint;    // fire by dragging
@@ -23,36 +24,36 @@ public class SimulationController : MonoBehaviour
         = new(Vector3.up, Vector3.zero);    // plane placement
     public bool planeEnabled = false;
     public bool stickToPlane = false;
-    public bool orbitEnabled = false;      // orbit placement
+    public bool orbitEnabled = false;       // orbit placement
     public float eccentricity = 0;
     public float orbitDirection = -1;
 
-    // mainly just to refresh trails when scaling
-    public float lastZoomFactor;
-    public string lastDistance;
+    // these two are just to refresh trails when scaling
+    private float lastZoomFactor;
+    private string lastDistance;
     
-    public event Action<Body> OnBodyAdded;
-    public event Action<Body> OnBodyRemoved;
-    public event Action<Body> OnBodySelected;
-    public event Action<Body> OnBodyDeselected;
+    public event Action<RenderableBody> OnBodyAdded;
+    public event Action<RenderableBody> OnBodyRemoved;
+    public event Action<RenderableBody> OnBodySelected;
+    public event Action<RenderableBody> OnBodyDeselected;
     public event Action<float> OnScaleChanged;
     public event Action OnPhysicsUpdate;
     public event Action<float, Body> OnOrbitChanged;
 
     public List<SpaceSnapshot> snapshots;
 
-    private Body selectedBody;
-    public Body SelectedBody { 
+    private RenderableBody selectedBody;
+    public RenderableBody SelectedBody { 
         get => selectedBody; 
         private set => selectedBody = value; 
     }
     // ^ NB: "Body" is serialisable, SO KEEP THIS PRIVATE
     //   (otherwise Unity defaults it to new Body() - bad if there isn't actually a body)
 
-    private Body bodyPreview;
-    public Body BodyPreview { 
-        get => bodyPreview; 
-        private set => bodyPreview = value;
+    private RenderableBody preview;
+    public RenderableBody Preview { 
+        get => preview; 
+        private set => preview = value; // separate method
     }
 
     private bool isActive = false;
@@ -72,30 +73,14 @@ public class SimulationController : MonoBehaviour
         get => showLabels;
         set {
             showLabels = value;
-
-            if (showLabels)
+            
+            if (value == true)
             {
-                foreach (Body body in simulation.bodies)
-                {
-                    body.SetLabelVisibility(body.ShowLabel);
-                }
-
-                if (bodyPreview?.Label != null)
-                {
-                    bodyPreview.SetLabelVisibility(true);
-                }
+                ShowAllLabels();
             }
             else
             {
-                foreach (Body body in simulation.bodies)
-                {
-                    body.SetLabelVisibility(false);
-                }
-
-                if (bodyPreview?.Label != null)
-                {
-                    bodyPreview.SetLabelVisibility(false);
-                }
+                HideAllLabels();
             }
         }
     }
@@ -106,19 +91,13 @@ public class SimulationController : MonoBehaviour
         set {
             showTrails = value;
             
-            if (showTrails)
+            if (value == true)
             {
-                foreach (Body body in simulation.bodies)
-                {
-                    body.SetTrailVisibility(body.ShowTrail);
-                }
+                ShowAllTrails();
             }
             else
             {
-                foreach (Body body in simulation.bodies)
-                {
-                    body.SetTrailVisibility(false);
-                }
+                HideAllTrails();
             }
         }
     }
@@ -151,8 +130,11 @@ public class SimulationController : MonoBehaviour
 
     public void Start()
     {
-        renderer = new(this);
-        physics = new(this);
+        bodies = new();
+
+        renderer = new();
+        physics = new();
+
         selectedBody = null;
     }
 
@@ -162,11 +144,20 @@ public class SimulationController : MonoBehaviour
     {
         this.simulation = simulation;
 
+        bodies = new();
+
         foreach (Body body in simulation.bodies)
         {
-            body.CreateEntity();
-            renderer.GiveTrailRenderer(body);
-            OnBodyAdded?.Invoke(body);
+            RenderableBody rBody = new()
+            {
+                Body = body
+            };
+
+            rBody.CreateEntity();
+            rBody.CreateLabel();
+            rBody.CreateTrail();
+
+            AddBody(rBody);
         }
 
         snapshots = new List<SpaceSnapshot>();
@@ -175,9 +166,9 @@ public class SimulationController : MonoBehaviour
     // clears all bodies in the Simulator
     public void ClearSimulator()
     {
-        foreach (Body body in simulation.bodies)
+        foreach (RenderableBody rBody in bodies)
         {
-            body.DestroyEntity();
+            rBody.DestroyEntity();
         }
 
         snapshots = null;
@@ -206,50 +197,65 @@ public class SimulationController : MonoBehaviour
 
     #region Simulator Methods
 
-    // adds the given body to the simulation
-    public void AddBody(Body body)
+    // adds the given renderable body to the simulation
+    public void AddBody(RenderableBody rBody)
     {
-        body.Entity.transform.parent = simulatorSpace.transform;
+        rBody.Entity.transform.SetParent(simulatorSpace.transform);
         
-        simulation.bodies.Add(body);
+        bodies.Add(rBody);
 
-        OnBodyAdded?.Invoke(body);
+        OnBodyAdded?.Invoke(rBody);
     }
 
-    // removes the given body from the simulation
-    public void RemoveBody(Body body)
+    // removes the given renderable body from the simulation
+    public void RemoveBody(RenderableBody rBody)
     {
-        if (body == null) return;
+        if (rBody == null) return;
 
-        if (selectedBody == body)
+        if (selectedBody == rBody)
         {
             DeselectBody();
-            CameraController.SetSubject(null);
-            CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+            CameraController.SetToUnfollow();
         }
 
-        simulation.bodies.Remove(body);
+        bodies.Remove(rBody);
 
-        OnBodyRemoved?.Invoke(body);
+        OnBodyRemoved?.Invoke(rBody);
         
-        body.DestroyEntity();
+        rBody.DestroyEntity();
     }
 
+    // disables the simulator entirely
     public void DisableSimulator()
     {
         DisablePlane();
 
         FullDisable();
         
-        if (bodyPreview != null) 
+        if (preview != null) 
         {
-            bodyPreview.DestroyEntity();
-            bodyPreview = null;
+            preview.DestroyEntity();
+            preview = null;
         }
         
         startVelocityPoint = null;
 
-        CameraController.SetSubject(null);
+        CameraController.Subject = null;
+    }
+
+    
+    // returns the body from the list of bodies which matches the give entity
+    public RenderableBody GetRenderableBodyFromEntity(GameObject entity)
+    {
+        foreach (RenderableBody rBody in bodies)
+        {
+            if (rBody.Entity == entity) 
+            {
+                return rBody;
+            }
+        }
+
+        return null;
     }
 
     #endregion Simulator Methods
@@ -267,15 +273,15 @@ public class SimulationController : MonoBehaviour
             RunControls();
 
             // body placement
-            if (bodyPreview != null && bodyPreview.Entity != null)
+            if (preview != null && preview.Entity != null)
             {
                 RunPreviewBearings();
-                renderer.ApplyScale(bodyPreview);
+                renderer.RenderBody(preview);
                 RunPreviewPlacement();
 
                 if (showLabels)
                 {
-                    renderer.RenderLabel(bodyPreview);
+                    renderer.RenderLabel(preview);
                 }
             }
 
@@ -286,11 +292,11 @@ public class SimulationController : MonoBehaviour
         // label rendering
         if (showLabels)
         {
-            foreach(Body body in simulation.bodies)
+            foreach(RenderableBody rBody in bodies)
             {
-                if (body.ShowLabel)
+                if (rBody.ShowLabel)
                 {
-                    renderer.RenderLabel(body);
+                    renderer.RenderLabel(rBody);
                 }
             }
         }
@@ -325,34 +331,31 @@ public class SimulationController : MonoBehaviour
             // when "WASD" pressed - switch back to simulator mode from follow mode
             Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
-            if (input.x != 0 || input.z != 0)
+            if ((input.x != 0 || input.z != 0) && selectedBody != null)
             {
-                CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
-                CameraController.SetSubject(null);
+                CameraController.SetToUnfollow();
             }
 
             // when "F" pressed - toggle following for the selected body (if any)
             if (Input.GetKeyDown(AppControls.keybinds["Follow"]))
             {
-                if (CameraController.GetCameraMode() == CameraController.CameraMode.Simulator)
+                if (CameraController.CameraMode == CameraController.Mode.Free)
                 {
                     if (selectedBody != null)
                     {
-                        CameraController.SetSubject(selectedBody);
-                        CameraController.SetCameraMode(CameraController.CameraMode.Following);
+                        CameraController.SetToFollow(selectedBody);
                     }   
                 }
                 else
                 {
-                    CameraController.SetSubject(null);
-                    CameraController.SetCameraMode(CameraController.CameraMode.Simulator);
+                    CameraController.SetToUnfollow();
                 }
             }
 
             // when "V" pressed - set an appropriate scale to view the subject (if in follow mode)
             if (Input.GetKeyDown(AppControls.keybinds["Adjust Scale"]))
             {
-                if (CameraController.GetCameraMode() == CameraController.CameraMode.Following)
+                if (selectedBody != null && CameraController.CameraMode == CameraController.Mode.Follow)
                 {
                     ScaleToFit(selectedBody);
                 }
@@ -405,7 +408,7 @@ public class SimulationController : MonoBehaviour
             }
 
             // orbit mode specific keybinds
-            if (planeEnabled)
+            if (orbitEnabled)
             {
                 // when "Z" pressed - decrease eccentricity (only to 0)
                 if (Input.GetKey(AppControls.keybinds["Decrease Eccentricity"]))
@@ -441,12 +444,12 @@ public class SimulationController : MonoBehaviour
 
         if (isRunning)
         {
-            ApplyPhysics(); // includes scaling
+            ApplyPhysics();
         }
         
-        foreach (Body body in simulation.bodies)
+        foreach (RenderableBody rBody in bodies)
         {
-            renderer.ApplyScale(body);
+            renderer.RenderBody(rBody);
         }
 
         if (lastZoomFactor != renderer.ZoomFactor || lastDistance != renderer.Distance)
@@ -467,9 +470,7 @@ public class SimulationController : MonoBehaviour
     // * then, because body A is done, update its forces for this round
     public void ApplyPhysics()
     {
-        List<Body> bodies = simulation.bodies;
-
-        List<Body> bodiesToRemove = new();
+        List<RenderableBody> bodiesToRemove = new();
 
         // * playing with increasing simulation calculations / update, rather than rate
         // time loop - simulates up to "t" seconds at a time
@@ -478,27 +479,29 @@ public class SimulationController : MonoBehaviour
             // main loop - runs physics
             for (int a = 0; a < bodies.Count; a++)
             {
-                Body bodyA = bodies[a];
+                RenderableBody rBodyA = bodies[a];
+                Body bodyA = rBodyA.Body;
 
                 // gravity / collisions loop - mutual attraction, so "cut in half"
                 for (int b = a + 1; b < bodies.Count; b++)
                 {
-                    Body bodyB = bodies[b];
+                    RenderableBody rBodyB = bodies[b];
+                    Body bodyB = rBodyB.Body;
 
                     // collision handling - stop here if colliding
                     Body majorBody = physics.IsColliding(bodyA, bodyB);
 
                     if (majorBody != null)
                     {
-                        Body minorBody = majorBody == bodyA ? bodyB : bodyA;
+                        RenderableBody rMajorBody = majorBody == bodyA ? rBodyA : rBodyB;
+                        RenderableBody rMinorBody = majorBody == bodyA ? rBodyB : rBodyA;
 
-                        physics.ApplyCollision(majorBody, minorBody);
-                        bodiesToRemove.Add(minorBody);
+                        physics.ApplyCollision(majorBody, rMinorBody.Body);
+                        bodiesToRemove.Add(rMinorBody);
 
-                        if (selectedBody == minorBody) // swap over to dominating body
+                        if (selectedBody == rMinorBody) // swap over to dominating body
                         {
-                            CameraController.SetSubject(majorBody);
-                            SelectBody(majorBody);
+                            CameraController.SetToFollow(rMajorBody);
                         }
 
                         continue;
@@ -522,9 +525,9 @@ public class SimulationController : MonoBehaviour
                 // temperature loop - special case for star / sub-body interaction
                 if (bodyA is Star star)
                 {
-                    foreach (Body body in bodies)
+                    foreach (RenderableBody rBody in bodies)
                     {
-                        if (body is SubBody subBody)
+                        if (rBody.Body is SubBody subBody)
                         {
                             float power = physics.GetPowerReceived(star, subBody);
                             physics.ApplyPower(subBody, power);
@@ -539,7 +542,7 @@ public class SimulationController : MonoBehaviour
             }
 
             // removes any bodies marked for removal by physics
-            foreach (Body body in bodiesToRemove)
+            foreach (RenderableBody body in bodiesToRemove)
             {
                 RemoveBody(body);
             }
@@ -565,32 +568,15 @@ public class SimulationController : MonoBehaviour
         ReadjustAllTrails();
     }
 
-    // readjusts trails (mainly for scale changes since they're a bit buggy)
-    public void ReadjustAllTrails()
-    {
-        foreach (Body body in simulation.bodies)
-        {
-            TrailRenderer trail = body.Entity.GetComponent<TrailRenderer>();
-
-            if (trail == null) continue;
-
-            trail.Clear();
-
-            trail.widthMultiplier = Mathf.Max(body.Radius * renderer.Scale, 0.1f);
-
-            trail.time = trailTime;
-        }
-    }
-
     // scales the simulation to fit the given body
-    public void ScaleToFit(Body body)
+    public void ScaleToFit(RenderableBody rBody)
     {
-        if (body == null) return;
+        if (rBody == null) return;
 
         float targetDiameter = 5;
 
         double value = targetDiameter * UnitReference.DISTANCE_UNITS[renderer.Distance] 
-            / (2 * body.Radius * renderer.UNITS_PER_WORLDSPACE);
+            / (2 * rBody.Body.Radius * renderer.UNITS_PER_WORLDSPACE);
 
         SetZoomFactor((float) Math.Log10(value));
 
@@ -633,31 +619,33 @@ public class SimulationController : MonoBehaviour
     #region Preview Management
 
     // creates a new preview instance of the given type
-    public void SetEntityPreview(string bodyType)
+    public void SetPreviewByType(string bodyType)
     {       
         Type type = Type.GetType(bodyType);
+        Body body;
 
         // assigning the correct class for the new body
         if (type != null && typeof(Body).IsAssignableFrom(type))
         {
-            bodyPreview = (Body) Activator.CreateInstance(type);
+            body = (Body) Activator.CreateInstance(type);
         } 
         else 
         {
             Debug.Log($"ERROR: '{bodyType}' is not a valid Body type - defaulting to Body");
-            bodyPreview = new Body();
+            body = new Body();
         }
 
-        bodyPreview.Name = "New " + type.ToString();
+        preview = new() { Body = body };
+        preview.Body.Name = "New " + type.ToString();
 
         PreparePreviewVisuals();
     }
 
     // creates a new preview instance from the given body
-    public void SetEntityPreviewToTemplate(BodyTemplate template)
+    public void SetPreviewByTemplate(BodyTemplate template)
     {
-        bodyPreview = template.Body.GetShallowCopy();
-        bodyPreview.Name = template.Body.Name;
+        preview = new() { Body = template.Body.GetCopy() };
+        preview.Body.Name = template.Body.Name;
 
         PreparePreviewVisuals();
     }
@@ -665,29 +653,29 @@ public class SimulationController : MonoBehaviour
     // auxiliary: prepares the visuals for the body preview
     public void PreparePreviewVisuals()
     {
-        if (bodyPreview == null) return;
+        if (preview == null) return;
 
-        bodyPreview.CreateEntity();
-        bodyPreview.Entity.transform.parent = simulatorSpace.transform;
+        preview.CreateEntity();
+        preview.CreateLabel();
+        preview.CreateLine();
+        preview.Entity.transform.parent = simulatorSpace.transform;
 
-        renderer.GiveLineRenderer(bodyPreview);
-
-        Material m = bodyPreview.Entity.GetComponent<MeshRenderer>().material;
+        Material m = preview.Entity.GetComponent<MeshRenderer>().material;
         m.color = new Color(m.color.r, m.color.g, m.color.b, 0.25f);
     }
 
     // removes the current body preview
     public void RemoveEntityPreview()
     {
-        if (bodyPreview != null)
+        if (preview != null)
         {
-            if (bodyPreview.Entity != null) 
+            if (preview.Entity != null) 
             {
-                bodyPreview.Entity.GetComponent<LineRenderer>().enabled = false;
-                bodyPreview.DestroyEntity();
+                preview.Entity.GetComponent<LineRenderer>().enabled = false;
+                preview.DestroyEntity();
             }
 
-            bodyPreview = null;
+            preview = null;
         }
     }
 
@@ -703,17 +691,18 @@ public class SimulationController : MonoBehaviour
         // determine position
         if (planeEnabled && stickToPlane)
         {
-            bodyPreview.Position = RunPlanePlacement();
+            preview.Body.Position = RunPlanePlacement();
+            Debug.Log(preview.Body.Position);
         }
         else
         {
-            bodyPreview.Position = RunFreePlacement();
+            preview.Body.Position = RunFreePlacement();
         }
 
         // determine velocity
         if (orbitEnabled)
         {
-            Body attractor = null;
+            RenderableBody attractor = null;
 
             if (selectedBody != null)
             {
@@ -721,7 +710,7 @@ public class SimulationController : MonoBehaviour
             }
             else
             {
-                Body closestBody = GetBodyClosestToPreview();
+                RenderableBody closestBody = GetBodyClosestToPreview();
 
                 if (closestBody != null)
                 {
@@ -733,45 +722,57 @@ public class SimulationController : MonoBehaviour
             {
                 float G = simulation.settings.GravitationalConstant * (float) UnitReference.G;
 
-                bodyPreview.Position = RestrictToRadiusOfTarget(bodyPreview, attractor);
+                preview.Body.Position = RestrictToRadiusOfTarget(preview.Body, attractor.Body);
                 
-                bodyPreview.Velocity = physics.GetStableOrbitVelocity(
-                    attractor, bodyPreview, G, eccentricity, orbitDirection);
+                preview.Body.Velocity = physics.GetStableOrbitVelocity(
+                    attractor.Body, preview.Body, G, eccentricity, orbitDirection);
                 
-                renderer.DrawOrbitBetweenBodies(
-                    attractor, bodyPreview, eccentricity, orbitDirection);
+                renderer.DrawOrbitAroundPoint(
+                    preview, attractor.Body.Position, eccentricity, orbitDirection);
+            
+                OnOrbitChanged?.Invoke(eccentricity, attractor.Body);
             }
-
-            OnOrbitChanged?.Invoke(eccentricity, attractor);
+            else
+            {
+                OnOrbitChanged?.Invoke(eccentricity, null);
+            }
         }
         else
         {
             if (stickToPlane)
             {
-                bodyPreview.Velocity = GetPlaneVelocityDrag();    
+                preview.Body.Velocity = GetPlaneVelocityDrag();    
             }
             else
             {
-                bodyPreview.Velocity = GetFreeVelocityDrag();
+                preview.Body.Velocity = GetFreeVelocityDrag();
             }
             
-            renderer.DrawTrajectory(bodyPreview, bodyPreview.Velocity);
+            renderer.DrawTrajectory(preview, preview.Body.Velocity);
         }
     }
 
     // places an instance of the selected body down (if any)
     private void RunPreviewPlacement()
     {
-        if (Input.GetKeyDown(AppControls.keybinds["Place Body"]) && UIController.FocusedField == null)
+        if (Input.GetKeyDown(AppControls.keybinds["Place Body"]) 
+            && UIController.FocusedField == null)
         {
-            Body body = bodyPreview.GetShallowCopy(); // incl. Position & Velocity
-            body.CreateEntity();
-            AddBody(body);
-            renderer.ApplyScale(body);
+            RenderableBody rBody = new() { Body = preview.Body.GetCopy() };
+            rBody.CreateEntity();
+            rBody.CreateLabel();
+            rBody.CreateTrail();
 
-            renderer.GiveTrailRenderer(body);
+            rBody.Trail.widthMultiplier = Mathf.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
 
-            if (showLabels) renderer.RenderLabel(body);
+            renderer.RenderBody(rBody);
+
+            AddBody(rBody);
+
+            if (showLabels) 
+            {
+                renderer.RenderLabel(rBody);
+            }
         }
     }
 
@@ -793,7 +794,7 @@ public class SimulationController : MonoBehaviour
         }
         else
         {
-            return bodyPreview.Position;
+            return preview.Body.Position;
         }
     }
     
@@ -877,14 +878,14 @@ public class SimulationController : MonoBehaviour
         if (startVelocityPoint == null)
         {
             Vector3? position = GetMouseOnPlane();
-            
+
             if (position != null) 
             {
                 return (Vector3) position / renderer.Scale;
             }
         }
         
-        return bodyPreview.Position;
+        return preview.Body.Position;
     }
 
     // returns the space velocity relative to the user's "drag and release" along the plane
@@ -966,8 +967,8 @@ public class SimulationController : MonoBehaviour
     // returns a space position where the subject lies at least at the edge of the target
     private Vector3 RestrictToRadiusOfTarget(Body subject, Body target)
     {
-        float radiiSum = target.Radius + bodyPreview.Radius;
-        Vector3 vector = subject.Position - target.Position; // parent -> bodyPreview
+        float radiiSum = target.Radius + preview.Body.Radius;
+        Vector3 vector = subject.Position - target.Position; // parent -> preview
 
         if (vector.magnitude > radiiSum)
         {
@@ -981,23 +982,22 @@ public class SimulationController : MonoBehaviour
     }
 
     // auxiliary: returns the body which is closest to the body preview
-    private Body GetBodyClosestToPreview()
+    private RenderableBody GetBodyClosestToPreview()
     {
-        List<Body> bodies = simulation.bodies;
-
         if (bodies.Count == 0) return null;
 
-        Vector3 origin = bodyPreview.Position;
-        Body closest = bodies[0];
-        float distance = Vector3.Distance(origin, closest.Position);
+        Vector3 origin = preview.Body.Position;
+        RenderableBody closest = bodies[0];
+        float distance = Vector3.Distance(origin, closest.Body.Position);
 
         for (int b = 1; b < bodies.Count; b++)
         {
-            float newDistance = Vector3.Distance(origin, bodies[b].Position);
+            RenderableBody candidate = bodies[b];
+            float newDistance = Vector3.Distance(origin, candidate.Body.Position);
 
             if (newDistance < distance)
             {
-                closest = bodies[b];
+                closest = candidate;
                 distance = newDistance;
             }
         }
@@ -1011,10 +1011,10 @@ public class SimulationController : MonoBehaviour
     #region Body Selection
 
     // explicitly selects the given body
-    public void SelectBody(Body body)
+    public void SelectBody(RenderableBody rBody)
     {
-        selectedBody = body;
-        OnBodySelected?.Invoke(body);
+        selectedBody = rBody;
+        OnBodySelected?.Invoke(rBody);
     }
 
     // deselects any currently selected body
@@ -1036,9 +1036,9 @@ public class SimulationController : MonoBehaviour
             // temporarily "blacklists" grid plane & body preview from consuming hits
             simulatorPlane.GetComponent<Collider>().enabled = false;
 
-            if (bodyPreview != null && bodyPreview.Entity != null)
+            if (preview != null && preview.Entity != null)
             {
-                bodyPreview.Entity.GetComponent<Collider>().enabled = false;
+                preview.Entity.GetComponent<Collider>().enabled = false;
             }
 
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -1046,22 +1046,21 @@ public class SimulationController : MonoBehaviour
                 if (hit.collider != null)
                 {
                     GameObject hitPart = hit.collider.gameObject;
-                    Body body = GetBodyFromEntity(hitPart);
+                    RenderableBody rBody = GetRenderableBodyFromEntity(hitPart);
 
-                    if (body != null)
+                    if (rBody != null)
                     {
-                        SelectBody(body);
-                        CameraController.SetSubject(selectedBody);
-                        CameraController.SetCameraMode(CameraController.CameraMode.Following);
+                        SelectBody(rBody);
+                        CameraController.SetToFollow(selectedBody);
                     }
                 }
             }
 
             simulatorPlane.GetComponent<Collider>().enabled = true;
             
-            if (bodyPreview != null && bodyPreview.Entity != null)
+            if (preview != null && preview.Entity != null)
             {
-                bodyPreview.Entity.GetComponent<Collider>().enabled = false;
+                preview.Entity.GetComponent<Collider>().enabled = false;
             }
         }
     }
@@ -1069,19 +1068,64 @@ public class SimulationController : MonoBehaviour
     #endregion Body Selection
 
 
-    
-    #region Auxiliary
+    #region Label Methods
 
-    // returns the body from the list of bodies which matches the give entity
-    public Body GetBodyFromEntity(GameObject entity)
+    // shows all labels (depending on individual labels)
+    public void ShowAllLabels()
     {
-        foreach (Body body in simulation.bodies)
+        foreach (RenderableBody rBody in bodies)
         {
-            if (body.Entity == entity) return body;
+            rBody.SetLabelVisibility(rBody.ShowLabel);
         }
 
-        return null;
+        preview?.SetLabelVisibility(true);
     }
 
-    #endregion Auxiliary
+    // sets the visibility of all labels (dependent on independent labels)
+    public void HideAllLabels()
+    {
+        foreach (RenderableBody body in bodies)
+        {
+            body.SetLabelVisibility(false);
+        }
+        
+        preview?.SetLabelVisibility(false);
+    }
+
+    #endregion Label Methods
+
+
+    #region Trail Methods
+
+    // shows all trails (depending on individual trails)
+    public void ShowAllTrails()
+    {
+        foreach (RenderableBody body in bodies)
+        {
+            body.SetTrailVisibility(body.ShowTrail);
+        }
+    }
+
+    public void HideAllTrails()
+    {
+        foreach (RenderableBody body in bodies)
+        {
+            body.SetTrailVisibility(false);
+        }
+    }
+
+    // readjusts trails (mainly for scale changes since they're a bit buggy)
+    public void ReadjustAllTrails()
+    {
+        foreach (RenderableBody rBody in bodies)
+        {
+            if (rBody.Trail == null) continue;
+
+            rBody.Trail.Clear();
+            rBody.Trail.widthMultiplier = Mathf.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
+            rBody.Trail.time = trailTime;
+        }
+    }
+
+    #endregion Trail Methods
 }

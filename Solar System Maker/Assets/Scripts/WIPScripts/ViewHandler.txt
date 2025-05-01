@@ -1,0 +1,272 @@
+// handles viewing and movement within a simulation
+// * this class can exist without a simulator for static views
+// * to be adjustable, it will need a SimulatorController
+
+using UnityEngine;
+
+public class ViewHandler
+{
+
+    #region Attributes
+
+    // a mode for each situation
+    public enum Mode { Fixed, Free, Follow }
+    
+    private Mode cameraMode;
+    public Mode CameraMode {
+        get => cameraMode;
+        set => cameraMode = value;
+    }
+
+    private Quaternion rotation;        // rotation of view
+    public Quaternion Rotation {
+        get => rotation;
+        set => rotation = value;
+    }
+
+    private Vector3 scaledPosition;     // world position of view (not space position)
+    public Vector3 ScaledPosition {     // - used by renderer
+        get => scaledPosition;
+        set => scaledPosition = value;
+    }
+
+    // fixed mode
+    public Vector3 fixedPoint;
+    public float fixedDistance;
+    public Quaternion fixedAngle;
+
+    // free mode
+    public float sensitivity;
+    public float speed;
+    public float slowRate;
+    public float normalRate;
+    public float fastRate;
+    private float currentSpeed;
+
+    // follow mode
+    private RenderableBody subject;
+    public RenderableBody Subject {
+        get => subject;
+        set => subject = value;
+    }
+
+    private float followDistance;
+    public float FollowDistance {
+        get => followDistance;
+        set => followDistance = value;
+    }
+
+    #endregion Attributes
+
+
+    #region Constructor
+
+    public ViewHandler()
+    {
+        cameraMode = Mode.Fixed;
+        rotation = Camera.main.transform.rotation;
+
+        fixedPoint = Vector3.zero;
+        fixedDistance = 30f;
+        fixedAngle = Quaternion.Euler(25f, 225, 0);
+
+        sensitivity = 5;
+        speed = 10;
+        slowRate = 0.2f;
+        normalRate = 1f;
+        fastRate = 5f;
+
+        followDistance = 30f;
+    }
+
+    #endregion Constructor
+
+
+    #region Auxiliary Methods
+
+    // restricts the given Quaternion's pitch to the given range
+    // * mainly to stop the camera from going crazy when looking directly up or down
+    public Quaternion RestrictQuaternionPitch(
+        Quaternion rotation, float lowerPitch, float upperPitch)
+    {
+        Vector3 euler = rotation.eulerAngles;
+        if (euler.x > 180) euler.x -= 360; // wrap around
+        euler.x = Mathf.Clamp(euler.x, lowerPitch, upperPitch);
+
+        return Quaternion.Euler(euler.x, euler.y, 0);
+    }
+
+    #endregion Auxiliary Methods
+
+
+    #region Camera Controls
+
+    public void RunViewer()
+    {
+        if (cameraMode == Mode.Fixed)
+        {
+            RunFixedMode();
+        } 
+        else if (cameraMode == Mode.Free)
+        {
+            RunFreeMode();
+        } 
+        else if (cameraMode == Mode.Follow)
+        {
+            RunFollowingMode();
+        }
+    }
+
+    #endregion Camera Controls
+
+
+    #region Fixed Mode
+
+    // rotates the camera around the origin at an elevation and angle
+    private void RunFixedMode()
+    {
+        Camera.main.transform.position = fixedPoint + fixedAngle * new Vector3(0, 0, -fixedDistance);
+        Camera.main.transform.rotation = fixedAngle;
+
+        // scaledPosition = point + rotation * offset;
+        // rotation = Quaternion.Euler(27.5, 225, 0);
+    }
+
+    #endregion Fixed Mode
+
+
+    #region Free Mode
+
+    // runs the camera in Simulator mode
+    private void RunFreeMode()
+    {
+        RunFreeMovement();
+
+        if (Input.GetMouseButton(1)) {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Confined;
+            RunFreeRotation();
+        }
+        else
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+    // updates the camera's movement based on key presses
+    // * NB: no need for separate WASD binds - automatically done by input!
+    private void RunFreeMovement()
+    {
+        if (UIController.FocusedField != null) return;
+
+        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        
+        if (Input.GetKey(AppControls.keybinds["Move Slower"]))
+        {
+            currentSpeed = slowRate;
+        }
+        else if (Input.GetKey(AppControls.keybinds["Move Faster"]))
+        {
+            currentSpeed = fastRate;
+        }
+        else
+        {
+            currentSpeed = normalRate;
+        }
+
+        currentSpeed *= speed;
+
+        Vector3 change = rotation * input * currentSpeed * Time.deltaTime;
+        scaledPosition += change;
+
+        Camera.main.transform.rotation = rotation;
+    }
+
+    // updates the camera's rotation with mouse movement
+    private void RunFreeRotation()
+    {
+        Vector2 mouseChange = new()
+        {
+            x = -Input.GetAxis("Mouse Y") * sensitivity,
+            y = Input.GetAxis("Mouse X") * sensitivity
+        };
+
+        Vector3 euler = rotation.eulerAngles;
+
+        Quaternion cameraRotation = Quaternion.Euler(euler.x, euler.y, 0);
+        Quaternion addedRotation = Quaternion.Euler(mouseChange.x, mouseChange.y, 0);
+        Quaternion combinedRotation = cameraRotation * addedRotation;
+
+        combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
+
+        rotation = combinedRotation;
+
+        Camera.main.transform.rotation = rotation;
+    }
+
+    #endregion Free Mode
+
+
+    #region Following Mode
+
+    // sets the viewer up to follow the given body
+    public void SetToFollow(RenderableBody rBody)
+    {
+        subject = rBody;
+        cameraMode = Mode.Follow;
+
+        scaledPosition = rBody.Entity.transform.position;
+    }
+
+    // sets the viewer to stop following the given body and go back to free mode
+    public void SetToUnfollow()
+    {
+        if (subject?.Entity != null)
+        {
+            scaledPosition = subject.Entity.transform.position 
+                + rotation * new Vector3(0, 0, -followDistance);
+        }
+
+        CameraMode = Mode.Free;
+        subject = null;
+    }
+
+    // handles following mode (uses the real camera while ScaledPosition is set on the subject)
+    private void RunFollowingMode()
+    {
+        if (subject == null) return;
+
+        Vector2 mouseChange = new();
+
+        // rotate on right click
+        if (Input.GetMouseButton(1)) {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Confined;
+
+            mouseChange.x = -Input.GetAxis("Mouse Y") * sensitivity;
+            mouseChange.y = Input.GetAxis("Mouse X") * sensitivity;
+        }
+        else
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+        Vector3 orientation = Camera.main.transform.rotation.eulerAngles;
+
+        Quaternion currentRotation = Quaternion.Euler(orientation.x, orientation.y, 0);
+        Quaternion addedRotation = Quaternion.Euler(mouseChange.x, mouseChange.y, 0);
+        Quaternion combinedRotation = currentRotation * addedRotation;
+
+        combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
+
+        Vector3 origin = subject.Entity.transform.position;
+        Vector3 offset = combinedRotation * new Vector3(0, 0, -followDistance);
+        
+        Camera.main.transform.position = origin + offset;
+        Camera.main.transform.rotation = combinedRotation;
+    }
+
+    #endregion Following Mode
+}
