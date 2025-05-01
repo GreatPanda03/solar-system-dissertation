@@ -6,6 +6,9 @@
     min-width: 100%;
     min-height: 100%;
     justify-content: center;
+    position: absolute;
+    top: 0;
+    flex-shrink: 0;
 }
 
 #Container {
@@ -71,16 +74,7 @@
     width: 50%;
 }
 
-#Content {
-    color: rgb(255, 255, 255);
-    -unity-font-style: bold;
-    -unity-text-align: upper-center;
-    align-self: center;
-    width: 100%;
-    justify-content: flex-start;
-}
-
-#Information {
+#Page {
     color: rgb(255, 255, 255);
     -unity-font-style: normal;
     -unity-text-align: upper-center;
@@ -90,12 +84,24 @@
     margin-bottom: 2.5%;
 }
 
-#Controls {
+#Footer {
+    width: 100%;
+    flex-direction: row;
+    flex-grow: 1;
+    height: 8%;
+    max-height: 8%;
+    min-height: 8%;
+    margin-bottom: 10px;
+    justify-content: center;
+    align-items: stretch;
+}
+
+#PageNumber {
     color: rgb(255, 255, 255);
     -unity-font-style: normal;
     -unity-text-align: upper-center;
     align-self: center;
-    width: 100%;
+    width: auto;
     white-space: normal;
     margin-bottom: 2.5%;
 }

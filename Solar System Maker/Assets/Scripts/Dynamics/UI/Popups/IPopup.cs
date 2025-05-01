@@ -2,5 +2,5 @@
 
 public interface IPopup
 {
-    public static string Identifier;
+    public static string identifier;
 }

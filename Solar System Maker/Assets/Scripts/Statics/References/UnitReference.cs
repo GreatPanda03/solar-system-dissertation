@@ -62,12 +62,12 @@ public class UnitReference
         ["1 Millennium"]      = 3.154e+10
     };
 
-    public static Dictionary<string, double> LUMINOSITY_UNITS = new() // watts
+    public static Dictionary<string, double> LUMINOSITY_UNITS = new() // watts (J/s)
     {
         ["Sun"]   = 3.83e+26
     };
 
-    public static Dictionary<string, double> TEMPERATURE_UNITS = new()
+    public static Dictionary<string, double> TEMPERATURE_UNITS = new() // kelvin
     {
         ["Kelvin"]      = 0,
         ["Celsius"]     = 273.15
