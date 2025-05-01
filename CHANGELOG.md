@@ -11,6 +11,13 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.16.3
+**Date:** 2025/05/01
+<br/>**Additions / Changes:**
+* **1)** Made the tutorial section navigable with full content
+
+---
+
 ### Version: 1.16.2
 **Date:** 2025/05/01
 <br/>**Additions / Changes:**
