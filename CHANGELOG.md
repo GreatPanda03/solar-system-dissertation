@@ -11,6 +11,16 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.16.0
+**Date:** 2025/05/01
+<br/>**Bug Fixes:**
+* **1)** Fixed orbit mode only being enabled while the plane is active *(wrong state check)*
+
+**Additions / Changes:**
+* **1)** Moderate code refactor to draw out rendering and data into classes
+
+---
+
 ### Version: 1.15.5
 **Date:** 2025/04/30
 <br/>**Bug Fixes:**
