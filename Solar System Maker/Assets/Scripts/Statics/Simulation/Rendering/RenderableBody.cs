@@ -2,6 +2,7 @@
 // * this class acts as a wrapper around a body to then give it a physical form
 // * the body handles the physics, the renderable handles the looks - everyone looks at the renderable!
 
+using System.Diagnostics;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -264,6 +265,7 @@ public class RenderableBody
         trail = entity.AddComponent<TrailRenderer>();
         trail.material = new Material(Shader.Find("Sprites/Default"));
         trail.widthMultiplier = 0.1f;
+        trail.time = 60;
 
         Gradient gradient = new();
         

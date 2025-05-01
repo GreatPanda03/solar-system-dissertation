@@ -20,13 +20,11 @@ public class AppControls
         ["Increase Eccentricity"]   = KeyCode.X,
         ["Flip Orbit"]          = KeyCode.C,
 
-        ["Lower Plane"]         = KeyCode.U,
-        ["Raise Plane"]         = KeyCode.I,
-        ["Turn Plane Left"]     = KeyCode.J,
-        ["Turn Plane Right"]      = KeyCode.K,
-        ["Turn Plane Backwards"]  = KeyCode.N,
-        ["Turn Plane Forwards"]   = KeyCode.M,
-        ["Reset Plane"]         = KeyCode.O,
-        ["Localise Plane"]      = KeyCode.L
+        ["Lower Plane"]         = KeyCode.T,
+        ["Raise Plane"]         = KeyCode.Y,
+        ["Descend On Plane"]    = KeyCode.G,
+        ["Ascend On Plane"]     = KeyCode.H,
+        ["Reset Plane"]         = KeyCode.B,
+        ["Localise Plane"]      = KeyCode.N
     };
 }

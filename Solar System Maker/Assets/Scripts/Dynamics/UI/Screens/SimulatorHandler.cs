@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -84,6 +83,7 @@ public class SimulatorHandler
         simController.OnBodyDeselected += OnBodyDeselected;
         simController.OnScaleChanged += OnScaleChanged;
         simController.OnPhysicsUpdate += OnPhysicsUpdate;
+        simController.OnPlaneChanged += OnPlaneChanged;
         simController.OnOrbitChanged += OnOrbitChanged;
     }
 
@@ -95,7 +95,8 @@ public class SimulatorHandler
         simController.OnBodyDeselected -= OnBodyDeselected;
         simController.OnScaleChanged -= OnScaleChanged;
         simController.OnPhysicsUpdate -= OnPhysicsUpdate;
-        simController.OnOrbitChanged += OnOrbitChanged;
+        simController.OnPlaneChanged -= OnPlaneChanged;
+        simController.OnOrbitChanged -= OnOrbitChanged;
     }
 
     #endregion Event Methods
@@ -180,6 +181,7 @@ public class SimulatorHandler
     public void OnScaleChanged(double newScale)
     {
         UpdateScaleLabel();
+        UpdateElevationLabel();
     }
 
     public void OnPhysicsUpdate()
@@ -190,16 +192,32 @@ public class SimulatorHandler
         }
     }
 
+    public void OnPlaneChanged()
+    {
+        UpdateElevationLabel();
+    }
+
+    // auxiliary: updates the elevation label
+    public void UpdateElevationLabel()
+    {
+        string unit = simController.renderer.Distance;
+        double scaledElevation = simController.planeOffset.y
+            * (1 / Math.Pow(10, simController.renderer.ZoomFactor));
+
+        ui.Q<Label>("Elevation").text = $"(Elevation Offset = {scaledElevation:0.000} {unit}(s))";
+    }
+
     public void OnOrbitChanged(double eccentricity, Body attractor)
     {
-        ui.Q<Label>("Eccentricity").text = $"(Eccentricity = {eccentricity:0.000})";
+        ui.Q<Label>("Eccentricity").text = $"(Orbit Eccentricity = {eccentricity:0.000})";
 
         if (simController.Preview != null && attractor != null)
         {
-            double distance = (simController.Preview.Body.Position - attractor.Position).magnitude;
-            double scale = (double) UnitReference.DISTANCE_UNITS[simController.renderer.Distance]; // zoomFactor not used here
-            double scaledDistance = distance / scale;
             string unit = simController.renderer.Distance;
+            double unitScale = (double) UnitReference.DISTANCE_UNITS[unit]; // zoom not used here!
+            double distance = (simController.Preview.Body.Position - attractor.Position).magnitude;
+            double scaledDistance = distance / unitScale;
+            
 
             double periapsis = scaledDistance;
             double apoapsis = scaledDistance * (1 + eccentricity) / (1 - eccentricity);
@@ -350,6 +368,7 @@ public class SimulatorHandler
         // plane tools
         toolbox.Q<Button>("Plane").clicked += OnPlaneClicked;
         subToolbox.Q<VisualElement>("PlaneList").style.display = DisplayStyle.None;
+        ui.Q<VisualElement>("PlaneDetails").style.display = DisplayStyle.None;
         InitialisePlaneButtons();
 
         // orbit mode
@@ -453,10 +472,12 @@ public class SimulatorHandler
         {
             simController.EnablePlane();
             planeList.style.display = DisplayStyle.Flex;
+            ui.Q<VisualElement>("PlaneDetails").style.display = DisplayStyle.Flex;
             MarkAsSelected(planeButton);
         }
         else
         {
+            ui.Q<VisualElement>("PlaneDetails").style.display = DisplayStyle.None;
             planeList.style.display = DisplayStyle.None;
             simController.DisablePlane();
             MarkAsDeselected(planeButton);
@@ -676,32 +697,24 @@ public class SimulatorHandler
         };
 
         planeList.Q<Button>("Lower").clicked += () => {
-            simController.TranslatePlane(new Vector3d(0, -1, 0));
+            simController.TranslatePlane(new Vector3(0, -1, 0));
         };
 
         planeList.Q<Button>("Raise").clicked += () => {
-            simController.TranslatePlane(new Vector3d(0, 1, 0));
+            simController.TranslatePlane(new Vector3(0, 1, 0));
         };
         
-        planeList.Q<Button>("TurnLeft").clicked += () => {
-            simController.TurnPlane(new Vector3d(-1, 0, 0));
+        planeList.Q<Button>("Descend").clicked += () => {
+            simController.planeOffset += new Vector3(0, -0.1f, 0);
         };
 
-        planeList.Q<Button>("TurnRight").clicked += () => {
-            simController.TurnPlane(new Vector3d(1, 0, 0));
-        };
-
-        planeList.Q<Button>("TurnBackwards").clicked += () => {
-            simController.TurnPlane(new Vector3d(0, 0, -1));
-        };
-
-        planeList.Q<Button>("TurnForwards").clicked += () => {
-            simController.TurnPlane(new Vector3d(0, 0, 1));
+        planeList.Q<Button>("Ascend").clicked += () => {
+            simController.planeOffset += new Vector3(0, 0.1f, 0);
         };
 
         planeList.Q<Button>("Reset").clicked += () => {
-            simController.SetPlanePositionAndRotation(
-                Vector3.zero, Quaternion.Euler(90, 0, 0));
+            simController.simulatorPlane.transform.position = Vector3.zero;
+            simController.planeOffset = Vector3.zero;
         };
     }
 

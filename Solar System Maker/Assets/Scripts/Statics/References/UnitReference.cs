@@ -16,6 +16,7 @@ public class UnitReference
         ["Kilometre"]       = 1e+3,
         ["Mile"]            = 1.609_344e+3,
         ["Earth Radius"]    = 6.367_5e+6,       // average between equator and pole
+        ["Jupiter Radius"]  = 6.991_1e+7,
         ["Solar Radius"]    = 6.957e+8, 
         ["Lunar Distance"]  = 3.843_99e+8,      // average distance
         ["AU"]              = 1.495_978_707e+11
@@ -29,6 +30,7 @@ public class UnitReference
         ["Tonne"]           = 1e+3,
         ["Moon"]            = 7.345_8e+22,
         ["Earth"]           = 5.972_2e+24,
+        ["Jupiter"]         = 1.898e+27,
         ["Sun"]             = 1.988_5e+30
     };
 

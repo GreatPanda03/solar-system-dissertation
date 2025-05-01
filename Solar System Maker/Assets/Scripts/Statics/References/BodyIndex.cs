@@ -44,6 +44,22 @@ public static class BodyIndex
                     Tilt = Quaternion.Euler(0, 0, 23.5f)
                 }
             }
+        },
+        {
+            new()
+            {
+                Name = "Jupiter",
+                Description = "",
+                Body = new Planet()
+                {
+                    Name = "Jupiter",
+                    Mass = 1.898e+27,
+                    Radius = 6.991_1e+7,
+                    AngularVelocity = 1.673e-08,
+                    Texture = "Materials/Specific/Jupiter",
+                    Tilt = Quaternion.Euler(0, 0, 3.13f)
+                }  
+            }
         }
     };
 

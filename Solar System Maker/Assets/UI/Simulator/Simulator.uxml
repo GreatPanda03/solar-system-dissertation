@@ -22,7 +22,7 @@
         <ui:Button name="Properties" tooltip="Properties" class="toolboxButton" style="width: 30px; height: 30px; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255);">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Properties&apos;);" />
         </ui:Button>
-        <ui:Button name="Plane" tooltip="Fixate Plane" class="toolboxButton" style="width: 30px; height: 30px; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255);">
+        <ui:Button name="Plane" tooltip="Fixate Plane" class="toolboxButton" style="width: 30px; height: 30px; background-image: none; -unity-background-image-tint-color: rgb(255, 255, 255); display: none;">
             <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/BodyTools/Plane&apos;);" />
         </ui:Button>
         <ui:Button name="Follow" tooltip="Follow" class="toolboxButton">
@@ -107,6 +107,9 @@
         <ui:Label text="Create bodies to view them in the list." name="NoBodies" class="propertiesNoBody" style="display: flex; font-size: 12px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;" />
     </ui:VisualElement>
     <ui:VisualElement name="SubToolbox" class="toolboxBar" style="bottom: 40px; flex-direction: column; margin-left: 0;">
+        <ui:VisualElement name="PlaneDetails" style="flex-grow: 1;">
+            <ui:Label text="(Elevation Offset = 0.000)" name="Elevation" style="-unity-font-style: normal; color: rgb(255, 255, 255);" />
+        </ui:VisualElement>
         <ui:VisualElement name="OrbitDetails" style="flex-grow: 1;">
             <ui:Label text="(Orbit Eccentricity = 0.000)" name="Eccentricity" style="-unity-font-style: normal; color: rgb(255, 255, 255);" />
             <ui:Label text="(Orbit Radius = No target)" name="OrbitRadius" style="-unity-font-style: normal; color: rgb(255, 255, 255);" />
@@ -118,6 +121,7 @@
             <ui:Button text="km" name="Kilometre" tooltip="Kilometres" class="toolboxButton" />
             <ui:Button text="mi" name="Mile" tooltip="Miles" class="toolboxButton" />
             <ui:Button text="E&lt;sub&gt;R&lt;/sub&gt;" name="Earth_Radius" tooltip="Earth Radii" class="toolboxButton" />
+            <ui:Button text="J&lt;sub&gt;R&lt;/sub&gt;" name="Jupiter_Radius" tooltip="Earth Radii" class="toolboxButton" />
             <ui:Button text="S&lt;sub&gt;R&lt;/sub&gt;" name="Solar_Radius" tooltip="Solar Radii" class="toolboxButton" />
             <ui:Button text="LD" name="Lunar_Distance" tooltip="Lunar Distances" class="toolboxButton" />
             <ui:Button text="AU" name="AU" tooltip="Astronomical Units" class="toolboxButton" />
@@ -140,17 +144,11 @@
             <ui:Button name="Raise" tooltip="Raise Plane" class="toolboxButton">
                 <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Plane/Raise&apos;);" />
             </ui:Button>
-            <ui:Button name="TurnLeft" tooltip="Turn Plane Left" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Plane/TurnLeft&apos;);" />
+            <ui:Button name="Ascend" tooltip="Turn Plane Left" class="toolboxButton">
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Plane/Ascend&apos;);" />
             </ui:Button>
-            <ui:Button name="TurnRight" tooltip="Turn Plane Right" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Plane/TurnRight&apos;);" />
-            </ui:Button>
-            <ui:Button name="TurnBackwards" tooltip="Turn Plane Backwards" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Plane/TurnBackwards&apos;);" />
-            </ui:Button>
-            <ui:Button name="TurnForwards" tooltip="Turn Plane Forwards" class="toolboxButton">
-                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Plane/TurnForwards&apos;);" />
+            <ui:Button name="Descend" tooltip="Turn Plane Right" class="toolboxButton">
+                <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Plane/Descend&apos;);" />
             </ui:Button>
             <ui:Button name="Reset" tooltip="Reset To Origin" class="toolboxButton">
                 <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/ToolBox/Plane/Reset&apos;);" />

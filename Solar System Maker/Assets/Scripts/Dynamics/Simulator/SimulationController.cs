@@ -25,6 +25,7 @@ public class SimulationController : MonoBehaviour
         = new(Vector3.up, Vector3.zero);    // plane placement
     public bool planeEnabled = false;
     public bool stickToPlane = false;
+    public Vector3 planeOffset = Vector3.zero;
     public bool orbitEnabled = false;       // orbit placement
     public double eccentricity = 0;
     public double orbitDirection = -1;
@@ -39,6 +40,7 @@ public class SimulationController : MonoBehaviour
     public event Action<RenderableBody> OnBodyDeselected;
     public event Action<double> OnScaleChanged;
     public event Action OnPhysicsUpdate;
+    public event Action OnPlaneChanged;
     public event Action<double, Body> OnOrbitChanged;
 
     public List<SpaceSnapshot> snapshots;
@@ -423,43 +425,37 @@ public class SimulationController : MonoBehaviour
                 // when "U" pressed - move plane down
                 if (Input.GetKey(AppControls.keybinds["Lower Plane"]))
                 {
-                    TranslatePlane(new Vector3d(0, -1, 0));
+                    TranslatePlane(new Vector3(0, -3f * Time.deltaTime, 0));
+                    OnPlaneChanged?.Invoke();
                 }
 
                 // when "I" pressed - raise the plane
                 if (Input.GetKey(AppControls.keybinds["Raise Plane"]))
                 {
-                    TranslatePlane(new Vector3d(0, 1, 0));
+                    TranslatePlane(new Vector3(0, 3f * Time.deltaTime, 0));
+                    OnPlaneChanged?.Invoke();
                 }
 
-                // when "J" pressed - rotate the plane left
-                if (Input.GetKey(AppControls.keybinds["Turn Plane Left"]))
+                // when "J" pressed - offsets on the plane by -1
+                if (Input.GetKey(AppControls.keybinds["Descend On Plane"]))
                 {
-                    TurnPlane(new Vector3d(-1, 0, 0));
+                    planeOffset += new Vector3(0, -3f * Time.deltaTime, 0);
+                    OnPlaneChanged?.Invoke();
                 }
 
-                // when "K" pressed - rotate the plane right
-                if (Input.GetKey(AppControls.keybinds["Turn Plane Right"]))
+                // when "K" pressed - offsets on the plane by +1
+                if (Input.GetKey(AppControls.keybinds["Ascend On Plane"]))
                 {
-                    TurnPlane(new Vector3d(1, 0, 0));
-                }
-
-                // when "N" pressed - rotate the plane backwards
-                if (Input.GetKey(AppControls.keybinds["Turn Plane Backwards"]))
-                {
-                    TurnPlane(new Vector3d(0, 0, -1));
-                }
-
-                // when "M" pressed - rotate the plane forward
-                if (Input.GetKey(AppControls.keybinds["Turn Plane Forwards"]))
-                {
-                    TurnPlane(new Vector3d(0, 0, 1));
+                    planeOffset += new Vector3(0, 3f * Time.deltaTime, 0);
+                    OnPlaneChanged?.Invoke();
                 }
 
                 // when "O" pressed - reset plane to origin
                 if (Input.GetKey(AppControls.keybinds["Reset Plane"]))
                 {
-                    SetPlanePositionAndRotation(Vector3.zero, Quaternion.Euler(90, 0, 0));
+                    simulatorPlane.transform.position = Vector3.zero;
+                    planeOffset = Vector3.zero;
+                    OnPlaneChanged?.Invoke();
                 }
             }
 
@@ -989,7 +985,7 @@ public class SimulationController : MonoBehaviour
 
             if (position != null) 
             {
-                return (Vector3d) position / renderer.Scale;
+                return (Vector3d) (position + planeOffset) / renderer.Scale;
             }
         }
         
@@ -1036,20 +1032,10 @@ public class SimulationController : MonoBehaviour
     }
 
     // adjusts the plane by the given vector
-    public void TranslatePlane(Vector3d shift)
+    public void TranslatePlane(Vector3 shift)
     {
         SetPlanePositionAndRotation(
             simulatorPlane.transform.position + (Vector3) shift,
-            simulatorPlane.transform.rotation);
-    }
-
-    // turns the plane by the given rotation
-    public void TurnPlane(Vector3d rotation)
-    {
-        simulatorPlane.transform.Rotate((Vector3) rotation);
-
-        SetPlanePositionAndRotation(
-            simulatorPlane.transform.position,
             simulatorPlane.transform.rotation);
     }
 
