@@ -14,6 +14,18 @@ public class CameraController : MonoBehaviour
         set => cameraMode = value;
     }
 
+    private Vector3d virtualPosition; // used to create the illusion of movement
+    public Vector3d VirtualPosition { // * WORLD position, *not* SPACE position
+        get => virtualPosition;
+        set => virtualPosition = value;
+    }
+
+    private Quaternion virtualRotation; // current rotation (matches camera)
+    public Quaternion VirtualRotation {
+        get => virtualRotation;
+        set => virtualRotation = value;
+    }
+
     // these properties can be set from the inspector
     [Header("Fixed Mode")]
     public Vector3 centre;
@@ -43,6 +55,10 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         cameraMode = Mode.Fixed;
+        
+        virtualPosition = (Vector3d) Camera.main.transform.position;
+        virtualRotation = Camera.main.transform.rotation;
+        
         Debug.Log("Camera loaded");
     }
 
@@ -128,7 +144,7 @@ public class CameraController : MonoBehaviour
     {
         if (UIController.FocusedField != null) return;
 
-        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        Vector3d input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
         if (Input.GetKey(AppControls.keybinds["Move Slower"]))
         {
@@ -144,7 +160,14 @@ public class CameraController : MonoBehaviour
         }
 
         currentSpeed *= speed;
-        Camera.main.transform.Translate(currentSpeed * Time.deltaTime * input);
+        Vector3 movement = currentSpeed * Time.deltaTime * (Vector3) input;
+
+        Debug.Log(movement);
+
+        virtualPosition += (Vector3d) (virtualRotation * movement);
+        Debug.Log(virtualPosition);
+
+        Camera.main.transform.Translate(movement);
     }
 
     // updates the camera's rotation with mouse movement
@@ -153,7 +176,7 @@ public class CameraController : MonoBehaviour
         Vector2 mouseChange = new()
         {
             x = -Input.GetAxis("Mouse Y") * sensitivity,
-            y = Input.GetAxis("Mouse X") * sensitivity
+            y =  Input.GetAxis("Mouse X") * sensitivity
         };
 
         Vector3 cameraOrientation = Camera.main.transform.rotation.eulerAngles;
@@ -163,6 +186,8 @@ public class CameraController : MonoBehaviour
         Quaternion combinedRotation = cameraRotation * addedRotation;
 
         combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
+
+        virtualRotation = combinedRotation;
 
         Camera.main.transform.rotation = combinedRotation;
     }
@@ -199,14 +224,14 @@ public class CameraController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Confined;
 
             mouseChange.x = -Input.GetAxis("Mouse Y") * sensitivity;
-            mouseChange.y = Input.GetAxis("Mouse X") * sensitivity;
+            mouseChange.y =  Input.GetAxis("Mouse X") * sensitivity;
         }
         else
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
-
+ 
         Vector3 cameraOrientation = Camera.main.transform.rotation.eulerAngles;
 
         Quaternion cameraRotation = Quaternion.Euler(cameraOrientation.x, cameraOrientation.y, 0);
@@ -216,10 +241,14 @@ public class CameraController : MonoBehaviour
         combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
 
         Vector3 origin = subject.Entity.transform.position;
-        Vector3 offset = combinedRotation * new Vector3(0, 0, -followDistance);
+        Vector3 offset = combinedRotation * new Vector3(0, 0, (float) -followDistance);
         
-        Camera.main.transform.position = origin + offset;
-        Camera.main.transform.rotation = combinedRotation;
+        // essentially makes the body the "point of focus"
+        virtualPosition = (Vector3d) subject.Entity.transform.position;
+        Debug.Log(virtualPosition);
+
+        Camera.main.transform.SetPositionAndRotation(
+            origin + offset, combinedRotation);
     }
 
     #endregion Follow Mode

@@ -198,7 +198,8 @@ public class UIController : MonoBehaviour
 
         foreach (VisualElement element in allElements)
         {
-            if (element is TextField || element is FloatField || element is Vector3Field)
+            if (element is TextField || element is FloatField 
+                || element is DoubleField || element is Vector3Field)
             {
                 // only focus if the field is clicked
                 element.RegisterCallback<FocusEvent>((e) => { // after focus gained
@@ -287,8 +288,8 @@ public class UIController : MonoBehaviour
             if (element is Button button)
             {
                 Vector2 mousePosition = Input.mousePosition;
-                float X = mousePosition.x;
-                float Y = Screen.height - mousePosition.y;
+                double X = mousePosition.x;
+                double Y = Screen.height - mousePosition.y;
 
                 Rect extents = button.worldBound;
 

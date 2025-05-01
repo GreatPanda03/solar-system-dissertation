@@ -1,6 +1,7 @@
 // manages instances of Body Template popups
 // * these popups allow the user to save the given body as a template
 
+using Unity.VisualScripting;
 using UnityEngine.UIElements;
 
 public class SaveBodyPopupHandler : IPopup
@@ -48,7 +49,7 @@ public class SaveBodyPopupHandler : IPopup
             BodyTemplate newSave = DataHandler.GetNextBodyTemplateSlot();
             newSave.Name = popup.Q<TextField>("Name").value;
             newSave.Description = popup.Q<TextField>("Description").value;
-            newSave.Body = body;
+            newSave.Body = body.GetCopy();
 
             DataHandler.BodyTemplates.Add(newSave);
         }; 

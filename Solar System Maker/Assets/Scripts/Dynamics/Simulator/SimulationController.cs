@@ -15,7 +15,7 @@ public class SimulationController : MonoBehaviour
     public new RenderingHandler renderer;   // reserved keyword? hence new?
     public PhysicsHandler physics;
 
-    public List<RenderableBody> bodies;
+    public List<RenderableBody> rBodies;
 
     public GameObject simulatorSpace;       // general placement
     public GameObject simulatorPlane;
@@ -25,20 +25,20 @@ public class SimulationController : MonoBehaviour
     public bool planeEnabled = false;
     public bool stickToPlane = false;
     public bool orbitEnabled = false;       // orbit placement
-    public float eccentricity = 0;
-    public float orbitDirection = -1;
+    public double eccentricity = 0;
+    public double orbitDirection = -1;
 
     // these two are just to refresh trails when scaling
-    private float lastZoomFactor;
+    private double lastZoomFactor;
     private string lastDistance;
     
     public event Action<RenderableBody> OnBodyAdded;
     public event Action<RenderableBody> OnBodyRemoved;
     public event Action<RenderableBody> OnBodySelected;
     public event Action<RenderableBody> OnBodyDeselected;
-    public event Action<float> OnScaleChanged;
+    public event Action<double> OnScaleChanged;
     public event Action OnPhysicsUpdate;
-    public event Action<float, Body> OnOrbitChanged;
+    public event Action<double, Body> OnOrbitChanged;
 
     public List<SpaceSnapshot> snapshots;
 
@@ -130,7 +130,7 @@ public class SimulationController : MonoBehaviour
 
     public void Start()
     {
-        bodies = new();
+        rBodies = new();
 
         renderer = new();
         physics = new();
@@ -144,7 +144,7 @@ public class SimulationController : MonoBehaviour
     {
         this.simulation = simulation;
 
-        bodies = new();
+        rBodies = new();
 
         foreach (Body body in simulation.bodies)
         {
@@ -157,7 +157,10 @@ public class SimulationController : MonoBehaviour
             rBody.CreateLabel();
             rBody.CreateTrail();
 
-            AddBody(rBody);
+            // slightly different to "AddBody" below
+            rBody.Entity.transform.SetParent(simulatorSpace.transform);
+            rBodies.Add(rBody);
+            OnBodyAdded?.Invoke(rBody);
         }
 
         snapshots = new List<SpaceSnapshot>();
@@ -166,7 +169,7 @@ public class SimulationController : MonoBehaviour
     // clears all bodies in the Simulator
     public void ClearSimulator()
     {
-        foreach (RenderableBody rBody in bodies)
+        foreach (RenderableBody rBody in rBodies)
         {
             rBody.DestroyEntity();
         }
@@ -202,7 +205,8 @@ public class SimulationController : MonoBehaviour
     {
         rBody.Entity.transform.SetParent(simulatorSpace.transform);
         
-        bodies.Add(rBody);
+        simulation.bodies.Add(rBody.Body);
+        rBodies.Add(rBody);
 
         OnBodyAdded?.Invoke(rBody);
     }
@@ -218,7 +222,8 @@ public class SimulationController : MonoBehaviour
             CameraController.SetToUnfollow();
         }
 
-        bodies.Remove(rBody);
+        simulation.bodies.Remove(rBody.Body);
+        rBodies.Remove(rBody);
 
         OnBodyRemoved?.Invoke(rBody);
         
@@ -247,7 +252,7 @@ public class SimulationController : MonoBehaviour
     // returns the body from the list of bodies which matches the give entity
     public RenderableBody GetRenderableBodyFromEntity(GameObject entity)
     {
-        foreach (RenderableBody rBody in bodies)
+        foreach (RenderableBody rBody in rBodies)
         {
             if (rBody.Entity == entity) 
             {
@@ -276,12 +281,12 @@ public class SimulationController : MonoBehaviour
             if (preview != null && preview.Entity != null)
             {
                 RunPreviewBearings();
-                renderer.RenderBody(preview);
+                preview.RenderBody(renderer.Scale);
                 RunPreviewPlacement();
 
                 if (showLabels)
                 {
-                    renderer.RenderLabel(preview);
+                    preview.RenderLabel();
                 }
             }
 
@@ -292,11 +297,11 @@ public class SimulationController : MonoBehaviour
         // label rendering
         if (showLabels)
         {
-            foreach(RenderableBody rBody in bodies)
+            foreach(RenderableBody rBody in rBodies)
             {
                 if (rBody.ShowLabel)
                 {
-                    renderer.RenderLabel(rBody);
+                    rBody.RenderLabel();
                 }
             }
         }
@@ -306,21 +311,21 @@ public class SimulationController : MonoBehaviour
     public void RunControls()
     {
         // on mouse wheel - zoom in / out
-        float scroll = Input.mouseScrollDelta.y;
-        float zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
+        double scroll = Input.mouseScrollDelta.y;
+        double zoomAdjustment = scroll > 0 ? 0.01f : (scroll < 0 ? -0.01f : 0);
 
         if (zoomAdjustment != 0)
         {
-            float oldScale = renderer.Scale;
+            double oldScale = renderer.Scale;
             SetZoomFactor(renderer.ZoomFactor + zoomAdjustment);
-            float newScale = renderer.Scale;
+            double newScale = renderer.Scale;
 
             // applying the main zoom offset
             Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             Vector3 direction = mouseRay.direction * Math.Sign(zoomAdjustment);
 
-            Vector3 spacePosition = (Camera.main.transform.position + direction) / (float) oldScale;
-            Camera.main.transform.position = spacePosition * (float) newScale;
+            Vector3d spacePosition = (Vector3d) (Camera.main.transform.position + direction) / (float) oldScale;
+            Camera.main.transform.position = (Vector3) (spacePosition * (double) newScale);
 
             OnScaleChanged?.Invoke(newScale);
         }
@@ -329,7 +334,7 @@ public class SimulationController : MonoBehaviour
         if (UIController.FocusedField == null)
         {
             // when "WASD" pressed - switch back to simulator mode from follow mode
-            Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+            Vector3d input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
             if ((input.x != 0 || input.z != 0) && selectedBody != null)
             {
@@ -367,37 +372,37 @@ public class SimulationController : MonoBehaviour
                 // when "U" pressed - move plane down
                 if (Input.GetKey(AppControls.keybinds["Lower Plane"]))
                 {
-                    TranslatePlane(new Vector3(0, -1, 0));
+                    TranslatePlane(new Vector3d(0, -1, 0));
                 }
 
                 // when "I" pressed - raise the plane
                 if (Input.GetKey(AppControls.keybinds["Raise Plane"]))
                 {
-                    TranslatePlane(new Vector3(0, 1, 0));
+                    TranslatePlane(new Vector3d(0, 1, 0));
                 }
 
                 // when "J" pressed - rotate the plane left
                 if (Input.GetKey(AppControls.keybinds["Turn Plane Left"]))
                 {
-                    TurnPlane(new Vector3(-1, 0, 0));
+                    TurnPlane(new Vector3d(-1, 0, 0));
                 }
 
                 // when "K" pressed - rotate the plane right
                 if (Input.GetKey(AppControls.keybinds["Turn Plane Right"]))
                 {
-                    TurnPlane(new Vector3(1, 0, 0));
+                    TurnPlane(new Vector3d(1, 0, 0));
                 }
 
                 // when "N" pressed - rotate the plane backwards
                 if (Input.GetKey(AppControls.keybinds["Turn Plane Backwards"]))
                 {
-                    TurnPlane(new Vector3(0, 0, -1));
+                    TurnPlane(new Vector3d(0, 0, -1));
                 }
 
                 // when "M" pressed - rotate the plane forward
                 if (Input.GetKey(AppControls.keybinds["Turn Plane Forwards"]))
                 {
-                    TurnPlane(new Vector3(0, 0, 1));
+                    TurnPlane(new Vector3d(0, 0, 1));
                 }
 
                 // when "O" pressed - reset plane to origin
@@ -413,13 +418,13 @@ public class SimulationController : MonoBehaviour
                 // when "Z" pressed - decrease eccentricity (only to 0)
                 if (Input.GetKey(AppControls.keybinds["Decrease Eccentricity"]))
                 {
-                    eccentricity = Mathf.Max(eccentricity - 0.001f, 0);
+                    eccentricity = Math.Max(eccentricity - 0.001f, 0);
                 }
 
                 // when "X" pressed - increase eccentricity (only to 0.999)
                 if (Input.GetKey(AppControls.keybinds["Increase Eccentricity"]))
                 {
-                    eccentricity = Mathf.Min(eccentricity + 0.001f, 0.99f); // to avoid zero-division
+                    eccentricity = Math.Min(eccentricity + 0.001f, 0.99f); // to avoid zero-division
                 }
 
                 // when "C" pressed - swap orbit direction
@@ -447,9 +452,9 @@ public class SimulationController : MonoBehaviour
             ApplyPhysics();
         }
         
-        foreach (RenderableBody rBody in bodies)
+        foreach (RenderableBody rBody in rBodies)
         {
-            renderer.RenderBody(rBody);
+            rBody.RenderBody(renderer.Scale);
         }
 
         if (lastZoomFactor != renderer.ZoomFactor || lastDistance != renderer.Distance)
@@ -477,15 +482,15 @@ public class SimulationController : MonoBehaviour
         // for (int t = 1; t <= UnitReference.TIME_UNITS[physics.TimePerSecond]; t++)
         // { 
             // main loop - runs physics
-            for (int a = 0; a < bodies.Count; a++)
+            for (int a = 0; a < rBodies.Count; a++)
             {
-                RenderableBody rBodyA = bodies[a];
+                RenderableBody rBodyA = rBodies[a];
                 Body bodyA = rBodyA.Body;
 
                 // gravity / collisions loop - mutual attraction, so "cut in half"
-                for (int b = a + 1; b < bodies.Count; b++)
+                for (int b = a + 1; b < rBodies.Count; b++)
                 {
-                    RenderableBody rBodyB = bodies[b];
+                    RenderableBody rBodyB = rBodies[b];
                     Body bodyB = rBodyB.Body;
 
                     // collision handling - stop here if colliding
@@ -508,8 +513,8 @@ public class SimulationController : MonoBehaviour
                     }
                     
                     // if no collisions, continue with general forces
-                    Vector3 gravity = physics.GetGravitationalForce(bodyA, bodyB,
-                        simulation.settings.GravitationalConstant * (float) UnitReference.G);
+                    Vector3d gravity = physics.GetGravitationalForce(bodyA, bodyB,
+                        simulation.settings.GravitationalConstant * (double) UnitReference.G);
 
                     if (!bodyA.Anchored) 
                     {
@@ -525,11 +530,11 @@ public class SimulationController : MonoBehaviour
                 // temperature loop - special case for star / sub-body interaction
                 if (bodyA is Star star)
                 {
-                    foreach (RenderableBody rBody in bodies)
+                    foreach (RenderableBody rBody in rBodies)
                     {
                         if (rBody.Body is SubBody subBody)
                         {
-                            float power = physics.GetPowerReceived(star, subBody);
+                            double power = physics.GetPowerReceived(star, subBody);
                             physics.ApplyPower(subBody, power);
                         }
                     }
@@ -555,7 +560,7 @@ public class SimulationController : MonoBehaviour
     #region Scale Management
 
     // sets the zoom factor of the controller's renderer to the given value
-    public void SetZoomFactor(float zoomFactor)
+    public void SetZoomFactor(double zoomFactor)
     {
         renderer.ZoomFactor = zoomFactor;
         ReadjustAllTrails();
@@ -573,12 +578,12 @@ public class SimulationController : MonoBehaviour
     {
         if (rBody == null) return;
 
-        float targetDiameter = 5;
+        double targetDiameter = 5;
 
         double value = targetDiameter * UnitReference.DISTANCE_UNITS[renderer.Distance] 
             / (2 * rBody.Body.Radius * renderer.UNITS_PER_WORLDSPACE);
 
-        SetZoomFactor((float) Math.Log10(value));
+        SetZoomFactor((double) Math.Log10(value));
 
         OnScaleChanged?.Invoke(renderer.ZoomFactor);
 
@@ -589,8 +594,8 @@ public class SimulationController : MonoBehaviour
 
         // 1. from the renderer, to scale bodies, we have:
 
-        //    > float scaledRadius = body.Radius * scale
-        //    > body.Entity.transform.localScale = 2 * scaledRadius * new Vector3(1,1,1);
+        //    > double scaledRadius = body.Radius * scale
+        //    > body.Entity.transform.localScale = 2 * scaledRadius * new Vector3d(1,1,1);
 
         // so the target diameter would be:
 
@@ -599,7 +604,7 @@ public class SimulationController : MonoBehaviour
 
         // 2. from the renderer, we also have the following to determine scale:
 
-        //    > float scale = 1 / UnitReference.DISTANCE_UNITS[distance]      (2)
+        //    > double scale = 1 / UnitReference.DISTANCE_UNITS[distance]      (2)
         //         * Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE;                
 
         // 3. substituting (2) into (1), we have:
@@ -644,6 +649,8 @@ public class SimulationController : MonoBehaviour
     // creates a new preview instance from the given body
     public void SetPreviewByTemplate(BodyTemplate template)
     {
+        RemoveEntityPreview();
+
         preview = new() { Body = template.Body.GetCopy() };
         preview.Body.Name = template.Body.Name;
 
@@ -692,7 +699,6 @@ public class SimulationController : MonoBehaviour
         if (planeEnabled && stickToPlane)
         {
             preview.Body.Position = RunPlanePlacement();
-            Debug.Log(preview.Body.Position);
         }
         else
         {
@@ -720,7 +726,7 @@ public class SimulationController : MonoBehaviour
 
             if (attractor != null) // also restricts to beyond attractor's radius
             {
-                float G = simulation.settings.GravitationalConstant * (float) UnitReference.G;
+                double G = simulation.settings.GravitationalConstant * UnitReference.G;
 
                 preview.Body.Position = RestrictToRadiusOfTarget(preview.Body, attractor.Body);
                 
@@ -735,6 +741,8 @@ public class SimulationController : MonoBehaviour
             else
             {
                 OnOrbitChanged?.Invoke(eccentricity, null);
+
+                preview.Line.positionCount = 0;
             }
         }
         else
@@ -763,15 +771,15 @@ public class SimulationController : MonoBehaviour
             rBody.CreateLabel();
             rBody.CreateTrail();
 
-            rBody.Trail.widthMultiplier = Mathf.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
+            rBody.Trail.widthMultiplier = (float) Math.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
 
-            renderer.RenderBody(rBody);
+            rBody.RenderBody(renderer.Scale);
 
             AddBody(rBody);
 
             if (showLabels) 
             {
-                renderer.RenderLabel(rBody);
+                rBody.RenderBody(renderer.Scale);
             }
         }
     }
@@ -782,13 +790,13 @@ public class SimulationController : MonoBehaviour
     #region Free Placement
 
     // returns a space position relative to a distance from the user's camera
-    private Vector3 RunFreePlacement()
+    private Vector3d RunFreePlacement()
     {
         if (startVelocityPoint == null)
         {
             Vector3 screenPosition = Input.mousePosition;
             screenPosition.z = Camera.main.nearClipPlane + 30;
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+            Vector3d worldPosition = (Vector3d) Camera.main.ScreenToWorldPoint(screenPosition);
 
             return worldPosition / renderer.Scale;
         }
@@ -799,7 +807,7 @@ public class SimulationController : MonoBehaviour
     }
     
     // returns a space velocity relative to the user's "drag and release"
-    private Vector3 GetFreeVelocityDrag()
+    private Vector3d GetFreeVelocityDrag()
     {
         // starting the trajectory
         if (Input.GetMouseButtonDown(0)
@@ -814,7 +822,7 @@ public class SimulationController : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             startVelocityPoint = null;
-            return Vector3.zero;
+            return Vector3d.zero;
         }
         else if (startVelocityPoint != null)
         {
@@ -822,10 +830,10 @@ public class SimulationController : MonoBehaviour
             screenPosition.z = Camera.main.nearClipPlane + 30;
             Vector3 endVelocityPoint = Camera.main.ScreenToWorldPoint(screenPosition);
 
-            return (Vector3) (startVelocityPoint - endVelocityPoint) / renderer.Scale;
+            return (Vector3d) (startVelocityPoint - endVelocityPoint) / renderer.Scale;
         }
 
-        return Vector3.zero;
+        return Vector3d.zero;
     }
 
     #endregion Free Placement
@@ -873,7 +881,7 @@ public class SimulationController : MonoBehaviour
     }
 
     // returns the space position of the mouse's position along the plane (intersection)
-    private Vector3 RunPlanePlacement()
+    private Vector3d RunPlanePlacement()
     {
         if (startVelocityPoint == null)
         {
@@ -881,7 +889,7 @@ public class SimulationController : MonoBehaviour
 
             if (position != null) 
             {
-                return (Vector3) position / renderer.Scale;
+                return (Vector3d) position / renderer.Scale;
             }
         }
         
@@ -889,7 +897,7 @@ public class SimulationController : MonoBehaviour
     }
 
     // returns the space velocity relative to the user's "drag and release" along the plane
-    private Vector3 GetPlaneVelocityDrag()
+    private Vector3d GetPlaneVelocityDrag()
     {
         // starting the trajectory
         if (Input.GetMouseButtonDown(0) 
@@ -902,18 +910,18 @@ public class SimulationController : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             startVelocityPoint = null;
-            return Vector3.zero;
+            return Vector3d.zero;
         }
         else if (startVelocityPoint != null)
         {
             Vector3? endVelocityPoint = GetMouseOnPlane();
 
             return endVelocityPoint != null 
-                ? (Vector3) (startVelocityPoint - endVelocityPoint) / renderer.Scale
-                : Vector3.zero;
+                ? (Vector3d) (startVelocityPoint - endVelocityPoint) / (float) renderer.Scale
+                : Vector3d.zero;
         }
 
-        return Vector3.zero;
+        return Vector3d.zero;
     }
 
     // updates the placement plane to the given position and rotation
@@ -928,17 +936,17 @@ public class SimulationController : MonoBehaviour
     }
 
     // adjusts the plane by the given vector
-    public void TranslatePlane(Vector3 shift)
+    public void TranslatePlane(Vector3d shift)
     {
         SetPlanePositionAndRotation(
-            simulatorPlane.transform.position + shift,
+            simulatorPlane.transform.position + (Vector3) shift,
             simulatorPlane.transform.rotation);
     }
 
     // turns the plane by the given rotation
-    public void TurnPlane(Vector3 rotation)
+    public void TurnPlane(Vector3d rotation)
     {
-        simulatorPlane.transform.Rotate(rotation);
+        simulatorPlane.transform.Rotate((Vector3) rotation);
 
         SetPlanePositionAndRotation(
             simulatorPlane.transform.position,
@@ -965,10 +973,10 @@ public class SimulationController : MonoBehaviour
     }
 
     // returns a space position where the subject lies at least at the edge of the target
-    private Vector3 RestrictToRadiusOfTarget(Body subject, Body target)
+    private Vector3d RestrictToRadiusOfTarget(Body subject, Body target)
     {
-        float radiiSum = target.Radius + preview.Body.Radius;
-        Vector3 vector = subject.Position - target.Position; // parent -> preview
+        double radiiSum = target.Radius + preview.Body.Radius;
+        Vector3d vector = subject.Position - target.Position; // parent -> preview
 
         if (vector.magnitude > radiiSum)
         {
@@ -976,7 +984,7 @@ public class SimulationController : MonoBehaviour
         }
         else
         {
-            Vector3 direction = vector.normalized;
+            Vector3d direction = vector.normalized;
             return target.Position + (radiiSum * direction);
         }
     }
@@ -984,16 +992,16 @@ public class SimulationController : MonoBehaviour
     // auxiliary: returns the body which is closest to the body preview
     private RenderableBody GetBodyClosestToPreview()
     {
-        if (bodies.Count == 0) return null;
+        if (rBodies.Count == 0) return null;
 
-        Vector3 origin = preview.Body.Position;
-        RenderableBody closest = bodies[0];
-        float distance = Vector3.Distance(origin, closest.Body.Position);
+        Vector3d origin = preview.Body.Position;
+        RenderableBody closest = rBodies[0];
+        double distance = Vector3d.Distance(origin, closest.Body.Position);
 
-        for (int b = 1; b < bodies.Count; b++)
+        for (int b = 1; b < rBodies.Count; b++)
         {
-            RenderableBody candidate = bodies[b];
-            float newDistance = Vector3.Distance(origin, candidate.Body.Position);
+            RenderableBody candidate = rBodies[b];
+            double newDistance = Vector3d.Distance(origin, candidate.Body.Position);
 
             if (newDistance < distance)
             {
@@ -1073,7 +1081,7 @@ public class SimulationController : MonoBehaviour
     // shows all labels (depending on individual labels)
     public void ShowAllLabels()
     {
-        foreach (RenderableBody rBody in bodies)
+        foreach (RenderableBody rBody in rBodies)
         {
             rBody.SetLabelVisibility(rBody.ShowLabel);
         }
@@ -1084,7 +1092,7 @@ public class SimulationController : MonoBehaviour
     // sets the visibility of all labels (dependent on independent labels)
     public void HideAllLabels()
     {
-        foreach (RenderableBody body in bodies)
+        foreach (RenderableBody body in rBodies)
         {
             body.SetLabelVisibility(false);
         }
@@ -1100,7 +1108,7 @@ public class SimulationController : MonoBehaviour
     // shows all trails (depending on individual trails)
     public void ShowAllTrails()
     {
-        foreach (RenderableBody body in bodies)
+        foreach (RenderableBody body in rBodies)
         {
             body.SetTrailVisibility(body.ShowTrail);
         }
@@ -1108,7 +1116,7 @@ public class SimulationController : MonoBehaviour
 
     public void HideAllTrails()
     {
-        foreach (RenderableBody body in bodies)
+        foreach (RenderableBody body in rBodies)
         {
             body.SetTrailVisibility(false);
         }
@@ -1117,13 +1125,13 @@ public class SimulationController : MonoBehaviour
     // readjusts trails (mainly for scale changes since they're a bit buggy)
     public void ReadjustAllTrails()
     {
-        foreach (RenderableBody rBody in bodies)
+        foreach (RenderableBody rBody in rBodies)
         {
             if (rBody.Trail == null) continue;
 
             rBody.Trail.Clear();
-            rBody.Trail.widthMultiplier = Mathf.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
-            rBody.Trail.time = trailTime;
+            rBody.Trail.widthMultiplier = (float) Math.Max(rBody.Body.Radius * renderer.Scale, 0.1f);
+            rBody.Trail.time = (float) trailTime;
         }
     }
 

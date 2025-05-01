@@ -4,14 +4,16 @@
 
 using System;
 using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class RenderingHandler
 {
 
     #region Attributes
     
-    public readonly float UNITS_PER_WORLDSPACE = 1;
+    public readonly double UNITS_PER_WORLDSPACE = 1;
 
     private string distance;
     public string Distance {
@@ -22,8 +24,8 @@ public class RenderingHandler
         }
     }
 
-    private float zoomFactor;
-    public float ZoomFactor {
+    private double zoomFactor;
+    public double ZoomFactor {
         get => zoomFactor;
         set {
             zoomFactor = value;
@@ -31,8 +33,8 @@ public class RenderingHandler
         }
     }
     
-    private float scale;
-    public float Scale {
+    private double scale;
+    public double Scale {
         get => scale;
         private set => scale = value;
     }
@@ -55,65 +57,29 @@ public class RenderingHandler
     #region Scaling Methods
 
     // updates the scale with the current scale metric and zoom factor
-    public float CalculateScale()
+    public double CalculateScale()
     {
-        return (float) (1 / UnitReference.DISTANCE_UNITS[distance] 
+        return (double) (1 / UnitReference.DISTANCE_UNITS[distance] 
             * Math.Pow(10, zoomFactor) * UNITS_PER_WORLDSPACE);
     }
 
-    // extra: applies the current scale to the given body
-    public void RenderBody(RenderableBody rBody)
-    {
-        if (rBody.Entity == null) return;
-
-        Transform transform = rBody.Entity.transform;
-        transform.position = (float) scale * rBody.Body.Position;
-        transform.localScale = (float) (rBody.Body.Radius * 2) * scale * new Vector3(1,1,1);
-        transform.rotation = Quaternion.Euler(0, rBody.Body.Rotation * Mathf.Rad2Deg, 0);
-    }
-
     #endregion Scaling Methods
-
-
-    #region Label Methods
-
-    // renders the given body's label
-    // * positions the label at "top right" of body, relative to the camera
-    public void RenderLabel(RenderableBody rBody)
-    {
-        if (rBody.Label == null) return;
-
-        Transform origin = Camera.main.transform;
-        Vector3 position = rBody.Entity.transform.position;
-        float size = rBody.Entity.transform.localScale.magnitude / 2; // radius
-
-        Vector3 edge = size * (origin.right + origin.up); // parallel to camera forward
-        Vector3 screenPoint = Camera.main.WorldToScreenPoint(position + edge);
-
-        rBody.Label.transform.position = screenPoint;
-        rBody.Label.GetComponent<TextMeshProUGUI>().enabled = screenPoint.z >= 0;
-
-        // ^ technically has a screen position even when BEHIND the camera
-        // * this check stops the label from showing up when behind the camera
-    }
-
-    #endregion Label Methods
 
 
     #region Trajectory Methods
 
 
     // draws a trajectory for the given body based on the given vector
-    public void DrawTrajectory(RenderableBody rBody, Vector3 trajectory)
+    public void DrawTrajectory(RenderableBody rBody, Vector3d trajectory)
     {
         if (rBody.Line == null) return;
 
-        Vector3 scaledOrigin = rBody.Body.Position * scale;
-        Vector3 scaledTrajectory = trajectory * scale;
+        Vector3d scaledOrigin = rBody.Body.Position * scale;
+        Vector3d scaledTrajectory = trajectory * scale;
 
 	    rBody.Line.positionCount = 2;
-        rBody.Line.SetPosition(0, scaledOrigin);
-        rBody.Line.SetPosition(1, scaledOrigin + scaledTrajectory);
+        rBody.Line.SetPosition(0, (Vector3) scaledOrigin);
+        rBody.Line.SetPosition(1, (Vector3) (scaledOrigin + scaledTrajectory));
     }
 
     // draws the orbit of one body around another
@@ -122,36 +88,38 @@ public class RenderingHandler
     // * LOTS of maths...
     public void DrawOrbitAroundPoint(
         RenderableBody satellite, 
-        Vector3 point, 
-        float eccentricity = 0,
-        float orbitDirection = 1)
+        Vector3d point, 
+        double eccentricity = 0,
+        double orbitDirection = 1)
     {
         if (satellite.Line == null) return;
 
         // measurements
-        Vector3 centre = point;
-        Vector3 edge = satellite.Body.Position;
+        Vector3d centre = point;
+        Vector3d edge = satellite.Body.Position;
 
-        Vector3 scaledCentre = (float) scale * centre;
-        Vector3 scaledEdge = (float) scale * edge;
-        Vector3 scaledVector = scaledEdge - scaledCentre; // from child to parent
-        float scaledDistance = scaledVector.magnitude;
+        Vector3d scaledCentre = (double) scale * centre;
+        Vector3d scaledEdge = (double) scale * edge;
+        Vector3d scaledVector = scaledEdge - scaledCentre; // from child to parent
+        double scaledDistance = scaledVector.magnitude;
         
         // "degrees diff" is where the path draws from based on child position relative to parent
         // * "abs" so the path doesn't "flip", "offset" to account for inclination
-        float degreesDiff = Mathf.Abs(Vector3.SignedAngle(scaledVector, Vector3.up, Vector3.forward));
-        float scaledXZ = Mathf.Sqrt(Mathf.Pow(scaledVector.x, 2) + Mathf.Pow(scaledVector.z, 2));
-        float radiansOffset = Mathf.Atan2(scaledVector.y, scaledXZ); // proportion of Pi / 2 to offset
-        float startingRadians = (degreesDiff * Mathf.Deg2Rad) + radiansOffset;
+        double degreesDiff = Math.Abs(Vector3.SignedAngle((Vector3) scaledVector, Vector3.up, Vector3.forward));
+        double scaledXZ = Math.Sqrt(Math.Pow(scaledVector.x, 2) + Math.Pow(scaledVector.z, 2));
+        double radiansOffset = Math.Atan2(scaledVector.y, scaledXZ); // proportion of Pi / 2 to offset
+        double startingRadians = (degreesDiff * Mathf.Deg2Rad) + radiansOffset;
+
+        // NB: "Vector3d" class doesn't include "Vector3.SignedAngle", so have to settle on floats (which is fine)
 
         // full distance of "a", with its scale restored (since the above is ratio-based)
-        float a = scaledDistance / (1 - eccentricity);
-        float b = Mathf.Sqrt(Mathf.Pow(a, 2) - Mathf.Pow(a * eccentricity, 2));
+        double a = scaledDistance / (1 - eccentricity);
+        double b = Math.Sqrt(Math.Pow(a, 2) - Math.Pow(a * eccentricity, 2));
 
         // ellipse components (A and B are vertex and co-vertex respectively)
-        Vector3 A = a * scaledVector.normalized;
-        Vector3 B = b * Vector3.Cross(scaledVector, Vector3.up).normalized;
-        Vector3 orbitCentre = scaledEdge - A;
+        Vector3d A = a * scaledVector.normalized;
+        Vector3d B = b * Vector3d.Cross(scaledVector, Vector3d.up).normalized;
+        Vector3d orbitCentre = scaledEdge - A;
 
         // calculations (for reference - figured out with desmos and intuition + sources above!):
         // * NOTE: the orbit is considered a VERTICAL ellipse!
@@ -173,23 +141,23 @@ public class RenderingHandler
         for (int p = 0; p <= resolution; p++)
         {
             // equation-based path prediction
-            float progress = (float) p / resolution;
-            float radians = startingRadians + orbitDirection * (progress * 2 * Mathf.PI);
+            double progress = (double) p / resolution;
+            double radians = startingRadians + orbitDirection * (progress * 2 * Math.PI);
 
             // * METHOD 1: plain circle along plane Y = 0
-            // float x = Mathf.Cos(radians) * scaledRadius;
-            // float z = Mathf.Sin(radians) * scaledRadius;
-            // points[p] = scaledCentre + new Vector3(x, 0, z);
+            // double x = Math.Cos(radians) * scaledRadius;
+            // double z = Math.Sin(radians) * scaledRadius;
+            // points[p] = scaledCentre + new Vector3d(x, 0, z);
             
             // * METHOD 2: plain circle along any axis
-            // Vector3 U = scaledDistance * Mathf.Cos(radians);
-            // Vector3 V = scaledDistance * Mathf.Sin(radians);
+            // Vector3d U = scaledDistance * Math.Cos(radians);
+            // Vector3d V = scaledDistance * Math.Sin(radians);
             // points[p] = orbitCentre + U + V;
 
             // * METHOD 3: ellipse along any axis  
-            Vector3 U = B * Mathf.Cos(radians);
-            Vector3 V = A * Mathf.Sin(radians); // adding aE doesn't work here - not sure why...
-            points[p] = orbitCentre + U + V;
+            Vector3d U = B * Math.Cos(radians);
+            Vector3d V = A * Math.Sin(radians); // adding aE doesn't work here - not sure why...
+            points[p] = (Vector3) (orbitCentre + U + V);
         }
 
         satellite.Line.SetPositions(points);

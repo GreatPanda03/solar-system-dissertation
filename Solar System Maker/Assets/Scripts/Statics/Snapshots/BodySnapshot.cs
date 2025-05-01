@@ -13,14 +13,14 @@ public class BodySnapshot
         set => id = value;
     }
 
-    private Vector3 position;
-    public Vector3 Position {
+    private Vector3d position;
+    public Vector3d Position {
         get => position;
         set => position = value;
     }
 
-    private Vector3 velocity;
-    public Vector3 Velocity {
+    private Vector3d velocity;
+    public Vector3d Velocity {
         get => velocity;
         set => velocity = value;
     }

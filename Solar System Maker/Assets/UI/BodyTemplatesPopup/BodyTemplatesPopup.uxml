@@ -16,8 +16,8 @@
                         <ui:Label text="Template TItle" name="Title" class="viewerTitle" style="display: flex; white-space: normal;" />
                         <ui:Label text="This is some sample text about our solar system!" name="Description" class="viewerDescription" style="height: auto; display: flex;" />
                         <ui:VisualElement name="Footer" class="footer" style="flex-grow: 1; flex-basis: 5%; display: flex; max-height: 10%; margin-top: 5px;">
-                            <ui:Button text="Delete" name="Delete" />
                             <ui:Button text="Select" name="Select" />
+                            <ui:Button text="Delete" name="Delete" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>

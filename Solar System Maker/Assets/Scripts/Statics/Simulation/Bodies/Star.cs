@@ -14,14 +14,14 @@ public class Star : Body
 
     #region Attributes
 
-    protected float luminosity;
-    public float Luminosity {
+    protected double luminosity;
+    public double Luminosity {
         get => luminosity;
         set => luminosity = value;
     }
 
     // mass is already a property of Body - this scales luminosity with mass instead
-    public override float Mass {
+    public override double Mass {
         get => mass;
         set {
             base.Mass = mass; // use body's "Mass" property
@@ -32,7 +32,7 @@ public class Star : Body
     }
 
     // ^ ditto for surface temperature
-    public override float SurfaceTemp {
+    public override double SurfaceTemp {
         get => surfaceTemp;
         set => surfaceTemp = value;
     }
@@ -46,12 +46,12 @@ public class Star : Body
     public Star() : base()
     {
         name = "Star";
-        mass = (float) UnitReference.MASS_UNITS["Sun"];
-        radius = (float) UnitReference.DISTANCE_UNITS["Solar Radius"];
+        mass = (double) UnitReference.MASS_UNITS["Sun"];
+        radius = (double) UnitReference.DISTANCE_UNITS["Solar Radius"];
         surfaceTemp = CalculateSurfaceTemperature(radius, luminosity);
         angularVelocity = 2.7e-6f;
 
-        luminosity = (float) UnitReference.LUMINOSITY_UNITS["Sun"];
+        luminosity = (double) UnitReference.LUMINOSITY_UNITS["Sun"];
 
         density = GetDensityFromMassAndVolume();
     }
@@ -63,24 +63,24 @@ public class Star : Body
 
     // class-wide method to return star luminosity by mass
     // * source: https://en.wikipedia.org/wiki/Mass%E2%80%93luminosity_relation
-    public static float CalculateLuminosity(float mass)
+    public static double CalculateLuminosity(double mass)
     {
-        float luminosity;
+        double luminosity;
 
-        float SUN_MASS = (float) UnitReference.MASS_UNITS["Sun"];
-        float SUN_LUMINOSITY = (float) UnitReference.LUMINOSITY_UNITS["Sun"];
+        double SUN_MASS = (double) UnitReference.MASS_UNITS["Sun"];
+        double SUN_LUMINOSITY = (double) UnitReference.LUMINOSITY_UNITS["Sun"];
 
         if (mass < 0.43 * SUN_MASS)
         {
-            luminosity = 0.23f * Mathf.Pow(SUN_MASS / mass, 2.3f) * SUN_LUMINOSITY;
+            luminosity = 0.23f * Math.Pow(SUN_MASS / mass, 2.3f) * SUN_LUMINOSITY;
         }
         else if (mass < 2 * SUN_MASS)
         {
-            luminosity = Mathf.Pow(mass / SUN_MASS, 4) * SUN_LUMINOSITY;
+            luminosity = Math.Pow(mass / SUN_MASS, 4) * SUN_LUMINOSITY;
         }
         else if (mass < 55 * SUN_MASS)
         {
-            luminosity = 1.4f * Mathf.Pow(mass / SUN_MASS, 3.5f) * SUN_LUMINOSITY;
+            luminosity = 1.4f * Math.Pow(mass / SUN_MASS, 3.5f) * SUN_LUMINOSITY;
         }
         else
         {
@@ -92,10 +92,10 @@ public class Star : Body
 
     // class-wide method to return star surface temperature from luminosity amd radius
     // * source: https://en.wikipedia.org/wiki/Effective_temperature
-    public static float CalculateSurfaceTemperature(float radius, float luminosity)
+    public static double CalculateSurfaceTemperature(double radius, double luminosity)
     {
-        float temperature = Mathf.Pow(
-            luminosity / (4 * Mathf.PI) / Mathf.Pow(radius, 2) / (float) UnitReference.STEFAN_BOLTZMANN, 
+        double temperature = Math.Pow(
+            luminosity / (4 * Math.PI) / Math.Pow(radius, 2) / (double) UnitReference.STEFAN_BOLTZMANN, 
             0.25f);
 
         return temperature;

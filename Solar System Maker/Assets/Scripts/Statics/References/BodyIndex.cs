@@ -18,10 +18,10 @@ public static class BodyIndex
                 Body = new Star()
                 {
                     Name = "Sun",
-                    Mass = (float) UnitReference.MASS_UNITS["Sun"],
-                    Radius = (float) UnitReference.DISTANCE_UNITS["Solar Radius"],
+                    Mass = (double) UnitReference.MASS_UNITS["Sun"],
+                    Radius = (double) UnitReference.DISTANCE_UNITS["Solar Radius"],
                     AngularVelocity = 2.7e-6f,
-                    Texture = Resources.Load<Material>("Materials/Specific/Sun")
+                    Texture = "Materials/Specific/Sun"
                 }
             }
         },
@@ -37,10 +37,11 @@ public static class BodyIndex
                 Body = new Planet()
                 {
                     Name = "Earth",
-                    Mass = (float) UnitReference.MASS_UNITS["Earth"],
-                    Radius = (float) UnitReference.DISTANCE_UNITS["Earth Radius"],
+                    Mass = (double) UnitReference.MASS_UNITS["Earth"],
+                    Radius = (double) UnitReference.DISTANCE_UNITS["Earth Radius"],
                     AngularVelocity = 7.29e-5f,
-                    Texture = Resources.Load<Material>("Materials/Specific/Earth")
+                    Texture = "Materials/Specific/Earth",
+                    Tilt = Quaternion.Euler(0, 0, 23.5f)
                 }
             }
         }
@@ -56,10 +57,10 @@ public static class BodyIndex
                 Body = new Moon()
                 {
                     Name = "Moon",
-                    Mass = (float) UnitReference.MASS_UNITS["Moon"],
+                    Mass = (double) UnitReference.MASS_UNITS["Moon"],
                     Radius = 1.74e6f,
                     AngularVelocity = 2.661_7e-6f,
-                    Texture = Resources.Load<Material>("Materials/Specific/Moon")
+                    Texture = "Materials/Specific/Moon"
                 }
             }
         }

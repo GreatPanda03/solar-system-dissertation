@@ -77,9 +77,9 @@ public class NewSimulationHandler
 
         // description can be blank
         
-        var gravitationalConstant = ui.Q<VisualElement>("GravitationalConstant").Q<FloatField>("Input");
+        var gravitationalConstant = ui.Q<VisualElement>("GravitationalConstant").Q<DoubleField>("Input");
 
-        if (gravitationalConstant.value == float.NaN || gravitationalConstant.value == 0)
+        if (gravitationalConstant.value == double.NaN || gravitationalConstant.value == 0)
         {
             DisplayValidation("<b>'G'</b> must be greater than 0!");
             return false;
@@ -93,7 +93,7 @@ public class NewSimulationHandler
     {
         var name = ui.Q<VisualElement>("Name").Q<TextField>("Input");
         var description = ui.Q<VisualElement>("Description").Q<TextField>("Input");
-        var gravitationalConstant = ui.Q<VisualElement>("GravitationalConstant").Q<FloatField>("Input");
+        var gravitationalConstant = ui.Q<VisualElement>("GravitationalConstant").Q<DoubleField>("Input");
 
         return new()
         {

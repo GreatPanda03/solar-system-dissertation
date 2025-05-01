@@ -11,7 +11,7 @@
                 <ui:VisualElement name="Fields" style="flex-grow: 1;">
                     <ui:TextField label="Name" placeholder-text="(blank)" name="Name" select-all-on-focus="false" select-all-on-mouse-up="false" style="color: rgb(255, 255, 255);" />
                     <ui:TextField label="Description" placeholder-text="(blank)" name="Description" select-all-on-focus="false" select-all-on-mouse-up="false" />
-                    <ui:FloatField label="G (relative)" value="0" name="GravitationalConstant" placeholder-text="(blank)" />
+                    <ui:DoubleField label="G (relative)" value="0" name="GravitationalConstant" placeholder-text="(blank)" tooltip="Gravitational Constant (relative)" />
                     <ui:DropdownField label="Collisions" name="CollisionQuality" choices="None,Low,High" />
                     <ui:FloatField label="Trail Time (s)" value="0" name="TrailTime" placeholder-text="(blank)" />
                 </ui:VisualElement>

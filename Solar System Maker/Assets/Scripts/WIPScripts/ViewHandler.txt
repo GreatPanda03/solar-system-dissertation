@@ -24,24 +24,24 @@ public class ViewHandler
         set => rotation = value;
     }
 
-    private Vector3 scaledPosition;     // world position of view (not space position)
-    public Vector3 ScaledPosition {     // - used by renderer
+    private Vector3d scaledPosition;     // world position of view (not space position)
+    public Vector3d ScaledPosition {     // - used by renderer
         get => scaledPosition;
         set => scaledPosition = value;
     }
 
     // fixed mode
-    public Vector3 fixedPoint;
-    public float fixedDistance;
+    public Vector3d fixedPoint;
+    public double fixedDistance;
     public Quaternion fixedAngle;
 
     // free mode
-    public float sensitivity;
-    public float speed;
-    public float slowRate;
-    public float normalRate;
-    public float fastRate;
-    private float currentSpeed;
+    public double sensitivity;
+    public double speed;
+    public double slowRate;
+    public double normalRate;
+    public double fastRate;
+    private double currentSpeed;
 
     // follow mode
     private RenderableBody subject;
@@ -50,8 +50,8 @@ public class ViewHandler
         set => subject = value;
     }
 
-    private float followDistance;
-    public float FollowDistance {
+    private double followDistance;
+    public double FollowDistance {
         get => followDistance;
         set => followDistance = value;
     }
@@ -66,7 +66,7 @@ public class ViewHandler
         cameraMode = Mode.Fixed;
         rotation = Camera.main.transform.rotation;
 
-        fixedPoint = Vector3.zero;
+        fixedPoint = Vector3d.zero;
         fixedDistance = 30f;
         fixedAngle = Quaternion.Euler(25f, 225, 0);
 
@@ -87,11 +87,11 @@ public class ViewHandler
     // restricts the given Quaternion's pitch to the given range
     // * mainly to stop the camera from going crazy when looking directly up or down
     public Quaternion RestrictQuaternionPitch(
-        Quaternion rotation, float lowerPitch, float upperPitch)
+        Quaternion rotation, double lowerPitch, double upperPitch)
     {
-        Vector3 euler = rotation.eulerAngles;
+        Vector3d euler = rotation.eulerAngles;
         if (euler.x > 180) euler.x -= 360; // wrap around
-        euler.x = Mathf.Clamp(euler.x, lowerPitch, upperPitch);
+        euler.x = Math.Clamp(euler.x, lowerPitch, upperPitch);
 
         return Quaternion.Euler(euler.x, euler.y, 0);
     }
@@ -125,7 +125,7 @@ public class ViewHandler
     // rotates the camera around the origin at an elevation and angle
     private void RunFixedMode()
     {
-        Camera.main.transform.position = fixedPoint + fixedAngle * new Vector3(0, 0, -fixedDistance);
+        Camera.main.transform.position = fixedPoint + fixedAngle * new Vector3d(0, 0, -fixedDistance);
         Camera.main.transform.rotation = fixedAngle;
 
         // scaledPosition = point + rotation * offset;
@@ -160,7 +160,7 @@ public class ViewHandler
     {
         if (UIController.FocusedField != null) return;
 
-        Vector3 input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+        Vector3d input = new(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
         
         if (Input.GetKey(AppControls.keybinds["Move Slower"]))
         {
@@ -177,7 +177,7 @@ public class ViewHandler
 
         currentSpeed *= speed;
 
-        Vector3 change = rotation * input * currentSpeed * Time.deltaTime;
+        Vector3d change = rotation * input * currentSpeed * Time.deltaTime;
         scaledPosition += change;
 
         Camera.main.transform.rotation = rotation;
@@ -192,7 +192,7 @@ public class ViewHandler
             y = Input.GetAxis("Mouse X") * sensitivity
         };
 
-        Vector3 euler = rotation.eulerAngles;
+        Vector3d euler = rotation.eulerAngles;
 
         Quaternion cameraRotation = Quaternion.Euler(euler.x, euler.y, 0);
         Quaternion addedRotation = Quaternion.Euler(mouseChange.x, mouseChange.y, 0);
@@ -225,7 +225,7 @@ public class ViewHandler
         if (subject?.Entity != null)
         {
             scaledPosition = subject.Entity.transform.position 
-                + rotation * new Vector3(0, 0, -followDistance);
+                + rotation * new Vector3d(0, 0, -followDistance);
         }
 
         CameraMode = Mode.Free;
@@ -253,7 +253,7 @@ public class ViewHandler
             Cursor.lockState = CursorLockMode.None;
         }
 
-        Vector3 orientation = Camera.main.transform.rotation.eulerAngles;
+        Vector3d orientation = Camera.main.transform.rotation.eulerAngles;
 
         Quaternion currentRotation = Quaternion.Euler(orientation.x, orientation.y, 0);
         Quaternion addedRotation = Quaternion.Euler(mouseChange.x, mouseChange.y, 0);
@@ -261,8 +261,8 @@ public class ViewHandler
 
         combinedRotation = RestrictQuaternionPitch(combinedRotation, -80, 80);
 
-        Vector3 origin = subject.Entity.transform.position;
-        Vector3 offset = combinedRotation * new Vector3(0, 0, -followDistance);
+        Vector3d origin = subject.Entity.transform.position;
+        Vector3d offset = combinedRotation * new Vector3d(0, 0, -followDistance);
         
         Camera.main.transform.position = origin + offset;
         Camera.main.transform.rotation = combinedRotation;

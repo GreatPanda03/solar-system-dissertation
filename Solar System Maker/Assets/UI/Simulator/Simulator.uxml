@@ -62,7 +62,7 @@
                         <ui:FloatField label="Density(kg/m&lt;sup&gt;3&lt;/sup&gt;)" value="10" name="Density" tooltip="Density" placeholder-text="(blank)" class="propertiesField" />
                         <ui:FloatField label="Speed (d/t)" value="10" name="Speed_custom" placeholder-text="(blank)" readonly="true" tooltip="Speed" class="propertiesField" />
                         <ui:FloatField label="Accel. (d/t&lt;sup&gt;2&lt;/sup&gt;)" value="10" name="Acceleration_custom" placeholder-text="(blank)" readonly="true" focusable="true" tooltip="Acceleration" class="propertiesField" />
-                        <ui:FloatField label="Rotations (t)" value="10" name="Rotations_custom" placeholder-text="(blank)" readonly="true" focusable="false" tooltip="Rotations" class="propertiesField" />
+                        <ui:FloatField label="Rotations (rpt)" value="10" name="Rotations_custom" placeholder-text="(blank)" readonly="true" focusable="false" tooltip="Rotations" class="propertiesField" />
                     </ui:VisualElement>
                 </ui:GroupBox>
                 <ui:GroupBox name="Star" class="propertiesGroup" style="display: flex;">

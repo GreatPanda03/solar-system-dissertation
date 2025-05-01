@@ -12,21 +12,21 @@ public class SubBody : Body
     #region Attributes
 
     // * source for temperature stuff: https://www.youtube.com/watch?v=pRs9v_Ze55w
-    protected float albedo;
-    public float Albedo {
+    protected double albedo;
+    public double Albedo {
         get => albedo;
         set => albedo = value;
     }
 
-    protected float emissivity;
-    public float Emissivity {
+    protected double emissivity;
+    public double Emissivity {
         get => emissivity;
         set => emissivity = value;
     }
 
-    protected float powerAbsorbed; // used similarly to velocity to determine position
+    protected double powerAbsorbed; // used similarly to velocity to determine position
     [JsonIgnore] // 0 between frames
-    public float PowerAbsorbed {
+    public double PowerAbsorbed {
         get => powerAbsorbed;
         set => powerAbsorbed = value;
     }

@@ -14,8 +14,8 @@ public class Planet : SubBody
 
     #region Attributes
 
-    protected float habitability;
-    public float Habitability {
+    protected double habitability;
+    public double Habitability {
         get => habitability;
         set => habitability = value;
     }
@@ -27,8 +27,8 @@ public class Planet : SubBody
     }
     */
 
-    protected float waterContent;
-    public float WaterContent {
+    protected double waterContent;
+    public double WaterContent {
         get => waterContent;
         set => waterContent = value;
     }
@@ -42,8 +42,8 @@ public class Planet : SubBody
     public Planet() : base()
     {
         name = "Planet";
-        mass = (float) UnitReference.MASS_UNITS["Earth"];
-        radius = (float) UnitReference.DISTANCE_UNITS["Earth Radius"];
+        mass = (double) UnitReference.MASS_UNITS["Earth"];
+        radius = (double) UnitReference.DISTANCE_UNITS["Earth Radius"];
         angularVelocity = 7.29e-5f;
         
         // source: https://climatepuzzles.org/technical/surface-emissivity/

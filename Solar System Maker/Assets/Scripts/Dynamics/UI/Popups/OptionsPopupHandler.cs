@@ -74,7 +74,7 @@ public class OptionsPopupHandler : IPopup
         Settings settings = simController.simulation.settings;
         popup.Q<TextField>("Name").value = settings.Name;
         popup.Q<TextField>("Description").value = settings.Description;
-        popup.Q<FloatField>("GravitationalConstant").value = settings.GravitationalConstant;
+        popup.Q<DoubleField>("GravitationalConstant").value = settings.GravitationalConstant;
         popup.Q<DropdownField>("CollisionQuality").value = simController.physics.collisionQuality.ToString();
         popup.Q<FloatField>("TrailTime").value = simController.TrailTime;
     }
@@ -97,9 +97,9 @@ public class OptionsPopupHandler : IPopup
 
         // description can be blank
         
-        var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
+        var gravitationalConstant = popup.Q<DoubleField>("GravitationalConstant");
 
-        if (gravitationalConstant.value == float.NaN 
+        if (gravitationalConstant.value == double.NaN 
             || gravitationalConstant.text == ""
             || gravitationalConstant.value == 0)
         {
@@ -141,7 +141,7 @@ public class OptionsPopupHandler : IPopup
     {
         var name = popup.Q<TextField>("Name");
         var description = popup.Q<TextField>("Description");
-        var gravitationalConstant = popup.Q<FloatField>("GravitationalConstant");
+        var gravitationalConstant = popup.Q<DoubleField>("GravitationalConstant");
 
         return new()
         {

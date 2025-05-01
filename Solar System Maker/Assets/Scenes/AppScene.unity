@@ -282,7 +282,7 @@ MonoBehaviour:
   centre: {x: 0, y: 0, z: 0}
   offset: {x: 15, y: 10, z: 15}
   angle: {x: 27.5, y: 225, z: 0}
-  sensitivity: 10
+  sensitivity: 5
   speed: 10
   slowRate: 0.2
   normalRate: 1
@@ -340,7 +340,7 @@ MonoBehaviour:
     settings:
       name: New Simulation
       description: 
-      gravitationalConstant: 0.01
+      gravitationalConstant: 0.009999999776482582
     bodies: []
   simulatorSpace: {fileID: 562911921}
   simulatorPlane: {fileID: 895624876}
@@ -409,7 +409,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1000, y: 1000, z: 1}
+  m_LocalScale: {x: 100000, y: 100000, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 443073568}

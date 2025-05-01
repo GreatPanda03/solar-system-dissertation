@@ -24,8 +24,8 @@ public class Settings
     }
 
     [SerializeField]
-    private float gravitationalConstant; // relative to unit G
-    public float GravitationalConstant {
+    private double gravitationalConstant; // relative to unit G
+    public double GravitationalConstant {
         get => gravitationalConstant;
         set => gravitationalConstant = value;
     }

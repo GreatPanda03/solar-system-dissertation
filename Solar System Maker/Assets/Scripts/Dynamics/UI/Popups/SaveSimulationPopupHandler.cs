@@ -62,6 +62,7 @@ public class SaveSimulationPopupHandler : IPopup
 
             DataHandler.SimulationSaves.Add(newSave);
             simulation.id = newSave.id;
+            simulation.settings = settings;
 
             // TODO: change this so that it's not specific!
             parent.Q<VisualElement>("Toolbar").Q<Label>("Title").text = newSave.settings.Name;

@@ -1,8 +1,12 @@
 // represents vectors with double values rather than floats
 
+// * Originally written by: Kris Holdich, Philipp Koller, and Neil Benoit
 // * source: https://github.com/sldsmkd/vector3d/blob/master/Vector3d.cs
 
+// * used for my own project for higher-precision calculations
+
 using System;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public struct Vector3d {
@@ -41,18 +45,21 @@ public struct Vector3d {
         }
     }
 
+    [JsonIgnore]
     public Vector3d normalized {
         get {
             return Vector3d.Normalize(this);
         }
     }
 
+    [JsonIgnore]
     public double magnitude {
         get {
             return Math.Sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         }
     }
 
+    [JsonIgnore]
     public double sqrMagnitude {
         get {
             return this.x * this.x + this.y * this.y + this.z * this.z;
@@ -172,6 +179,12 @@ public struct Vector3d {
 
     public static explicit operator Vector3(Vector3d vector3d) {
         return new Vector3((float)vector3d.x, (float)vector3d.y, (float)vector3d.z);
+    }
+
+    // added myself (auto-generated)
+    public static explicit operator Vector3d(Vector3 v)
+    {
+        return new Vector3d(v.x, v.y, v.z);
     }
 
     public static Vector3d Lerp(Vector3d from, Vector3d to, double t) {

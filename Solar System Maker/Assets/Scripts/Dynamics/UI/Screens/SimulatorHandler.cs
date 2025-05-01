@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -26,8 +27,7 @@ public class SimulatorHandler
     public VisualTreeAsset bodyTemplatePopup;
     
     private string selectedBodyItem;
-    private VisualElement focusedField;
-    private Vector3 lastVelocity = Vector3.zero; // temporary - only for acceleration field
+    private Vector3d lastVelocity = Vector3d.zero; // temporary - only for acceleration field
 
     #endregion Attributes
 
@@ -148,7 +148,7 @@ public class SimulatorHandler
         
         ApplyExplorerFilters();
 
-        if (simController.bodies.Count > 0)
+        if (simController.rBodies.Count > 0)
         {
             ui.Q<Label>("NoBodies").style.display = DisplayStyle.None;
         }
@@ -177,7 +177,7 @@ public class SimulatorHandler
         UpdateProperties(null);
     }
 
-    public void OnScaleChanged(float newScale)
+    public void OnScaleChanged(double newScale)
     {
         UpdateScaleLabel();
     }
@@ -190,15 +190,15 @@ public class SimulatorHandler
         }
     }
 
-    public void OnOrbitChanged(float eccentricity, Body attractor)
+    public void OnOrbitChanged(double eccentricity, Body attractor)
     {
         ui.Q<Label>("Eccentricity").text = $"(Eccentricity = {eccentricity:0.000})";
 
         if (simController.Preview != null && attractor != null)
         {
-            float distance = (simController.Preview.Body.Position - attractor.Position).magnitude;
-            float scale = (float) UnitReference.DISTANCE_UNITS[simController.renderer.Distance]; // zoomFactor not used here
-            float scaledDistance = distance / scale;
+            double distance = (simController.Preview.Body.Position - attractor.Position).magnitude;
+            double scale = (double) UnitReference.DISTANCE_UNITS[simController.renderer.Distance]; // zoomFactor not used here
+            double scaledDistance = distance / scale;
             string unit = simController.renderer.Distance;
 
             ui.Q<Label>("OrbitRadius").text = $"(Orbit Radius = {scaledDistance} {unit}(s))";
@@ -643,27 +643,27 @@ public class SimulatorHandler
         };
 
         planeList.Q<Button>("Lower").clicked += () => {
-            simController.TranslatePlane(new Vector3(0, -1, 0));
+            simController.TranslatePlane(new Vector3d(0, -1, 0));
         };
 
         planeList.Q<Button>("Raise").clicked += () => {
-            simController.TranslatePlane(new Vector3(0, 1, 0));
+            simController.TranslatePlane(new Vector3d(0, 1, 0));
         };
         
         planeList.Q<Button>("TurnLeft").clicked += () => {
-            simController.TurnPlane(new Vector3(-1, 0, 0));
+            simController.TurnPlane(new Vector3d(-1, 0, 0));
         };
 
         planeList.Q<Button>("TurnRight").clicked += () => {
-            simController.TurnPlane(new Vector3(1, 0, 0));
+            simController.TurnPlane(new Vector3d(1, 0, 0));
         };
 
         planeList.Q<Button>("TurnBackwards").clicked += () => {
-            simController.TurnPlane(new Vector3(0, 0, -1));
+            simController.TurnPlane(new Vector3d(0, 0, -1));
         };
 
         planeList.Q<Button>("TurnForwards").clicked += () => {
-            simController.TurnPlane(new Vector3(0, 0, 1));
+            simController.TurnPlane(new Vector3d(0, 0, 1));
         };
 
         planeList.Q<Button>("Reset").clicked += () => {
@@ -915,7 +915,7 @@ public class SimulatorHandler
     {
         ClearExplorer();
 
-        List<RenderableBody> bodies = simController.bodies;
+        List<RenderableBody> bodies = simController.rBodies;
 
         if (bodies.Count > 0)
         {
@@ -1154,10 +1154,10 @@ public class SimulatorHandler
         foreach (VisualElement group in groups.Children())
         {
             Label title = group.Q<Label>("Title");
+            VisualElement container = group.Q<VisualElement>("Container");
 
             // collapsible groups on click
             title.RegisterCallback<ClickEvent>((e) => {
-                VisualElement container = group.Q<VisualElement>("Container");
                 bool visible = container.style.display == DisplayStyle.Flex;
 
                 if (!visible)
@@ -1173,7 +1173,7 @@ public class SimulatorHandler
             });
 
             // preparing each field accordingly
-            foreach (VisualElement field in group.Children())
+            foreach (VisualElement field in container.Children())
             {
                 string property = field.name;
 
@@ -1184,6 +1184,10 @@ public class SimulatorHandler
                 else if (field is FloatField floatField)
                 {
                     InitialisePropertyField(floatField, property);
+                }
+                else if (field is DoubleField doubleField)
+                {
+                    InitialisePropertyField(doubleField, property);
                 }
                 else if (field is Vector3Field vectorField)
                 {
@@ -1201,30 +1205,22 @@ public class SimulatorHandler
         {
             Body body = simController.SelectedBody.Body;
 
-            if (body == null) return;
-
             if (e.keyCode == KeyCode.Return && body != null)
             {
                 var value = field.value;
                 PropertyInfo info = body.GetType().GetProperty(property);
-                info.SetValue(body, field.value);
+                info.SetValue(body, Convert.ChangeType(value, info.PropertyType));
                 field.Blur(); // unfocuses the field
+
+                // special cases
+                if (info.Name == "Name")
+                {
+                    simController.SelectedBody.UpdateLabel(value.ToString());
+                }
 
                 RefreshExplorer();
             }
         }, TrickleDown.TrickleDown);
-
-        // ^ NB: "TrickleDown" makes it only require one Enter press
-
-        field.RegisterCallback<FocusEvent>((e) => // after gaining focus
-        {
-            focusedField = field;
-        });
-
-        field.RegisterCallback<FocusOutEvent>((e) => // before losing focus
-        {
-            focusedField = null;
-        });
     }
 
     // sets the visiblity of the properties window
@@ -1245,7 +1241,7 @@ public class SimulatorHandler
             groups.style.display = DisplayStyle.None;
             properties.Q<Label>("NoSelection").style.display = DisplayStyle.Flex;
             
-            lastVelocity = Vector3.zero;
+            lastVelocity = Vector3d.zero;
         }
         else 
         {
@@ -1269,30 +1265,43 @@ public class SimulatorHandler
                     // don't update when focused (to permit editing)
                     if (field is TextField textField)
                     {
-                        if (focusedField == textField) continue;
-                        textField.value = (string) property.GetValue(body);
+                        if (UIController.FocusedField != textField) 
+                        {
+                            textField.value = (string) property.GetValue(body);
+                        }
                     } 
                     else if (field is FloatField floatField)
                     {
-                        if (focusedField == floatField) continue;
-                        floatField.value = (float) property.GetValue(body);
+                        if (UIController.FocusedField != floatField)
+                        {
+                            floatField.value = (float) (double) property.GetValue(body);
+                        }
+                    }
+                    else if (field is DoubleField doubleField)
+                    {
+                        if (UIController.FocusedField != doubleField)
+                        {
+                            doubleField.value = (double) property.GetValue(body);   
+                        }
                     } 
                     else if (field is Vector3Field vectorField)
                     {
-                        if (focusedField == vectorField) continue;
-                        vectorField.value = (Vector3) property.GetValue(body);
+                        if (UIController.FocusedField != vectorField)
+                        {
+                            vectorField.value = (Vector3) property.GetValue(body);
+                        }
                     }
                 }
             }
 
             // special case fields
-            float distanceScale = simController.renderer.Scale;
-            float timeScale = simController.physics.TimeCoefficient / Time.fixedDeltaTime;
-            float DTScale = distanceScale * timeScale;
+            double distanceScale = simController.renderer.Scale;
+            double timeScale = simController.physics.TimeCoefficient / Time.fixedDeltaTime;
+            double DTScale = distanceScale * timeScale;
 
-            properties.Q<FloatField>("Speed_custom").value = body.Velocity.magnitude * DTScale;
-            properties.Q<FloatField>("Acceleration_custom").value = (lastVelocity - body.Velocity).magnitude * DTScale;
-            properties.Q<FloatField>("Rotations_custom").value = body.AngularVelocity / (2 * MathF.PI) * timeScale;
+            properties.Q<FloatField>("Speed_custom").value = (float) (body.Velocity.magnitude * DTScale);
+            properties.Q<FloatField>("Acceleration_custom").value = (float) ((lastVelocity - body.Velocity).magnitude * DTScale);
+            properties.Q<FloatField>("Rotations_custom").value = (float) (body.AngularVelocity / (2 * Math.PI) * timeScale);
 
             lastVelocity = body.Velocity; // for acceleration
 

@@ -109,17 +109,32 @@ public class RenderableBody
         GameObject bodyPrefab = Resources.Load<GameObject>($"Prefabs/Body");
         entity = GameObject.Instantiate(bodyPrefab);
         entity.name = body.Name;
-        entity.transform.position = body.Position;
+        entity.transform.position = (Vector3) body.Position;
 
         if (body.Texture != null)
         {
-            entity.GetComponent<MeshRenderer>().material = body.Texture;
+            Material material = Resources.Load<Material>(body.Texture);
+
+            if (material != null)
+            {
+                entity.GetComponent<MeshRenderer>().material = material;
+            }    
+            else
+            {
+                ApplyDefaultTexture();
+            }
         }
         else
         {
-            entity.GetComponent<MeshRenderer>().material // standard material
-                = Resources.Load<Material>($"Materials/Generic/{body.GetType()}");
+            ApplyDefaultTexture();
         }
+    }
+
+    // applies the default texture the body (determined by type)
+    public void ApplyDefaultTexture()
+    {
+        entity.GetComponent<MeshRenderer>().material // standard material
+                = Resources.Load<Material>($"Materials/Generic/{body.GetType()}");
     }
 
     // creates all decorators for the entity
@@ -128,6 +143,19 @@ public class RenderableBody
         CreateLabel();
         CreateLine();
         CreateTrail();
+    }
+
+    // renders the body in physical space at the given scale
+    public void RenderBody(double scale)
+    {
+        if (entity == null || body == null) return;
+
+        Transform transform = entity.transform;
+        transform.position = (Vector3) (scale * body.Position);
+        transform.localScale = (Vector3) (body.Radius * 2 * scale * Vector3d.one);
+
+        transform.rotation = body.Tilt 
+            * Quaternion.Euler(0, (float) body.Rotation * Mathf.Rad2Deg, 0);
     }
     
     // destroys the entity's physical components
@@ -159,6 +187,32 @@ public class RenderableBody
         label.name = "Label";
         label.GetComponent<TextMeshProUGUI>().text = body.Name;
         label.transform.SetParent(GameObject.Find("Overlay").transform, false);
+    }
+
+    // renders the given body's label at the given scale
+    // * positions the label at "top right" of body, relative to the camera
+    public void RenderLabel()
+    {
+        if (entity == null || label == null) return;
+
+        float radius = entity.transform.localScale.magnitude / 2;
+
+        Transform origin = Camera.main.transform;
+        Vector3 position = entity.transform.position;
+        Vector3 edge = (origin.right + origin.up) * radius; // parallel to camera forward
+        Vector3 screenPoint = Camera.main.WorldToScreenPoint((Vector3) (position + edge));
+
+        label.transform.position = screenPoint;
+        label.GetComponent<TextMeshProUGUI>().enabled = screenPoint.z >= 0;
+
+        // ^ technically has a screen position even when BEHIND the camera
+        // * this check stops the label from showing up when behind the camera
+    }
+
+    // updates the label with the given text
+    public void UpdateLabel(string text)
+    {
+        label.GetComponent<TextMeshProUGUI>().text = text;
     }
 
     // sets the visibility of the body's label

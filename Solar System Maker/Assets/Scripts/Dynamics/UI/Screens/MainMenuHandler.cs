@@ -30,8 +30,7 @@ public class MainMenuHandler
         ui.Q<Button>("ExitApp").clicked += OnExitClicked;
 
         // loading a sample simulation
-        List<Body> bodies = SystemGenerator.GenerateMenuSystem(
-            (float) UnitReference.G); // actual G
+        List<Body> bodies = SystemGenerator.GenerateMenuSystem(UnitReference.G); // actual G
 
         Simulation simulation = new()
         {

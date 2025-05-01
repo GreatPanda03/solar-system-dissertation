@@ -24,8 +24,8 @@ public class Body
         set => name = value;
     }
 
-    private Material texture;
-    public Material Texture {
+    private string texture; // the path of the material to use, if any
+    public string Texture {
         get => texture;
         set => texture = value;
     }
@@ -38,14 +38,14 @@ public class Body
 
             if (anchored)
             {
-                acceleration = Vector3.zero;
-                velocity = Vector3.zero;
+                acceleration = Vector3d.zero;
+                velocity = Vector3d.zero;
             }
         }
     }
 
-    protected float mass;
-    public virtual float Mass {
+    protected double mass;
+    public virtual double Mass {
         get => mass;
         set {
             mass = value;
@@ -53,8 +53,8 @@ public class Body
         }
     }
 
-    protected float radius;
-    public virtual float Radius {
+    protected double radius;
+    public virtual double Radius {
         get => radius;
         set { 
             radius = value;
@@ -62,33 +62,33 @@ public class Body
         }
     }
 
-    protected Vector3 position;
-    public virtual Vector3 Position {
+    protected Vector3d position;
+    public virtual Vector3d Position {
         get => position; 
         set => position = value; 
     }
 
-    protected Vector3 velocity;
-    public virtual Vector3 Velocity {
+    protected Vector3d velocity;
+    public virtual Vector3d Velocity {
         get => velocity; 
         set => velocity = value; 
     }
 
-    protected Vector3 acceleration;
+    protected Vector3d acceleration;
     [JsonIgnore] // 0 between frames
-    public virtual Vector3 Acceleration {
+    public virtual Vector3d Acceleration {
         get => acceleration; 
         set => acceleration = value; 
     }
 
-    protected float surfaceTemp;
-    public virtual float SurfaceTemp {
+    protected double surfaceTemp;
+    public virtual double SurfaceTemp {
         get => surfaceTemp; 
         set => surfaceTemp = value; 
     }
 
-    protected float density;
-    public virtual float Density {
+    protected double density;
+    public virtual double Density {
         get => density; 
         set {
             density = value;
@@ -96,20 +96,20 @@ public class Body
         }
     }
 
-    protected Vector3 axis; // axis of rotation, relative to plane Y = 0
-    public virtual Vector3 Axis {
-        get => axis;
-        set => axis = value;
+    protected Quaternion tilt; // axis of rotation, relative to plane Y = 0
+    public virtual Quaternion Tilt {
+        get => tilt;
+        set => tilt = value;
     }
 
-    protected float rotation; // radians around axis
-    public virtual float Rotation {
+    protected double rotation; // radians around axis
+    public virtual double Rotation {
         get => rotation;
         set => rotation = value;
     }
 
-    protected float angularVelocity; // measured in radians/s
-    public virtual float AngularVelocity {
+    protected double angularVelocity; // measured in radians/s
+    public virtual double AngularVelocity {
         get => angularVelocity;
         set {
             angularVelocity = value;
@@ -125,13 +125,13 @@ public class Body
     {
         name = "Body";
         mass = 10f;
-        position = new Vector3(0,0,0);
-        velocity = new Vector3(0,0,0);
-        acceleration = new Vector3(0,0,0);
+        position = new Vector3d(0,0,0);
+        velocity = new Vector3d(0,0,0);
+        acceleration = new Vector3d(0,0,0);
         surfaceTemp = 0f;
         density = 1f;
         angularVelocity = 1 * Mathf.Deg2Rad;
-        axis = Vector3.up;
+        tilt = Quaternion.Euler(0,0,0);
 
         radius = GetRadiusFromMassAndDensity();
     }
@@ -163,18 +163,18 @@ public class Body
 
     #region Metric Methods
 
-    public float GetVolume()
+    public double GetVolume()
     {
-        return 4f / 3f * Mathf.PI * Mathf.Pow(radius, 3);
+        return 4f / 3f * Math.PI * Math.Pow(radius, 3);
     }
 
     // auxiliary: returns values in relation to "p = m / v"
-    public float GetRadiusFromMassAndDensity()
+    public double GetRadiusFromMassAndDensity()
     {
-        return Mathf.Pow(mass / density * 0.75f / Mathf.PI, 1f / 3f);
+        return Math.Pow(mass / density * 0.75f / Math.PI, 1f / 3f);
     }
 
-    public float GetDensityFromMassAndVolume()
+    public double GetDensityFromMassAndVolume()
     {
         return mass / GetVolume();
     }

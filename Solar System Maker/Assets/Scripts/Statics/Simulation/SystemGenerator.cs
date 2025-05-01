@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SystemGenerator
 {
-    public static List<Body> GenerateMenuSystem(float G) // actual G
+    public static List<Body> GenerateMenuSystem(double G) // actual G
     {
         List<Body> bodies = new();
         PhysicsHandler physics = new();
@@ -14,7 +14,7 @@ public class SystemGenerator
         Star star = new()
         {
             Name = "Star",
-            Position = new Vector3(0,0,0),
+            Position = new Vector3d(0,0,0),
         };
         
         bodies.Add(star);
@@ -25,12 +25,12 @@ public class SystemGenerator
             Vector2 offset = Random.insideUnitCircle.normalized 
                 * (float) UnitReference.DISTANCE_UNITS["AU"];
 
-            float elevation = (float) UnitReference.DISTANCE_UNITS["AU"]
+            double elevation = (double) UnitReference.DISTANCE_UNITS["AU"]
                 * Random.Range(-0.1f, 0.1f);
 
-            Vector3 position = star.Position 
-                + new Vector3(offset.x, 0, offset.y) * Mathf.Pow(p, 1.25f)
-                + new Vector3(0, elevation, 0);
+            Vector3d position = star.Position 
+                + new Vector3d(offset.x, 0, offset.y) * System.Math.Pow(p, 1.25f)
+                + new Vector3d(0, elevation, 0);
 
             Planet planet = new()
             {

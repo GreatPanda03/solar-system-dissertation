@@ -19,7 +19,7 @@ public class Moon : SubBody
     public Moon() : base()
     {
         name = "Moon";
-        mass = (float) UnitReference.MASS_UNITS["Moon"];
+        mass = (double) UnitReference.MASS_UNITS["Moon"];
         radius = 1.74e6f;
         angularVelocity = 2.661_7e-6f;
 
