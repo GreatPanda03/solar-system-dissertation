@@ -11,6 +11,23 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.16.1
+**Date:** 2025/05/01
+<br/>**Bug Fixes:**
+* **1)** Fixed orbit mode leaving trajectories when deleting attractors
+* **2)** Fixed body templates being saved with the original object rather than a copy
+* **3)** Fixed "Save As" simulation settings not reflecting after saving
+
+**Additions / Changes:**
+* **1)** Added new Vector3d data type to handle vectors with doubles instead of floats
+    * **Source:** https://github.com/sldsmkd/vector3d
+* **2)** Replaced most floating point values with doubles for calculation precision
+* **3)** Textures now save for a simulation save / body template (etc.)
+* **4)** The default Earth template now has a tilt
+* **5)** Swapped body templates popup load / delete buttons to be consistent with general system loading / deleting
+
+---
+
 ### Version: 1.16.0
 **Date:** 2025/05/01
 <br/>**Bug Fixes:**
