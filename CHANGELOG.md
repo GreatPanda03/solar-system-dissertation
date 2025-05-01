@@ -11,6 +11,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.16.4
+**Date:** 2025/05/01
+<br/>**Additions / Changes:**
+* **1)** Replaced plane rotation tools with plane offset tools to increase / decrease the current placement height when sticking to the plane *(same result as rotating)*
+* **2)** Remapped plane controls to be closer to WASD *(for convenience)*
+* **3)** Added Jupiter Radius as a distance and Jupiter as a template
+
+---
+
 ### Version: 1.16.3
 **Date:** 2025/05/01
 <br/>**Additions / Changes:**
