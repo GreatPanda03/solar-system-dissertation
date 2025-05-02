@@ -3,10 +3,7 @@
 //     given the appropriate bodies, values, etc.
 
 using System;
-using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class RenderingHandler
 {

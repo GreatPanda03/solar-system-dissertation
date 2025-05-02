@@ -18,19 +18,6 @@ public class SubBody : Body
         set => albedo = value;
     }
 
-    protected double emissivity;
-    public double Emissivity {
-        get => emissivity;
-        set => emissivity = value;
-    }
-
-    protected double powerAbsorbed; // used similarly to velocity to determine position
-    [JsonIgnore] // 0 between frames
-    public double PowerAbsorbed {
-        get => powerAbsorbed;
-        set => powerAbsorbed = value;
-    }
-
     #endregion Attributes
 
 
@@ -40,7 +27,6 @@ public class SubBody : Body
     public SubBody() : base() 
     {
         albedo = 0;
-        emissivity = 0.5f;
     }
 
     #endregion Constructor

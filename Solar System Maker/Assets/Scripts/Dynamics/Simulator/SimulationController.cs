@@ -577,23 +577,39 @@ public class SimulationController : MonoBehaviour
                     }
                 }
 
-                // temperature loop - special case for star / sub-body interaction
-                if (bodyA is Star star)
-                {
-                    foreach (RenderableBody rBody in rBodies)
-                    {
-                        if (rBody.Body is SubBody subBody)
-                        {
-                            double power = physics.GetPowerReceived(star, subBody);
-                            physics.ApplyPower(subBody, power);
-                        }
-                    }
-                }
-
                 // final update
                 physics.Update(bodyA, physics.TimeCoefficient);
                 
                 // bodyA.Update(Time.deltaTime);
+            }
+
+            // temperature loop - special case for star / sub-body interaction
+            List<Star> stars = new();
+            List<SubBody> subBodies = new();
+
+            foreach (Body body in simulation.bodies)
+            {
+                if (body is Star aStar)
+                {
+                    stars.Add(aStar);
+                }
+                else if (body is SubBody aSubBody)
+                {
+                    subBodies.Add(aSubBody);
+                }
+
+                foreach (SubBody subBody in subBodies)
+                {
+                    double flux = 0;
+
+                    foreach (Star star in stars)
+                    {
+                        flux += physics.GetFlux(star, subBody);
+                    }
+
+                    subBody.SurfaceTemp = physics.GetEffectiveTemperature(subBody, flux)
+                        - UnitReference.TEMPERATURE_UNITS["Kelvin"];
+                }
             }
 
             // removes any bodies marked for removal by physics

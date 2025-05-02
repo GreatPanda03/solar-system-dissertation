@@ -27,12 +27,6 @@ public class Planet : SubBody
     }
     */
 
-    protected double waterContent;
-    public double WaterContent {
-        get => waterContent;
-        set => waterContent = value;
-    }
-
     #endregion Attributes
 
 
@@ -48,10 +42,8 @@ public class Planet : SubBody
         
         // source: https://climatepuzzles.org/technical/surface-emissivity/
         albedo = 0.31f;
-        emissivity = 0.65f;
         
         habitability = 0;
-        waterContent = 0;
         
         density = GetDensityFromMassAndVolume();
     }

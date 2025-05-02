@@ -58,18 +58,6 @@ public class PhysicsHandler
         body.Velocity += body.Acceleration * dt;
         body.Position += body.Velocity * dt;
         body.Acceleration = Vector3d.zero;
-
-        // special case for sub-bodies
-        if (body is SubBody subBody)
-        {
-            double powerAbsorbed = subBody.PowerAbsorbed;
-            double powerRadiated = GetPowerRadiated(subBody);
-
-            subBody.SurfaceTemp = Math.Pow(powerAbsorbed - powerRadiated, 0.25f)
-                - (double) UnitReference.TEMPERATURE_UNITS["Celsius"];
-
-            subBody.PowerAbsorbed = 0;
-        }
     }
 
     #endregion General
@@ -222,42 +210,19 @@ public class PhysicsHandler
 
     #region Temperature
 
-    // returns the power absorbed by the given sub body from the given star
-    //   based on luminosity, planet radius, distance, and albedo
-    public double GetPowerReceived(Star star, SubBody body)
+    // returns the flux of the given star against the given body
+    public double GetFlux(Star star, Body body)
     {
-        double r = body.Radius;
-        double D = (star.Position - body.Position).magnitude;
-        
-        double numerator = star.Luminosity * (r*r); // albedo not considered here - see "Apply Power"
-        double denominator = 4 * D*D;
-
-        double powerReceived = numerator / denominator;
-
-        return powerReceived;
+        double d = (star.Position - body.Position).magnitude;
+        return star.Luminosity / (4 * Math.PI * d*d);
     }
 
-    // returns the power being emitted by the given body based on 
-    //   its current temperature and emissivity
-    public double GetPowerRadiated(SubBody body)
+    // returns the effective temperature of the given body the incoming flux
+    public double GetEffectiveTemperature(SubBody body, double flux)
     {
-        double r = body.Radius;
-
-        double power = body.Emissivity * (double) UnitReference.STEFAN_BOLTZMANN 
-            * Math.Pow(body.SurfaceTemp + (double) UnitReference.TEMPERATURE_UNITS["Kelvin"], 4);
-
-        double surfaceArea = 4 * Math.PI * (r*r);
-        
-        double powerRadiated = power * surfaceArea;
-        powerRadiated = powerRadiated == double.NaN ? double.MaxValue : powerRadiated;
-
-        return powerRadiated;
-    }
-
-    // applies the given power directly to the given sub-body
-    public void ApplyPower(SubBody body, double power)
-    {
-        body.PowerAbsorbed += power * (1 - body.Albedo);
+        double numerator = flux * (1 - body.Albedo);
+        double denominator = 4 * UnitReference.STEFAN_BOLTZMANN;
+        return Math.Pow(numerator / denominator, 0.25);
     }
 
     #endregion Temperature

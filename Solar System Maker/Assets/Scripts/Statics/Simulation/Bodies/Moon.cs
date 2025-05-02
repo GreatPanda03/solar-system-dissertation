@@ -8,7 +8,7 @@ public class Moon : SubBody
 
     #region Attributes
 
-    // ... no additional
+    // ... no additional attributes
 
     #endregion Attributes
 
@@ -25,7 +25,6 @@ public class Moon : SubBody
 
         // source: https://www.researchgate.net/figure/a-Emissivity-spectra-of-lunar-surface-samples-and-spectral-filters-of-the-three-bands_fig1_346092026
         albedo = 0.11f;
-        emissivity = 0.97f;
 
         density = GetDensityFromMassAndVolume();
     }

@@ -78,13 +78,11 @@
                     <ui:Label text="Planetary -" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
                     <ui:VisualElement name="Container" style="flex-grow: 1;">
                         <ui:FloatField label="Albedo" value="10" name="Albedo" tooltip="Albedo" class="propertiesField" />
-                        <ui:FloatField label="Emissivity" value="10" name="Emissivity" tooltip="Emissivity" readonly="false" class="propertiesField" />
                     </ui:VisualElement>
                 </ui:GroupBox>
                 <ui:GroupBox name="Planet" class="propertiesGroup" style="display: flex;">
                     <ui:Label text="Planet -" name="Title" class="propertiesTitle propertiesSubtitle" style="display: flex;" />
                     <ui:VisualElement name="Container" style="flex-grow: 1;">
-                        <ui:FloatField label="Water (%)" value="10" name="WaterContent" tooltip="Water Content" class="propertiesField" />
                         <ui:FloatField label="Habitability" value="10" name="Habitability" tooltip="Habitability" readonly="false" class="propertiesField" />
                     </ui:VisualElement>
                 </ui:GroupBox>
@@ -159,7 +157,7 @@
             <ui:Button name="Play" tooltip="Toggle Play" class="toolboxButton">
                 <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Time/Play&apos;);" />
             </ui:Button>
-            <ui:Button name="Flow" tooltip="Toggle Time Flow" class="toolboxButton">
+            <ui:Button name="Flow" tooltip="Toggle Time Flow" class="toolboxButton" style="display: none;">
                 <ui:VisualElement name="Icon" class="toolboxButtonIcon" style="background-image: resource(&apos;Icons/Toolbox/Time/Forward&apos;);" />
             </ui:Button>
             <ui:Button name="SlowTime" tooltip="Slow Time" class="toolboxButton">
