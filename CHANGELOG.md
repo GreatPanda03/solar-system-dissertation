@@ -11,6 +11,15 @@ All dates are in the form **YYYY/MM/DD**.
 
 ---
 
+### Version: 1.17.0
+**Date:** 2025/05/02
+<br/>**Additions / Changes:**
+* **1)** Replaced the temperature system with flux rather than power input / output
+* **2)** Removed Emissivity as a field for sub-bodies
+* **3)** Removed Water Content as a field for planets
+
+---
+
 ### Version: 1.16.4
 **Date:** 2025/05/01
 <br/>**Additions / Changes:**
