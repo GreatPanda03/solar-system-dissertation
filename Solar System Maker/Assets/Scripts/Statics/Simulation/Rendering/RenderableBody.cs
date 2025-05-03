@@ -201,7 +201,7 @@ public class RenderableBody
     {
         if (entity == null || label == null) return;
 
-        float radius = entity.transform.localScale.magnitude / 2;
+        float radius = entity.transform.localScale.x / 2;
 
         Transform origin = Camera.main.transform;
         Vector3 position = entity.transform.position;
