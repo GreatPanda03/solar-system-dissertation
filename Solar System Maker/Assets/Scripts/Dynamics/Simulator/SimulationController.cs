@@ -558,8 +558,6 @@ public class SimulationController : MonoBehaviour
                         {
                             CameraController.SetToFollow(rMajorBody);
                         }
-
-                        continue;
                     }
                     
                     // if no collisions, continue with general forces
