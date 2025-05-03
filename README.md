@@ -26,11 +26,10 @@ For additional information or questions, please contact **Muhammad Mogra**.
 ## Installing the Application
 
 #### Download the `.zip` Folder
-* **1)** Find the "Application" folder within the repository
-* **2)** Download the `.zip` file inside the folder.
-* **3)** Unzip the contents of the `.zip` file onto your Desktop *(or another appropriate location)*
-* **4)** Locate the application in the folder, called "Solar System Maker"
-* **5)** The application will start running on an available monitor and may take up the whole screen
+* **1)** Find and download the `Application.zip` folder within the repository
+* **2)** Unzip the contents of the `.zip` file onto your Desktop *(or another appropriate location)*
+* **3)** Within the `Application` folder in the `.zip` file, locate and open the application called `Solar System Maker`
+* **4)** The application will start running on an available monitor and may take up the whole screen
 
 #### Other Points
 Unity / Unity Hub isn't necessary to install since the application is standalone with all required frameworks and libraries installed with it.
