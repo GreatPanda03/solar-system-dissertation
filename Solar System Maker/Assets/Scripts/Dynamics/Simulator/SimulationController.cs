@@ -606,7 +606,7 @@ public class SimulationController : MonoBehaviour
                     }
 
                     subBody.SurfaceTemp = physics.GetEffectiveTemperature(subBody, flux)
-                        - UnitReference.TEMPERATURE_UNITS["Kelvin"];
+                        - UnitReference.TEMPERATURE_UNITS["Celsius"];
                 }
             }
 
