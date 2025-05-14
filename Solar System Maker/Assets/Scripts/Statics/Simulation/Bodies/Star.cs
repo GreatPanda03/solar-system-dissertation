@@ -24,9 +24,9 @@ public class Star : Body
     public override double Mass {
         get => mass;
         set {
-            base.Mass = mass; // use body's "Mass" property
+            base.Mass = value; // use body's "Mass" property
 
-            luminosity = CalculateLuminosity(mass);
+            luminosity = CalculateLuminosity(value);
             surfaceTemp = CalculateSurfaceTemperature(radius, luminosity);
         }
     }
